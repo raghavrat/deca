@@ -6,15 +6,21 @@ compatibility_flags = ["nodejs_compat"]
 command = "npm run build"
 node_compat = true
 
-# Production environment variables
+# Specify the build output directory for Pages
+pages_build_output_dir = ".next"
+
+[build.environment]
+NODE_VERSION = "20"
+
+# Production environment
 [env.production]
 NODE_VERSION = "20"
 
-# Development environment variables
+# Development environment
 [env.development]
 NODE_VERSION = "20"
 
-# Optional: Configure caching
+# Configure Pages
 [site]
 bucket = ".next/static"
 entry-point = "."
