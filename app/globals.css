@@ -1,0 +1,52 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground-rgb: 0, 0, 0;
+  --background-start-rgb: 214, 219, 220;
+  --background-end-rgb: 255, 255, 255;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --foreground-rgb: 255, 255, 255;
+    --background-start-rgb: 0, 0, 0;
+    --background-end-rgb: 0, 0, 0;
+  }
+}
+
+body {
+  color: rgb(var(--foreground-rgb));
+  background: linear-gradient(
+      to bottom,
+      transparent,
+      rgb(var(--background-end-rgb))
+    )
+    rgb(var(--background-start-rgb));
+}
+
+@layer components {
+  .btn {
+    @apply font-semibold py-4 px-6 rounded-[15px] shadow-md text-center transition-all duration-300 ease-in-out transform hover:scale-102 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#06C167];
+  }
+
+  .btn-primary {
+    @apply bg-[#06C167] hover:bg-[#05a75a] text-white;
+  }
+
+  .btn-secondary {
+    @apply bg-white hover:bg-gray-50 text-[#06C167];
+  }
+
+  .btn:hover {
+    @apply shadow-xl;
+    transform: translateY(-2px);
+  }
+
+  .btn:active {
+    @apply shadow-md;
+    transform: translateY(0);
+  }
+}
+
