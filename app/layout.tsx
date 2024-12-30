@@ -5,8 +5,8 @@ import Header from './components/Header'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata = {
-  title: 'Uber Learning Platform',
-  description: 'Performance Indicators and Tests for Uber',
+  title: 'Deca Pal',
+  description: 'Deca Pal',
 }
 
 export default function RootLayout({

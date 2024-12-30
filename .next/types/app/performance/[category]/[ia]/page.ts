@@ -1,4 +1,4 @@
-// File: C:\Users\rratn\Downloads\uber-website (1)\uber-website\app\performance\[category]\[ia]\page.tsx
+// File: C:\Users\rratn\OneDrive\Documents\GitHub\deca\app\performance\[category]\[ia]\page.tsx
 import * as entry from '../../../../../../app/performance/[category]/[ia]/page.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 
