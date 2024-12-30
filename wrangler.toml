@@ -1,14 +1,14 @@
+name = "deca"
+
 [build]
 command = "npm run build"
-node_version = "20.10.0"
 
 [build.environment]
 NODE_VERSION = "20.10.0"
 
-[site]
-bucket = ".next/static"
-entry-point = "."
+[build.buildOptions]
+command = "npm run build"
+environment = { NODE_VERSION = "20.10.0" }
 
-[[build.upload]]
-type = "build"
-dir = ".next"
+[site]
+pages_build_output_dir = ".next"
