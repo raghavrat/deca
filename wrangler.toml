@@ -9,16 +9,17 @@ node_compat = true
 # Specify the build output directory for Pages
 pages_build_output_dir = ".next"
 
+# Set Node.js version for the build environment
 [build.environment]
-NODE_VERSION = "20"
+NODE_VERSION = "20.10.0"
 
 # Production environment
 [env.production]
-NODE_VERSION = "20"
+NODE_VERSION = "20.10.0"
 
 # Development environment
 [env.development]
-NODE_VERSION = "20"
+NODE_VERSION = "20.10.0"
 
 # Configure Pages
 [site]
