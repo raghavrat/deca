@@ -1,8 +1,4 @@
-<<<<<<< HEAD
 // File: C:\Users\rratn\Downloads\uber-website (1)\uber-website\app\layout.tsx
-=======
-// File: C:\Users\rratn\Downloads\uber-website\app\layout.tsx
->>>>>>> 22ee48ed548d41ef82d536d121bc20d018918773
 import * as entry from '../../../app/layout.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 

@@ -128,8 +128,8 @@ export default function PerformancePage() {
   }
 
   return (
-    <div className="py-12 px-4 sm:px-6 lg:px-8 min-h-screen flex flex-col items-center justify-center bg-gray-100">
-      <h1 className="text-4xl font-bold mb-12 text-center text-gray-800">Uber Performance Indicators</h1>
+    <div className="py-12 px-4 sm:px-6 lg:px-8 min-h-screen flex flex-col items-center justify-center">
+      <h1 className="text-4xl font-bold mb-12 text-center text-gray-800">Performance Indicators</h1>
       
       <div className="w-full max-w-md space-y-4 px-2 sm:px-0">
         {clusters.map((cluster) => (
