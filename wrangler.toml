@@ -5,23 +5,10 @@ compatibility_flags = ["nodejs_compat"]
 [build]
 command = "npm run build"
 node_compat = true
+node_version = "20.10.0"
 
-# Specify the build output directory for Pages
 pages_build_output_dir = ".next"
 
-# Set Node.js version for the build environment
-[build.environment]
-NODE_VERSION = "20.10.0"
-
-# Production environment
-[env.production]
-NODE_VERSION = "20.10.0"
-
-# Development environment
-[env.development]
-NODE_VERSION = "20.10.0"
-
-# Configure Pages
 [site]
 bucket = ".next/static"
 entry-point = "."
