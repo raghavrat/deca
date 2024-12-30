@@ -16,4 +16,13 @@ const nextConfig = {
   compress: true,
 }
 
-module.exports = nextConfig 
+module.exports = {
+    compress: true,
+    webpack: (config) => {
+      config.optimization.splitChunks = {
+        chunks: 'all',
+        maxSize: 20000000 // 20MB
+      }
+      return config
+    }
+  }
