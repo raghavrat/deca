@@ -1,9 +1,13 @@
 {
   "scripts": {
+<<<<<<< HEAD
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
+=======
+    "dev": "next dev"
+>>>>>>> 22ee48ed548d41ef82d536d121bc20d018918773
   },
   "dependencies": {
     "lucide-react": "^0.469.0",
@@ -14,9 +18,12 @@
   "devDependencies": {
     "@types/node": "22.10.2",
     "@types/react": "19.0.2",
+<<<<<<< HEAD
     "autoprefixer": "^10.4.20",
     "postcss": "^8.4.49",
     "tailwindcss": "^3.4.17",
+=======
+>>>>>>> 22ee48ed548d41ef82d536d121bc20d018918773
     "typescript": "5.7.2"
   }
 }

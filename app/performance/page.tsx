@@ -6,7 +6,7 @@ import { ChevronDown, ChevronUp } from 'lucide-react'
 
 const clusters = ['MANAGMENT', 'MARKETING', 'FINANCE', 'HOSPITIALITY', 'ENTREPRENEUR']
 
-const instructionalAreas = {
+const instructionalAreas: Record<string, string[]> = {
   'MANAGMENT': [
     'Business Law',
     'Communications',
@@ -146,7 +146,7 @@ export default function PerformancePage() {
               )}
             </button>
             <div className={`mt-2 space-y-2 overflow-hidden transition-all duration-300 ease-in-out ${isOpen && selectedCluster === cluster ? 'max-h-[1000px] opacity-100 transform translate-y-0' : 'max-h-0 opacity-0 transform -translate-y-2'}`}>
-              {instructionalAreas[cluster].map((ia) => (
+              {instructionalAreas[cluster as keyof typeof instructionalAreas].map((ia) => (
                 <Link
                   key={ia}
                   href={`/performance/${cluster.toLowerCase()}/${ia.toLowerCase().replace(/\s+/g, '-')}`}
