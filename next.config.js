@@ -15,13 +15,26 @@ const nextConfig = {
   },
   compress: true,
 }
-
 module.exports = {
     compress: true,
     webpack: (config) => {
-      config.optimization.splitChunks = {
-        chunks: 'all',
-        maxSize: 20000000 // 20MB
+      config.optimization = {
+        ...config.optimization,
+        splitChunks: {
+          chunks: 'all',
+          maxInitialRequests: 25,
+          minSize: 20000,
+          maxSize: 400000,
+          cacheGroups: {
+            vendor: {
+              test: /[\\/]node_modules[\\/]/,
+              name(module) {
+                const packageName = module.context.match(/[\\/]node_modules[\\/](.*?)([\\/]|$)/)[1];
+                return `npm.${packageName.replace('@', '')}`;
+              },
+            },
+          },
+        },
       }
       return config
     }
