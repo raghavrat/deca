@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { questions, Question } from '../questions'
+export const runtime = 'edge'
 
 export default function TestPage() {
   const [remainingQuestions, setRemainingQuestions] = useState([...questions])

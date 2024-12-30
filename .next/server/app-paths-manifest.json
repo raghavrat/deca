@@ -1,8 +1,8 @@
 {
   "/_not-found/page": "app/_not-found/page.js",
-  "/performance/[category]/[ia]/page": "app/performance/[category]/[ia]/page.js",
-  "/performance/page": "app/performance/page.js",
   "/page": "app/page.js",
+  "/performance/[category]/[ia]/page": "app/performance/[category]/[ia]/page-fb5e9c18.js",
+  "/performance/page": "app/performance/page.js",
   "/test/[category]/page": "app/test/[category]/page.js",
   "/test/page": "app/test/page.js"
 }
