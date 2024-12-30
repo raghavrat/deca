@@ -6,8 +6,6 @@ import InstructionalArea from '../../../components/InstructionalArea'
 import Link from 'next/link'
 import { ChevronLeft } from 'lucide-react'
 
-export const runtime = 'edge'
-
 type PageProps = {
   params: Promise<{
     category: string

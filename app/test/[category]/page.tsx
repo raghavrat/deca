@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react'
 import { questions, Question } from '../../questions'
-export const runtime = 'edge'
 
 type PageProps = {
  params: Promise<{
