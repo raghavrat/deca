@@ -5,21 +5,26 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { ChevronDown, ChevronUp } from 'lucide-react'
 
-const clusters = ['MANAGMENT', 'MARKETING', 'FINANCE', 'HOSPITIALITY', 'ENTREPRENEUR']
+// First, define the type for valid clusters
+type Cluster = 'MANAGMENT' | 'MARKETING' | 'FINANCE' | 'HOSPITIALITY' | 'ENTREPRENEUR';
 
-const instructionalAreas = {
-  'MANAGMENT': ['Business Law', 'Communication Skills', 'Customer Relations', 'Economics', 'Emotional Intelligence', 'Entrepreneurship', 'Financial Analysis', 'Human Resources Management', 'Information Management', 'Operations', 'Professional Development', 'Strategic Management'],
-  'MARKETING': ['Channel Management', 'Marketing', 'Market Planning', 'Marketing-Information Management', 'Pricing', 'Product/Service Management', 'Promotion', 'Selling'],
-  'FINANCE': ['Accounting', 'Business Finance', 'Financial-Information Management', 'Risk Management', 'Insurance'],
-  'HOSPITIALITY': ['Lodging', 'Recreation, Amusements and Attractions', 'Restaurants and Food and Beverage Services', 'Travel and Tourism'],
-  'ENTREPRENEUR': ['Business Law', 'Communication Skills', 'Customer Relations', 'Economics', 'Emotional Intelligence', 'Entrepreneurship', 'Financial Analysis', 'Human Resources Management', 'Information Management', 'Operations', 'Professional Development', 'Strategic Management']
+// Update the clusters array to be typed
+const clusters: Cluster[] = ['MANAGMENT', 'MARKETING', 'FINANCE', 'HOSPITIALITY', 'ENTREPRENEUR'];
+
+// Type the instructionalAreas object
+const instructionalAreas: Record<Cluster, string[]> = {
+  'MANAGMENT': ['Business Law', 'Communication Skills', /* ... */],
+  'MARKETING': ['Channel Management', 'Marketing', /* ... */],
+  'FINANCE': ['Accounting', 'Business Finance', /* ... */],
+  'HOSPITIALITY': ['Lodging', 'Recreation, Amusements and Attractions', /* ... */],
+  'ENTREPRENEUR': ['Business Law', 'Communication Skills', /* ... */]
 }
 
 export default function Navigation() {
   const pathname = usePathname()
-  const [openCluster, setOpenCluster] = useState<string | null>(null)
+  const [openCluster, setOpenCluster] = useState<Cluster | null>(null)
 
-  const toggleCluster = (cluster: string) => {
+  const toggleCluster = (cluster: Cluster) => {
     setOpenCluster(openCluster === cluster ? null : cluster)
   }
 

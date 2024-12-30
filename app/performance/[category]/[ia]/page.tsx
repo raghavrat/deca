@@ -6,29 +6,43 @@ import InstructionalArea from '../../../components/InstructionalArea'
 import Link from 'next/link'
 import { ChevronLeft } from 'lucide-react'
 
-function capitalizeWords(str: string) {
-  return str.replace(/\b\w/g, (char) => char.toUpperCase());
+type PageProps = {
+  params: Promise<{
+    category: string
+    ia: string
+  }>,
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 }
 
-export default function IAPage({ params }: { params: { category: string; ia: string } }) {
-  const category = capitalizeWords(params.category)
-  const ia = capitalizeWords(params.ia.replace(/-/g, ' '))
+export default function IAPage({ params, searchParams }: PageProps) {
+  const [category, setCategory] = useState('')
+  const [ia, setIa] = useState('')
   const [filteredData, setFilteredData] = useState<Datashape[]>([])
 
   useEffect(() => {
-    const filtered = performanceIndicators.filter((item) => 
-      item.category.includes(category.toUpperCase() as any) && 
-      item.area.toLowerCase().includes(ia.toLowerCase())
-    )
-    setFilteredData(filtered)
+    const initParams = async () => {
+      const resolvedParams = await params
+      setCategory(capitalizeWords(resolvedParams.category))
+      setIa(capitalizeWords(resolvedParams.ia.replace(/-/g, ' ')))
+    }
+    initParams()
+  }, [params])
+
+  useEffect(() => {
+    if (category && ia) {
+      const filtered = performanceIndicators.filter((item) => 
+        item.category.includes(category.toUpperCase() as any) && 
+        item.area.toLowerCase().includes(ia.toLowerCase())
+      )
+      setFilteredData(filtered)
+    }
   }, [category, ia])
+
+  if (!category || !ia) return null
 
   return (
     <div className="py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-      <Link
-        href="/performance"
-        className="mb-6 inline-flex items-center text-[#06C167] hover:text-[#05a75a] transition-colors duration-200"
-      >
+      <Link href="/performance" className="mb-6 inline-flex items-center text-[#06C167] hover:text-[#05a75a] transition-colors duration-200">
         <ChevronLeft className="mr-1" />
         Back to Clusters
       </Link>
@@ -42,3 +56,6 @@ export default function IAPage({ params }: { params: { category: string; ia: str
   )
 }
 
+function capitalizeWords(str: string) {
+  return str.replace(/\b\w/g, (char) => char.toUpperCase());
+}
