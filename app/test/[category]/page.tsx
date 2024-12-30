@@ -56,7 +56,7 @@ export default function TestPage({ params }: { params: { category: string } }) {
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center pt-8 pb-12">
       <div className="w-full max-w-2xl mx-auto px-4">
-        <h1 className="text-3xl font-bold mb-8 text-center text-gray-800">{currentQuestion.category} Practice Test</h1>
+        <h1 className="text-3xl font-bold mb-8 text-center text-gray-800">{currentQuestion.category } Practice Test</h1>
         
         <div className={`bg-white shadow-lg rounded-[15px] p-6 mb-8 transition-opacity duration-300 ease-in-out ${isTransitioning ? 'opacity-0' : 'opacity-100'}`}>
           <h2 className="text-xl font-semibold mb-4 text-gray-700">{currentQuestion.text}</h2>
