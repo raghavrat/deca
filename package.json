@@ -1,29 +1,21 @@
 {
   "scripts": {
-<<<<<<< HEAD
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
-=======
-    "dev": "next dev"
->>>>>>> 22ee48ed548d41ef82d536d121bc20d018918773
   },
   "dependencies": {
-    "lucide-react": "^0.469.0",
-    "next": "^15.1.3",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0"
-  },
-  "devDependencies": {
-    "@types/node": "22.10.2",
-    "@types/react": "19.0.2",
-<<<<<<< HEAD
-    "autoprefixer": "^10.4.20",
-    "postcss": "^8.4.49",
-    "tailwindcss": "^3.4.17",
-=======
->>>>>>> 22ee48ed548d41ef82d536d121bc20d018918773
-    "typescript": "5.7.2"
+    "@types/node": "20.11.0",
+    "@types/react": "18.2.47",
+    "@types/react-dom": "18.2.18",
+    "autoprefixer": "10.4.16",
+    "lucide-react": "^0.309.0",
+    "next": "14.0.4",
+    "postcss": "8.4.33",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "tailwindcss": "3.4.1",
+    "typescript": "5.3.3"
   }
 }
