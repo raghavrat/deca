@@ -17,7 +17,7 @@ export enum AnswerType {
   "D" = 3
 }
 
-export const categories = ['MANAGMENT', 'MARKETING', 'FINANCE', 'HOSPITIALITY', 'ENTREPRENEUR']
+export const categories = ['MANAGEMENT', 'MARKETING', 'FINANCE', 'HOSPITIALITY', 'ENTREPRENEUR']
 
 export const questions: Question[] = [
   {
@@ -30,7 +30,7 @@ export const questions: Question[] = [
     ],
     explanation: "Uber's Performajhkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkknce Indicators are designed to evaluate various aspects of the business across different functional areas.",
       answerType: AnswerType.B,
-      category: "MANAGMENT"
+      category: "MANAGEMENT"
   },
   {
     text: "2What is the primary purpose of Uber's Performance?",
@@ -42,7 +42,7 @@ export const questions: Question[] = [
     ],
     explanation: "Uber's Performance Indicators are designed to evaluate various aspects of the business across different functional areas.",
     answerType: AnswerType.B,
-    category: "MANAGMENT"
+    category: "MANAGEMENT"
   },
   {
     text: "3What is the primary purpose of Uber's Performance?",
@@ -54,7 +54,7 @@ export const questions: Question[] = [
     ],
     explanation: "Uber's Performance Indicators are designed to evaluate various aspects of the business across different functional areas.",
     answerType: AnswerType.B,
-    category: "MANAGMENT"
+    category: "MANAGEMENT"
   },
   {
     text: "4What is the primary purpose of Uber's Performance?",
@@ -66,7 +66,7 @@ export const questions: Question[] = [
     ],
     explanation: "Uber's Performance Indicators are designed to evaluate various aspects of the business across different functional areas.",
     answerType: AnswerType.B,
-    category: "MANAGMENT"
+    category: "MANAGEMENT"
   },
   {
     text: "5What is the primary purpose of Uber's Performance?",
@@ -78,7 +78,7 @@ export const questions: Question[] = [
     ],
     explanation: "Uber's Performance Indicators are designed to evaluate various aspects of the business across different functional areas.",
     answerType: AnswerType.B,
-    category: "MANAGMENT"
+    category: "MANAGEMENT"
   }
   
 ]
