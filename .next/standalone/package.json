@@ -6,7 +6,10 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@firebase/auth": "^1.8.1",
     "critters": "^0.0.20",
+    "firebase": "^11.1.0",
+    "firebase-admin": "^13.0.2",
     "lucide-react": "latest",
     "next": "^14.0.4",
     "react": "^18.2.0",
