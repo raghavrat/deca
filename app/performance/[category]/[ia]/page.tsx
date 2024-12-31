@@ -1,10 +1,19 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { Datashape, performanceIndicators } from '../../../performanceIndicators'
-import InstructionalArea from '../../../components/InstructionalArea'
 import Link from 'next/link'
 import { ChevronLeft } from 'lucide-react'
+import dynamic from 'next/dynamic'
+
+// Dynamically import InstructionalArea with loading
+const InstructionalArea = dynamic(
+  () => import('../../../components/InstructionalArea'),
+  {
+    loading: () => <div className="animate-pulse bg-gray-200 h-96 rounded-lg"></div>,
+    ssr: false
+  }
+)
 
 type PageProps = {
   params: {
@@ -18,6 +27,7 @@ export default function IAPage({ params, searchParams }: PageProps) {
   const [category, setCategory] = useState('')
   const [ia, setIa] = useState('')
   const [filteredData, setFilteredData] = useState<Datashape[]>([])
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
     setCategory(capitalizeWords(params.category))
@@ -26,11 +36,16 @@ export default function IAPage({ params, searchParams }: PageProps) {
 
   useEffect(() => {
     if (category && ia) {
-      const filtered = performanceIndicators.filter((item) => 
-        item.category.includes(category.toUpperCase() as any) && 
-        item.area.toLowerCase().includes(ia.toLowerCase())
-      )
-      setFilteredData(filtered)
+      setIsLoading(true)
+      try {
+        const filtered = performanceIndicators.filter((item) => 
+          item.category.includes(category.toUpperCase() as any) && 
+          item.area.toLowerCase().includes(ia.toLowerCase())
+        )
+        setFilteredData(filtered)
+      } finally {
+        setIsLoading(false)
+      }
     }
   }, [category, ia])
 
@@ -43,11 +58,15 @@ export default function IAPage({ params, searchParams }: PageProps) {
         Back to Clusters
       </Link>
       <h2 className="text-3xl font-bold mb-6 text-gray-800">{category} - {ia}</h2>
-      {filteredData.length > 0 ? (
-        <InstructionalArea area={ia} indicators={filteredData} />
-      ) : (
-        <p className="text-gray-600">No performance indicators found for this instructional area.</p>
-      )}
+      <Suspense fallback={<div className="animate-pulse bg-gray-200 h-96 rounded-lg"></div>}>
+        {isLoading ? (
+          <div className="animate-pulse bg-gray-200 h-96 rounded-lg"></div>
+        ) : filteredData.length > 0 ? (
+          <InstructionalArea area={ia} indicators={filteredData} />
+        ) : (
+          <p className="text-gray-600">No performance indicators found for this instructional area.</p>
+        )}
+      </Suspense>
     </div>
   )
 }
