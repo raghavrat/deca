@@ -7,11 +7,11 @@ import Link from 'next/link'
 import { ChevronLeft } from 'lucide-react'
 
 type PageProps = {
-  params: Promise<{
+  params: {
     category: string
     ia: string
-  }>,
-  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
+  },
+  searchParams: { [key: string]: string | string[] | undefined }
 }
 
 export default function IAPage({ params, searchParams }: PageProps) {
@@ -20,12 +20,8 @@ export default function IAPage({ params, searchParams }: PageProps) {
   const [filteredData, setFilteredData] = useState<Datashape[]>([])
 
   useEffect(() => {
-    const initParams = async () => {
-      const resolvedParams = await params
-      setCategory(capitalizeWords(resolvedParams.category))
-      setIa(capitalizeWords(resolvedParams.ia.replace(/-/g, ' ')))
-    }
-    initParams()
+    setCategory(capitalizeWords(params.category))
+    setIa(capitalizeWords(params.ia.replace(/-/g, ' ')))
   }, [params])
 
   useEffect(() => {
