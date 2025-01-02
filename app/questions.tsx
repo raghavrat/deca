@@ -17,7 +17,7 @@ export enum AnswerType {
   "D" = 3
 }
 
-export const categories = ['MANAGEMENT', 'MARKETING', 'FINANCE', 'HOSPITIALITY', 'ENTREPRENEUR']
+export const categories = ['MANAGEMENT', 'MARKETING', 'FINANCE', 'HOSPITALITY', 'ENTREPRENEURSHIP']
 
 export const questions: Question[] = [
   {

@@ -4,7 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { ChevronDown, ChevronUp } from 'lucide-react'
 
-const clusters = ['MANAGEMENT', 'MARKETING', 'FINANCE', 'HOSPITIALITY', 'ENTREPRENEUR']
+const clusters = ['MANAGEMENT', 'MARKETING', 'FINANCE', 'HOSPITALITY', 'ENTREPRENEURSHIP']
 
 const instructionalAreas: Record<string, string[]> = {
   'MANAGEMENT': [
@@ -65,7 +65,7 @@ const instructionalAreas: Record<string, string[]> = {
     'Risk Management',
     'Strategic Management'
   ],
-  'HOSPITIALITY': [
+  'HOSPITALITY': [
     'Business Law',
     'Communications',
     'Customer Relations',
@@ -88,7 +88,7 @@ const instructionalAreas: Record<string, string[]> = {
     'Selling',
     'Strategic Management'
   ],
-  'ENTREPRENEUR': [
+  'ENTREPRENEURSHIP': [
     'Business Law',
     'Channel Management',
     'Communications',
