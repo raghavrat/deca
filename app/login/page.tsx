@@ -40,7 +40,7 @@ export default function Login() {
             <input
               type="email"
               required
-              className="w-full px-6 py-4 rounded-[15px] border border-gray-300 text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-[#06C167] focus:border-transparent"
+              className="w-full px-6 py-4 rounded-[15px] border border-gray-300 text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-[#0066cc] focus:border-transparent"
               placeholder="Email address"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -48,7 +48,7 @@ export default function Login() {
             <input
               type="password"
               required
-              className="w-full px-6 py-4 rounded-[15px] border border-gray-300 text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-[#06C167] focus:border-transparent"
+              className="w-full px-6 py-4 rounded-[15px] border border-gray-300 text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-[#0066cc] focus:border-transparent"
               placeholder="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -65,7 +65,7 @@ export default function Login() {
         <div className="text-center">
           <Link 
             href="/signup" 
-            className="text-[#06C167] hover:text-[#05a75a] font-semibold transition-colors duration-300"
+            className="text-[#0066cc] hover:text-[#0052a3] font-semibold transition-colors duration-300"
           >
             Don't have an account? Sign up
           </Link>
