@@ -12341,7 +12341,7 @@ export const performanceIndicators: Datashape[] = [
   {
     area: "Instructional Area: Operations ",
     indicator:
-      "agencies, property direct reservation channels, central reservation system, affiliate and nonaffiliate networks, Internet, etc.) (OP:555) ",
+      "Describe distribution systems used in lodging (e.g., global distribution systems [GDS], intersell agencies, property direct reservation channels, central reservation system, affiliate and nonaffiliate networks, Internet, etc.) (OP:555) ",
     text: "\n\nAgencies are travel agents or tour operators who book rooms on behalf of their customers. Property direct reservation channels are those that are managed directly by the property, such as their own website or call center. Central reservation systems are third-party systems that allow properties to manage their bookings from multiple sources. Affiliate and nonaffiliate networks are websites that offer bookings for multiple properties, such as Expedia or Booking.com. Finally, the Internet is the most common channel for booking properties, with customers being able to book directly on the property's website or through third-party websites.",
     category: ["HOSPITALITY"],
   },
