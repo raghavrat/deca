@@ -1,11 +1,11 @@
 'use client'
 
 import { useState } from 'react'
+import { Search, ChevronUp, ChevronDown } from 'lucide-react'
 import Link from 'next/link'
-import { ChevronDown, ChevronUp } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 
 const clusters = ['MANAGEMENT', 'MARKETING', 'FINANCE', 'HOSPITALITY', 'ENTREPRENEURSHIP']
-
 const instructionalAreas: Record<string, string[]> = {
   'MANAGEMENT': [
     'Business Law',
@@ -117,6 +117,8 @@ const instructionalAreas: Record<string, string[]> = {
 export default function PerformancePage() {
   const [selectedCluster, setSelectedCluster] = useState<string | null>(null)
   const [isOpen, setIsOpen] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
+  const router = useRouter()
 
   const handleClusterClick = (cluster: string) => {
     if (selectedCluster === cluster) {
@@ -127,16 +129,41 @@ export default function PerformancePage() {
     }
   }
 
+  const handleSearch = () => {
+    if (searchQuery.trim()) {
+      router.push(`/performance/search?query=${encodeURIComponent(searchQuery.trim())}`)
+    }
+  }
+
   return (
     <div className="py-12 px-4 sm:px-6 lg:px-8 min-h-screen flex flex-col items-center justify-center">
       <h1 className="text-4xl font-bold mb-12 text-center text-gray-800">Performance Indicators</h1>
       
+      <div className="w-full max-w-md mb-8 flex items-center justify-between">
+        <div className="flex-grow relative bg-white rounded-[15px] border border-gray-200 shadow-sm mr-4">
+          <input
+            type="text"
+            placeholder="Search performance indicators..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full px-4 py-3 pl-12 text-gray-800 bg-white rounded-[15px] focus:outline-none placeholder-gray-500"
+          />
+          <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+        </div>
+        <button 
+          onClick={handleSearch}
+          className="p-3 bg-white rounded-full shadow-sm hover:shadow-md transition-shadow duration-200"
+        >
+          <Search className="h-5 w-5 text-gray-400" />
+        </button>
+      </div>
+
       <div className="w-full max-w-md space-y-4 px-2 sm:px-0">
         {clusters.map((cluster) => (
           <div key={cluster} className="relative">
             <button
               onClick={() => handleClusterClick(cluster)}
-              className={`w-full bg-white hover:bg-gray-50 text-gray-800 font-semibold py-4 px-6 rounded-[15px] shadow-md text-center transition-all duration-300 ease-in-out transform hover:scale-102 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#06C167] flex justify-between items-center ${
+              className={`w-full bg-white hover:bg-gray-50 text-gray-800 font-semibold py-4 px-6 rounded-[15px] shadow-md text-center transition-all duration-300 ease-in-out transform hover:scale-102 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0066cc] flex justify-between items-center ${
                 selectedCluster === cluster ? 'bg-gray-50' : ''
               }`}
             >
@@ -150,7 +177,7 @@ export default function PerformancePage() {
                 <Link
                   key={ia}
                   href={`/performance/${cluster.toLowerCase()}/${ia.toLowerCase().replace(/\s+/g, '-')}`}
-                  className="block w-full bg-[#06C167] hover:bg-[#05a75a] text-white font-semibold py-3 px-6 rounded-[15px] shadow-md text-center transition-all duration-300 ease-in-out transform hover:scale-102 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#06C167]"
+                  className="block w-full bg-[#0066cc] hover:bg-[#0052a3] text-white font-semibold py-3 px-6 rounded-[15px] shadow-md text-center transition-all duration-300 ease-in-out transform hover:scale-102 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0066cc]"
                 >
                   {ia}
                 </Link>

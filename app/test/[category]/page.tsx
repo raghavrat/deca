@@ -90,7 +90,7 @@ export default function TestPage({ params, searchParams }: PageProps) {
              <button
                key={index}
                onClick={() => !showResults && setSelectedAnswer(index)} 
-               className={`w-full text-left p-4 rounded-[15px] transition-all duration-300 ease-in-out transform hover:scale-102 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#06C167] ${
+               className={`w-full text-left p-4 rounded-[15px] transition-all duration-300 ease-in-out transform hover:scale-102 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0066cc] ${
                  selectedAnswer === index && !showResults
                    ? 'bg-blue-500 text-white shadow-md'
                    : showResults
@@ -112,7 +112,7 @@ export default function TestPage({ params, searchParams }: PageProps) {
        {!showResults ? (
          <button
            onClick={handleSubmit}
-           className="w-full bg-[#06C167] hover:bg-[#05a75a] text-white font-semibold py-4 px-6 rounded-[15px] shadow-md text-center transition-all duration-300 ease-in-out transform hover:scale-102 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#06C167]"
+           className="w-full bg-[#0066cc] hover:bg-[#0052a3] text-white font-semibold py-4 px-6 rounded-[15px] shadow-md text-center transition-all duration-300 ease-in-out transform hover:scale-102 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0066cc]"
            disabled={selectedAnswer === null}
          >
            Submit Answer
@@ -120,7 +120,7 @@ export default function TestPage({ params, searchParams }: PageProps) {
        ) : (
          <button
            onClick={getNextQuestion}
-           className="w-full bg-white hover:bg-gray-50 text-[#06C167] font-semibold py-4 px-6 rounded-[15px] shadow-md text-center transition-all duration-300 ease-in-out transform hover:scale-102 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#06C167]"
+           className="w-full bg-white hover:bg-gray-50 text-[#0066cc] font-semibold py-4 px-6 rounded-[15px] shadow-md text-center transition-all duration-300 ease-in-out transform hover:scale-102 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0066cc]"
          >
            Next Question
          </button>

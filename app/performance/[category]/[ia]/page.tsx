@@ -53,7 +53,7 @@ export default function IAPage({ params, searchParams }: PageProps) {
 
   return (
     <div className="py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-      <Link href="/performance" className="mb-6 inline-flex items-center text-[#06C167] hover:text-[#05a75a] transition-colors duration-200">
+      <Link href="/performance" className="mb-6 inline-flex items-center text-[#0066cc] hover:text-[#0052a3] transition-colors duration-200">
         <ChevronLeft className="mr-1" />
         Back to Clusters
       </Link>
