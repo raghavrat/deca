@@ -1,10 +1,17 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { Search } from 'lucide-react'
 import { performanceIndicators } from '../../performanceIndicators'
 import Link from 'next/link'
 import { useSearchParams, useRouter } from 'next/navigation'
+
+const formatUrlSlug = (text: string) => {
+  return text
+    .toLowerCase()
+    .replace(/[\/\-]/g, '') // Remove dashes and slashes
+    .replace(/\s+/g, '-') // Replace spaces with dashes
+}
 
 export default function SearchPage() {
   const searchParams = useSearchParams()
@@ -28,6 +35,12 @@ export default function SearchPage() {
     }
   }
 
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleSearch()
+    }
+  }
+
   return (
     <div className="py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
       <h1 className="text-4xl font-bold mb-12 text-center text-gray-800">Search Performance Indicators</h1>
@@ -39,6 +52,7 @@ export default function SearchPage() {
             placeholder="Search performance indicators..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
+            onKeyPress={handleKeyPress}
             className="w-full px-4 py-3 pl-12 text-gray-800 font-semibold bg-transparent rounded-[15px] focus:outline-none placeholder-gray-500"
           />
           <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
@@ -55,18 +69,23 @@ export default function SearchPage() {
         {showResults && (
           currentQuery ? (
             filteredPIs.length > 0 ? (
-              filteredPIs.map((pi, index) => (
-                <div key={index} className="p-4 sm:p-6 bg-white rounded-lg shadow-sm">
-                  <h4 className="font-semibold text-[#0066cc] mb-2 break-words">{pi.indicator}</h4>
-                  <p className="text-gray-700 whitespace-pre-wrap mb-2 text-sm sm:text-base">{pi.text}</p>
-                  <Link 
-                    href={`/performance/${pi.category[0].toLowerCase()}/${pi.area.split(':')[1].trim().toLowerCase().replace(/ /g, '-')}`}
-                    className="text-sm text-[#0066cc] hover:text-[#0052a3] hover:underline inline-block"
-                  >
-                    View in {pi.area.split(':')[1].trim()}
-                  </Link>
-                </div>
-              ))
+              filteredPIs.map((pi, index) => {
+                const areaName = pi.area.split(':')[1].trim()
+                const urlSlug = formatUrlSlug(areaName)
+                
+                return (
+                  <div key={index} className="p-4 sm:p-6 bg-white rounded-lg shadow-sm">
+                    <h4 className="font-semibold text-[#0066cc] mb-2 break-words">{pi.indicator}</h4>
+                    <p className="text-gray-700 whitespace-pre-wrap mb-2 text-sm sm:text-base">{pi.text}</p>
+                    <Link 
+                      href={`/performance/${pi.category[0].toLowerCase()}/${urlSlug}`}
+                      className="text-sm text-[#0066cc] hover:text-[#0052a3] hover:underline inline-block"
+                    >
+                      View in {areaName}
+                    </Link>
+                  </div>
+                )
+              })
             ) : (
               <div className="text-center text-gray-500 py-4">
                 No performance indicators found

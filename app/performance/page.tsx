@@ -135,6 +135,19 @@ export default function PerformancePage() {
     }
   }
 
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleSearch()
+    }
+  }
+
+  const formatUrlSlug = (text: string) => {
+    return text
+      .toLowerCase()
+      .replace(/[\/\-]/g, '') // Remove dashes and slashes
+      .replace(/\s+/g, '-') // Replace spaces with dashes
+  }
+
   return (
     <div className="py-12 px-4 sm:px-6 lg:px-8 min-h-screen flex flex-col items-center justify-center">
       <h1 className="text-4xl font-bold mb-12 text-center text-gray-800">Performance Indicators</h1>
@@ -146,6 +159,7 @@ export default function PerformancePage() {
             placeholder="Search performance indicators..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
+            onKeyPress={handleKeyPress}
             className="w-full px-4 py-3 pl-12 text-gray-800 bg-white rounded-[15px] focus:outline-none placeholder-gray-500"
           />
           <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
@@ -176,7 +190,7 @@ export default function PerformancePage() {
               {instructionalAreas[cluster as keyof typeof instructionalAreas].map((ia) => (
                 <Link
                   key={ia}
-                  href={`/performance/${cluster.toLowerCase()}/${ia.toLowerCase().replace(/\s+/g, '-')}`}
+                  href={`/performance/${cluster.toLowerCase()}/${formatUrlSlug(ia)}`}
                   className="block w-full bg-[#0066cc] hover:bg-[#0052a3] text-white font-semibold py-3 px-6 rounded-[15px] shadow-md text-center transition-all duration-300 ease-in-out transform hover:scale-102 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0066cc]"
                 >
                   {ia}

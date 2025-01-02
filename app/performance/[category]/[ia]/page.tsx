@@ -23,6 +23,22 @@ type PageProps = {
   searchParams: { [key: string]: string | string[] | undefined }
 }
 
+const getOriginalName = (slug: string) => {
+  // Map of URL slugs to their original display names
+  const nameMap: { [key: string]: string } = {
+    'productservice-management': 'Product/Service Management',
+    'marketinginformation-management': 'Marketing-Information Management',
+    'financialinformation-management': 'Financial-Information Management'
+  }
+
+  // Return the mapped name if it exists, otherwise reconstruct from slug
+  return nameMap[slug] || slug
+    .replace(/-/g, ' ')
+    .split(' ')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ')
+}
+
 export default function IAPage({ params, searchParams }: PageProps) {
   const [category, setCategory] = useState('')
   const [ia, setIa] = useState('')
@@ -31,17 +47,19 @@ export default function IAPage({ params, searchParams }: PageProps) {
 
   useEffect(() => {
     setCategory(capitalizeWords(params.category))
-    setIa(capitalizeWords(params.ia.replace(/-/g, ' ')))
+    setIa(getOriginalName(params.ia))
   }, [params])
 
   useEffect(() => {
     if (category && ia) {
       setIsLoading(true)
       try {
-        const filtered = performanceIndicators.filter((item) => 
-          item.category.includes(category.toUpperCase() as any) && 
-          item.area.toLowerCase().includes(ia.toLowerCase())
-        )
+        const filtered = performanceIndicators.filter((item) => {
+          const normalizedArea = item.area.toLowerCase().replace(/[\/\-]/g, '').replace(/\s+/g, ' ')
+          const normalizedIa = ia.toLowerCase().replace(/[\/\-]/g, '').replace(/\s+/g, ' ')
+          return item.category.includes(category.toUpperCase() as any) && 
+                 normalizedArea.includes(normalizedIa)
+        })
         setFilteredData(filtered)
       } finally {
         setIsLoading(false)
