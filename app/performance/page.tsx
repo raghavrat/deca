@@ -186,7 +186,11 @@ export default function PerformancePage() {
                 isOpen ? <ChevronUp className="h-5 w-5 text-gray-400" /> : <ChevronDown className="h-5 w-5 text-gray-400" />
               )}
             </button>
-            <div className={`mt-2 space-y-2 overflow-hidden transition-all duration-300 ease-in-out ${isOpen && selectedCluster === cluster ? 'max-h-[1000px] opacity-100 transform translate-y-0' : 'max-h-0 opacity-0 transform -translate-y-2'}`}>
+            <div className={`mt-2 space-y-2 overflow-hidden transition-all duration-300 ease-in-out ${
+              isOpen && selectedCluster === cluster 
+                ? 'max-h-[2000px] opacity-100 transform translate-y-0' 
+                : 'max-h-0 opacity-0 transform -translate-y-2'
+            }`}>
               {instructionalAreas[cluster as keyof typeof instructionalAreas].map((ia) => (
                 <Link
                   key={ia}

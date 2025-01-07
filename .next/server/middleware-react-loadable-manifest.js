@@ -1,1 +1,1 @@
-self.__REACT_LOADABLE_MANIFEST="{\"app\\\\performance\\\\[category]\\\\[ia]\\\\page.tsx -> ../../../components/InstructionalArea\":{\"id\":\"app\\\\performance\\\\[category]\\\\[ia]\\\\page.tsx -> ../../../components/InstructionalArea\",\"files\":[\"static/chunks/_app-pages-browser_app_components_InstructionalArea_tsx.js\"]}}"
+self.__REACT_LOADABLE_MANIFEST="{}"
