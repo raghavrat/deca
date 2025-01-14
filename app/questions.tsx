@@ -2281,6 +2281,1579 @@ export const questions: Question[] = [
       "explanation": "Two brands join forces as 'co-brands' for the purpose of increasing sales and market share for both. Co-branding works best when two brands are complementary and more or less equal in stature, as this can help to create a synergy between the brands and increase their overall appeal to customers.",
       "answerType": AnswerType.B,
       "category": "MARKETING"
-    }
+    },
+    {
+      "text": "What effect do some environmental laws have on businesses?",
+      "answers": [
+        {"text": "Control exterior landscapes"},
+        {"text": "Require more employees"},
+        {"text": "Increase operating costs"},
+        {"text": "Limit equipment purchases"}
+      ],
+      "explanation": "Environmental laws are intended to conserve and protect the natural environment. Many of these laws have an impact on the way businesses operate by requiring them to decrease pollution or control waste. As a result, businesses often need to spend money to comply with the rules and regulations, which leads to an increase in operating costs.",
+      "answerType": AnswerType.C,
+      "category": "MARKETING"
+    },
+    {
+      "text": "The purpose of customs regulations is to",
+      "answers": [
+        {"text": "uphold the longstanding traditions of the country"},
+        {"text": "ensure that nothing foreign enters the country"},
+        {"text": "prevent immigration into the country"},
+        {"text": "control the flow of goods into and out of the country"}
+      ],
+      "explanation": "Customs regulations are in place to protect a country's economy, environment, citizens, and jobs by controlling the flow of goods into and out of the country.",
+      "answerType": AnswerType.D,
+      "category": "MARKETING"
+    },
+    {
+      "text": "Walmart, Domino's, and Avis Rent-a-Car are examples of",
+      "answers": [
+        {"text": "retailers"},
+        {"text": "wholesalers"},
+        {"text": "agents"},
+        {"text": "industrial distributors"}
+      ],
+      "explanation": "Retailers are businesses that buy consumer goods or services and sell them to the ultimate consumer. Walmart, Domino's, and Avis Rent-a-Car all sell directly to consumers.",
+      "answerType": AnswerType.A,
+      "category": "MARKETING"
+    },
+    {
+      "text": "One common barrier to the use of technology in channel management is",
+      "answers": [
+        {"text": "the overwhelming number of technology options"},
+        {"text": "employees' inability to master new technology"},
+        {"text": "the possibility for increased productivity and efficiency"},
+        {"text": "companies' refusal to implement new tools"}
+      ],
+      "explanation": "Using technology is a great way to improve overall channel management success. However, the sheer number of options for channel management technologies can be overwhelming for many companies.",
+      "answerType": AnswerType.A,
+      "category": "MARKETING"
+    },
+    {
+      "text": "When a channel leader requires another channel member to purchase and use an expensive electronic data interchange system in order to maintain its position in the distribution chain, the channel leader is engaging in the unethical practice of",
+      "answers": [
+        {"text": "diplomacy"},
+        {"text": "control"},
+        {"text": "deception"},
+        {"text": "coercion"}
+      ],
+      "explanation": "Coercion is an attempt to gain compliance through threats or by bullying. When a channel leader places unreasonable pressure on a channel member to do something that is not in the best interest of the channel member, it is using coercion.",
+      "answerType": AnswerType.D,
+      "category": "MARKETING"
+    },
+    {
+      "text": "One reason a channel of distribution that has strong leadership is often able to avoid conflict within the channel is because the leader has the",
+      "answers": [
+        {"text": "authority to demand cooperation"},
+        {"text": "ability to provide training"},
+        {"text": "capacity to regulate change"},
+        {"text": "personality to develop friendships"}
+      ],
+      "explanation": "Strong leaders have the authority and power to influence others and direct the actions of others. A channel of distribution that has strong leadership is often able to avoid conflict within the channel because the leader has the authority to set goals for the entire channel and demand cooperation.",
+      "answerType": AnswerType.A,
+      "category": "MARKETING"
+    },
+    {
+      "text": "Which of the following is an example of an affinity partnership?",
+      "answers": [
+        {"text": "A restaurant gives discounts to those who join its rewards program"},
+        {"text": "An airline offers frequent flyer miles to travelers"},
+        {"text": "A credit card company offers cards with sports teams' logos"},
+        {"text": "A bank pays to have its name on a local concert venue"}
+      ],
+      "explanation": "Affinity marketing is a strategy in which an organization solicits responses from a group that shares a common interest or activity. If a credit card has a sports team's logo on it, fans of that team might be more likely to choose that particular company.",
+      "answerType": AnswerType.C,
+      "category": "MARKETING"
+    },
+    {
+      "text": "Communication among coworkers and supervisors should be",
+      "answers": [
+        {"text": "an optional formality"},
+        {"text": "an opportunity for feedback"},
+        {"text": "saved for individual performance reviews"},
+        {"text": "contained in one meeting"}
+      ],
+      "explanation": "Staff communication should not be a one way street. Maintaining open lines of communication in a business setting is important, and employees need to feel comfortable giving feedback to their coworkers and supervisors.",
+      "answerType": AnswerType.B,
+      "category": "MARKETING"
+    },
+    {
+      "text": "When should a visual aid be shown during a presentation?",
+      "answers": [
+        {"text": "At the end of the presentation to summarize"},
+        {"text": "When the audience gets bored and restless"},
+        {"text": "During the entire presentation to maintain interest"},
+        {"text": "When the speaker shares relevant information"}
+      ],
+      "explanation": "Speakers should show visual aids to enhance their message when those charts, graphics, videos, etc., correspond with the specific information that they are presenting.",
+      "answerType": AnswerType.D,
+      "category": "MARKETING"
+    },
+    {
+      "text": "Which of the following is an open question?",
+      "answers": [
+        {"text": "What is your presentation about?"},
+        {"text": "Is your presentation finished?"},
+        {"text": "Do you need a projector for your presentation?"},
+        {"text": "Are you ready for your presentation?"}
+      ],
+      "explanation": "Open-ended questions are those that require more than just a yes or no answer. If someone asked you what your presentation was about, it would require you to say more than just yes or no.",
+      "answerType": AnswerType.A,
+      "category": "MARKETING"
+    },
+    {
+      "text": "A primary use of flowcharts in business documents or presentations is to",
+      "answers": [
+        {"text": "identify trends"},
+        {"text": "explain relationships"},
+        {"text": "compare and contrast data"},
+        {"text": "summarize numerical data"}
+      ],
+      "explanation": "Graphic aids help clarify, reinforce, and summarize information. Flowcharts help explain relationships.",
+      "answerType": AnswerType.B,
+      "category": "MARKETING"
+    },
+    {
+      "text": "A basic purpose of writing a daily activity report is to provide a(n)",
+      "answers": [
+        {"text": "permanent record of simple but important facts"},
+        {"text": "overview of work completed and planned"},
+        {"text": "basis for recommendations to employees"},
+        {"text": "evaluation of the achievement of company goals"}
+      ],
+      "explanation": "Daily activity reports are a type of simple written reports that outline the work completed, problems and concerns, and work to be done.",
+      "answerType": AnswerType.B,
+      "category": "MARKETING"
+    },
+    {
+      "text": "What should employees do to maintain a customer-service mindset?",
+      "answers": [
+        {"text": "Decide how to spend their break time"},
+        {"text": "Listen to the words of soothing songs"},
+        {"text": "Devote their full attention to customers"},
+        {"text": "Maximize conversations with coworkers"}
+      ],
+      "explanation": "Maintaining a customer-service mindset requires employees to set their minds on customers. They should not become distracted by other things around them.",
+      "answerType": AnswerType.C,
+      "category": "MARKETING"
+    },
+    {
+      "text": "Which of the following is an example of ethical behavior in marketing-information management?",
+      "answers": [
+        {"text": "Changing survey feedback to reflect a positive research outcome"},
+        {"text": "Distributing the phone numbers of customers without their permission"},
+        {"text": "Implementing procedures to protect the privacy of survey respondents"},
+        {"text": "Using complex processes for customers to opt out of emails"}
+      ],
+      "explanation": "Taking steps to protect the privacy of survey respondents is an ethical action.",
+      "answerType": AnswerType.C,
+      "category": "MARKETING"
+    },
+    {
+      "text": "By promoting their goods and services and offering a number of purchasing arrangements, businesses help to create __________ utility.",
+      "answers": [
+        {"text": "financial"},
+        {"text": "time"},
+        {"text": "possession"},
+        {"text": "place"}
+      ],
+      "explanation": "Possession utility is created when ownership of a product is transferred from the seller to the user.",
+      "answerType": AnswerType.C,
+      "category": "MARKETING"
+    },
+    {
+      "text": "Why are consumer goods often poor quality in a communist command economy?",
+      "answers": [
+        {"text": "People in a communist command economy consume everything that they produce"},
+        {"text": "People in a communist command economy do not need quality consumer goods"},
+        {"text": "The government pays workers based on quantity rather than quality"},
+        {"text": "High taxes take resources away from producers"}
+      ],
+      "explanation": "In a communist command economy, most resources are allocated toward industrial goods rather than consumer goods. The few consumer goods that are available are often poor quality because the government pays workers based on the quantity, not the quality, of what they produce.",
+      "answerType": AnswerType.C,
+      "category": "MARKETING"
+    },
+    {
+      "text": "What should economists do to account for the effects of inflation on GDP?",
+      "answers": [
+        {"text": "Avoid double counting"},
+        {"text": "Use only nominal GDP"},
+        {"text": "Use a price deflator"},
+        {"text": "Use the balance of trade"}
+      ],
+      "explanation": "A price deflator is an economic metric that converts prices to a base dollar value and allows GDP to be accurately compared over time.",
+      "answerType": AnswerType.C,
+      "category": "MARKETING"
+    },
+    {
+      "text": "What situation often exists when the economy is in a downturn, and many people are unemployed and cannot buy more than the basic necessities?",
+      "answers": [
+        {"text": "Trade deficit"},
+        {"text": "Inflation"},
+        {"text": "Excess demand"},
+        {"text": "Recession"}
+      ],
+      "explanation": "A recession is a six-month's contraction in the gross domestic product (GDP). A recession usually results in rising unemployment and people having less money to spend on consumer goods.",
+      "answerType": AnswerType.D,
+      "category": "MARKETING"
+    },
+    {
+      "text": "Kelly runs a small home bakery. To help her fulfill more orders, she hired three part-time employees. The additional workers increased her output, so she hired another three workers. To her surprise, Kelly's output actually decreased once she added the last three workers. This example best demonstrates the",
+      "answers": [
+        {"text": "harm of taking business risks"},
+        {"text": "law of diminishing returns"},
+        {"text": "danger of hiring employees"},
+        {"text": "need for effective employee training"}
+      ],
+      "explanation": "The law of diminishing returns is an economic concept that states that if one input increases while others are constant, at some point the increases in output will decline.",
+      "answerType": AnswerType.B,
+      "category": "MARKETING"
+    },
+    {
+      "text": "Which of the following circumstances is most likely to cause interest rates to increase?",
+      "answers": [
+        {"text": "Low inflation"},
+        {"text": "Consistent investment spending"},
+        {"text": "Economic recession"},
+        {"text": "Tight money supply"}
+      ],
+      "explanation": "Many factors affect interest rates, including business cycles, consumer spending, inflation, and the money supply. If the money supply is low or tight, there is less money available to lend.",
+      "answerType": AnswerType.D,
+      "category": "MARKETING"
+    },
+    {
+      "text": "Feedback can be extremely valuable because it",
+      "answers": [
+        {"text": "reinforces your own opinions"},
+        {"text": "shows you what areas to improve"},
+        {"text": "gives you a chance to be defensive"},
+        {"text": "points out others' strengths"}
+      ],
+      "explanation": "Feedback can be very valuable because it shows you how you are doing. If you know what you are doing wrong, you can change that behavior in the future.",
+      "answerType": AnswerType.B,
+      "category": "MARKETING"
+    },
+    {
+      "text": "Which of the following indicates a high level of self-esteem?",
+      "answers": [
+        {"text": "Believing that you should always put others ahead of yourself"},
+        {"text": "Making a mistake and thinking that you are good at making mistakes"},
+        {"text": "Seeing an advertisement for a job and feeling that you could handle it"},
+        {"text": "Imagining how you would feel if you had already graduated"}
+      ],
+      "explanation": "Self-esteem is how you feel about yourself at any given time. Your level of self-esteem can fluctuate from high to low. Feeling that you could do a job you have read about would indicate your level of self-esteem is high.",
+      "answerType": AnswerType.C,
+      "category": "MARKETING"
+    },
+    {
+      "text": "Which of the following remarks represents a negative attitude?",
+      "answers": [
+        {"text": "There's nothing fun about working except getting paid"},
+        {"text": "Most of my coworkers aren't personal friends, but they're all right"},
+        {"text": "My job's not the best, but it's not the worst either"},
+        {"text": "There are some policies that are okay, and some that I don't like"}
+      ],
+      "explanation": "A negative attitude is an outlook that focuses on the bad side of things.",
+      "answerType": AnswerType.A,
+      "category": "MARKETING"
+    },
+    {
+      "text": "Fulfilling one's obligations through words and actions in a dependable manner is __________ behavior.",
+      "answers": [
+        {"text": "routine"},
+        {"text": "responsible"},
+        {"text": "assertive"},
+        {"text": "aggressive"}
+      ],
+      "explanation": "People are able to trust and rely on individuals who display responsible behavior.",
+      "answerType": AnswerType.B,
+      "category": "MARKETING"
+    },
+    {
+      "text": "When people make you angry or upset, you may be able to maintain your self-control if you",
+      "answers": [
+        {"text": "frown to indicate your displeasure"},
+        {"text": "make an effort to remain calm"},
+        {"text": "use language to vent your anger"},
+        {"text": "adopt a defensive attitude"}
+      ],
+      "explanation": "In some cases, acting calm will actually help you be calmer.",
+      "answerType": AnswerType.B,
+      "category": "MARKETING"
+    },
+    {
+      "text": "What type of words should Rebecca use to describe her skills and accomplishments when writing her resume?",
+      "answers": [
+        {"text": "Jargon"},
+        {"text": "Passive"},
+        {"text": "Action"},
+        {"text": "Vague"}
+      ],
+      "explanation": "Using action words in a resume subtly indicates that the job applicant is assertive, on the move, and actively working to accomplish goals.",
+      "answerType": AnswerType.C,
+      "category": "MARKETING"
+    },
+    {
+      "text": "What type of negotiating style often involves a 'no-compromise' attitude?",
+      "answers": [
+        {"text": "Accommodating"},
+        {"text": "Combative"},
+        {"text": "Collaborative"},
+        {"text": "Flexible"}
+      ],
+      "explanation": "Those who use the combative style of negotiating are ready to fight for what they want at any cost.",
+      "answerType": AnswerType.B,
+      "category": "MARKETING"
+    },
+    {
+      "text": "During the staff meeting, Madeline said, “Although I don't have all of the information that I would like to have about the new system, I am confident that we will be able to work together and effectively handle any issues that we may encounter along the way.” What characteristic is Madeline demonstrating in this situation?",
+      "answers": [
+        {"text": "Self-control"},
+        {"text": "Recognition of others' achievements"},
+        {"text": "Tolerance for ambiguity"},
+        {"text": "Personal vision"}
+      ],
+      "explanation": "Tolerance for ambiguity is the willingness to take action despite having incomplete information or lacking clear direction.",
+      "answerType": AnswerType.C,
+      "category": "MARKETING"
+    },
+    {
+      "text": "Hazel started her own childcare network where she connects families to available babysitters at her school. Hazel could be described as a(n)",
+      "answers": [
+        {"text": "wholesaler"},
+        {"text": "direct salesperson"},
+        {"text": "entrepreneur"},
+        {"text": "franchiser"}
+      ],
+      "explanation": "An entrepreneur is anyone who creates, launches, organizes, and manages a new business and takes on the risk of that business.",
+      "answerType": AnswerType.C,
+      "category": "MARKETING"
+    },
+    {
+      "text": "Mike and Sue need a source of credit to finance the purchase of their first home. Which of the following sources of credit would best fit their need?",
+      "answers": [
+        {"text": "Sales finance companies"},
+        {"text": "Credit unions"},
+        {"text": "Savings and loan associations"},
+        {"text": "Commercial banks"}
+      ],
+      "explanation": "The majority of real-estate loans are handled by savings and loan associations.",
+      "answerType": AnswerType.C,
+      "category": "MARKETING"
+    },
+    {
+      "text": "Which of the following is fiat money?",
+      "answers": [
+        {"text": "A $20 bill"},
+        {"text": "A check"},
+        {"text": "A credit card"},
+        {"text": "Gold"}
+      ],
+      "explanation": "Fiat money is money that has no intrinsic value. Instead, its value comes from government backing. Paper currency such as a $20 bill is an example of fiat money.",
+      "answerType": AnswerType.A,
+      "category": "MARKETING"
+    },
+    {
+      "text": "Each pay period, Kendra has her employer automatically deposit her paycheck into her checking account so the funds are available for use when she needs them. In this situation, money is functioning as a(n)",
+      "answers": [
+        {"text": "store of value"},
+        {"text": "medium of exchange"},
+        {"text": "form of cash"},
+        {"text": "unit of measure"}
+      ],
+      "explanation": "Money functions as a store of value when it is saved rather than spent. The money can be held over time, and it retains value for future purchasing power.",
+      "answerType": AnswerType.A,
+      "category": "MARKETING"
+    },
+    {
+      "text": "Lisa charges another sole proprietor to use the extra office in the building she owns. Which of the following is Lisa's source of income?",
+      "answers": [
+        {"text": "Interest"},
+        {"text": "Rent"},
+        {"text": "Dividends"},
+        {"text": "Salary"}
+      ],
+      "explanation": "Income is the money resource owners receive for supplying goods and services. As a resource owner, Lisa is supplying office space and receiving rent payments from the sole proprietor, so she is receiving income.",
+      "answerType": AnswerType.B,
+      "category": "MARKETING"
+    },
+    {
+      "text": "Broadcast advertising is an example of __________ media.",
+      "answers": [
+        {"text": "out-of-home"},
+        {"text": "transit"},
+        {"text": "promotional"},
+        {"text": "direct mail"}
+      ],
+      "explanation": "Promotional media are channels of communication used by businesses to deliver advertising messages to target groups of consumers. Broadcast media include radio and television, which use radio waves to reach consumers.",
+      "answerType": AnswerType.C,
+      "category": "MARKETING"
+    },
+    {
+      "text": "Balancing the business's objective to make a profit with the interests of all the business's stakeholders is a primary consideration related to the business's",
+      "answers": [
+        {"text": "creative processes"},
+        {"text": "financial ethics"},
+        {"text": "forecasting methods"},
+        {"text": "maintenance activities"}
+      ],
+      "explanation": "An important aspect of financial ethics is making sure the business makes a profit and serves the best interests of its stakeholders (e.g., employees, customers, investors).",
+      "answerType": AnswerType.B,
+      "category": "MARKETING"
+    },
+    {
+      "text": "Which of the following phrases is most likely to be listed in an official job description?",
+      "answers": [
+        {"text": "Edit company newsletter"},
+        {"text": "Have 10-15 years' experience"},
+        {"text": "Possess an associate's degree or higher"},
+        {"text": "Able to work closely with others"}
+      ],
+      "explanation": "A job description is an explanation of the specific responsibilities associated with a certain job.",
+      "answerType": AnswerType.A,
+      "category": "MARKETING"
+    },
+    {
+      "text": "One reason why a business might gather marketing information is to",
+      "answers": [
+        {"text": "manipulate data"},
+        {"text": "remain competitive"},
+        {"text": "control customers"},
+        {"text": "eliminate risks"}
+      ],
+      "explanation": "Competition among businesses continues to increase. As a result, these businesses must have up-to-date marketing information to be competitive.",
+      "answerType": AnswerType.B,
+      "category": "MARKETING"
+    },
+    {
+      "text": "One of the advantages of obtaining and using marketing information is that it helps business managers to",
+      "answers": [
+        {"text": "train and direct employees"},
+        {"text": "prepare documents and reports"},
+        {"text": "review and understand regulations"},
+        {"text": "predict and control risks"}
+      ],
+      "explanation": "By obtaining and using marketing information, business managers can predict the risks that might occur in the future and take steps to control those risks.",
+      "answerType": AnswerType.D,
+      "category": "MARKETING"
+    },
+    {
+      "text": "To handle customer complaints effectively, the first thing that employees should do is",
+      "answers": [
+        {"text": "take the customers' problems personally"},
+        {"text": "state the business's policies to prevent misunderstandings"},
+        {"text": "give the customers what they want to make them happy"},
+        {"text": "listen to the customers to understand their concerns"}
+      ],
+      "explanation": "The first thing an employee should do is to listen to the customer to try to determine the reason for the complaint.",
+      "answerType": AnswerType.D,
+      "category": "MARKETING"
+    },
+    {
+      "text": "When Rebecca's research for her school project is complete, she's not quite sure what to do with her data. Her friend Allison suggests coding the data, and she decides to give it a try. Why should Rebecca use coding to organize her research findings?",
+      "answers": [
+        {"text": "It is the only method to interpret data in a meaningful way"},
+        {"text": "It prevents data entry mistakes such as omissions or duplications"},
+        {"text": "It saves time by eliminating the need to check the data for flaws and errors"},
+        {"text": "It turns large amounts of data into a form that is more easily understood"}
+      ],
+      "explanation": "To make sense of large amounts of data, the data must be analyzed. Coding can be an extremely useful tool for data analysis by grouping and assigning value to various responses from the survey.",
+      "answerType": AnswerType.D,
+      "category": "MARKETING"
+    },
+    {
+      "text": "One of the goals of qualitative research is to answer questions about",
+      "answers": [
+        {"text": "how many"},
+        {"text": "why"},
+        {"text": "how to"},
+        {"text": "who"}
+      ],
+      "explanation": "Qualitative research is based on obtaining information about opinions and experiences. One of its goals is to answer questions about 'why', such as why do people buy the products they buy.",
+      "answerType": AnswerType.B,
+      "category": "MARKETING"
+    },
+    {
+      "text": "Which of the following activities helps managers make smart decisions regarding the problems and opportunities facing their businesses?",
+      "answers": [
+        {"text": "Conducting marketing research"},
+        {"text": "Providing customer service"},
+        {"text": "Advertising and sales promotion"},
+        {"text": "Hiring new employees"}
+      ],
+      "explanation": "Conducting marketing research helps managers make smart decisions and plan appropriate strategies regarding the problems and opportunities facing their businesses.",
+      "answerType": AnswerType.A,
+      "category": "MARKETING"
+    },
+    {
+      "text": "A company wants to collect information from various sources to determine if it should consider expanding to international markets. What research method should the company use if it does not want to spend a lot of time or money to obtain the information?",
+      "answers": [
+        {"text": "Experimental"},
+        {"text": "Exploratory"},
+        {"text": "Interview"},
+        {"text": "Causal"}
+      ],
+      "explanation": "Exploratory research involves collecting information to help the business define its issue, situation, or concern, and decide how to proceed with its research.",
+      "answerType": AnswerType.B,
+      "category": "MARKETING"
+    },
+    {
+      "text": "Which of the following is a type of non-probability sampling design?",
+      "answers": [
+        {"text": "Systematic random sampling"},
+        {"text": "Cluster sampling"},
+        {"text": "Stratified random sampling"},
+        {"text": "Judgment sampling"}
+      ],
+      "explanation": "Judgment sampling, also known as expert sampling, requires researchers to handpick respondents based on their knowledge or expertise.",
+      "answerType": AnswerType.D,
+      "category": "MARKETING"
+    },
+    {
+      "text": "What type of data-collection method is being used when a researcher conducts a focus group?",
+      "answers": [
+        {"text": "Telemarketing"},
+        {"text": "Statistical"},
+        {"text": "Interview"},
+        {"text": "Probability"}
+      ],
+      "explanation": "The interview is a common method of collecting data from individuals. There are many types of interview procedures, and one is the focus group, which is a group formed for the purpose of discussing a specific topic.",
+      "answerType": AnswerType.C,
+      "category": "MARKETING"
+    },
+    {
+      "text": "Which situation is an example of SUGGING?",
+      "answers": [
+        {"text": "A salesperson offers a customer the opportunity to try an expensive product free of charge"},
+        {"text": "A business promotes a product by sending samples to its customers without authorization"},
+        {"text": "A marketer tells a customer that they are conducting research, and then begins a sales pitch"},
+        {"text": "A telemarketer asks a customer if they know anyone who would want to buy a certain product"}
+      ],
+      "explanation": "SUGGING is an acronym for 'selling under the guise of research'. SUGGING is an unethical practice in which a marketer pretends to conduct research but, in fact, is really attempting to sell a good or service to a consumer.",
+      "answerType": AnswerType.C,
+      "category": "MARKETING"
+    },
+    {
+      "text": "One reason that a business might conduct primary research rather than use secondary marketing information is because the",
+      "answers": [
+        {"text": "secondary information may be outdated"},
+        {"text": "primary information is always error-free"},
+        {"text": "primary information is less expensive to obtain"},
+        {"text": "secondary information is usually irrelevant"}
+      ],
+      "explanation": "Secondary information is information collected by others for purposes other than the project at hand. Though the secondary information may have been relevant at one time, it may be too old to reflect any changes that have occurred since it was collected.",
+      "answerType": AnswerType.A,
+      "category": "MARKETING"
+    },
+    {
+      "text": "Which of the following marketing functions focuses on informing all current and potential customers about the business's products?",
+      "answers": [
+        {"text": "Marketing-information management"},
+        {"text": "Promotion"},
+        {"text": "Product/Service Management"},
+        {"text": "Pricing"}
+      ],
+      "explanation": "The promotion function focuses on informing customers about new products, improved products, new uses for existing products, and special values on products.",
+      "answerType": AnswerType.B,
+      "category": "MARKETING"
+    },
+    {
+      "text": "The owner of a business is meeting with the company's managers and supervisors to set objectives for the next year. This group is developing the company's",
+      "answers": [
+        {"text": "market share"},
+        {"text": "business goals"},
+        {"text": "channels of distribution"},
+        {"text": "promotional mix"}
+      ],
+      "explanation": "The goals or objectives of a business are the things the business wants to attain.",
+      "answerType": AnswerType.B,
+      "category": "MARKETING"
+    },
+    {
+      "text": "Marketers divide their markets by grouping customers according to their",
+      "answers": [
+        {"text": "similarities"},
+        {"text": "differences"},
+        {"text": "hobbies"},
+        {"text": "occupations"}
+      ],
+      "explanation": "Marketers divide their markets by grouping customers according to their similarities—not their differences.",
+      "answerType": AnswerType.A,
+      "category": "MARKETING"
+    },
+    {
+      "text": "An international soft-drink company that wants to add bottled spring water to its product mix has determined there are four major brands that currently hold the majority of the market share for that product. The strengths and weaknesses of each potential competitor have been examined. This is an example of a(n)",
+      "answers": [
+        {"text": "purpose and mission"},
+        {"text": "action plan"},
+        {"text": "marketing strategy"},
+        {"text": "situation analysis"}
+      ],
+      "explanation": "Information regarding competitors, their products, and their strengths and weaknesses is collected as part of an external environment analysis. This type of analysis is one aspect of the overall situation analysis.",
+      "answerType": AnswerType.D,
+      "category": "MARKETING"
+    },
+    {
+      "text": "Which of the following is an example of how a business uses sales forecasts?",
+      "answers": [
+        {"text": "To plan purchases"},
+        {"text": "To organize inventory"},
+        {"text": "To manage staff"},
+        {"text": "To control trends"}
+      ],
+      "explanation": "Many businesses consider the sales forecast as the cornerstone of their planning. One way that businesses use the sales forecast is to plan purchases.",
+      "answerType": AnswerType.A,
+      "category": "MARKETING"
+    },
+    {
+      "text": "Which of the following forms of communication is the most efficient way to bring four coworkers who are located in different cities together to simultaneously discuss a common business issue?",
+      "answers": [
+        {"text": "Video conferencing"},
+        {"text": "Voice memo"},
+        {"text": "Switchboard"},
+        {"text": "Teleprompter"}
+      ],
+      "explanation": "Video conferencing is a communication method that allows several individuals to simultaneously hold a discussion via a video conferencing platform.",
+      "answerType": AnswerType.A,
+      "category": "MARKETING"
+    },
+    {
+      "text": "The migration of people from one location to another that affects the types of products that businesses sell is an example of a",
+      "answers": [
+        {"text": "geography issue"},
+        {"text": "population trend"},
+        {"text": "transportation route"},
+        {"text": "social lifestyle"}
+      ],
+      "explanation": "Migration is a population trend that indicates the movement of people throughout the country as well as into and out of the country.",
+      "answerType": AnswerType.B,
+      "category": "MARKETING"
+    },
+    {
+      "text": "When developing websites, businesses often use",
+      "answers": [
+        {"text": "instant messaging"},
+        {"text": "data tracking"},
+        {"text": "design software"},
+        {"text": "intranet retrieval"}
+      ],
+      "explanation": "Developing websites has become easier with advances in technology. Today, web design software is available, so even small businesses can create and post web pages to promote themselves and connect to customers.",
+      "answerType": AnswerType.C,
+      "category": "MARKETING"
+    },
+    {
+      "text": "Which of the following is an ethical dilemma related to an employee providing information in the workplace?",
+      "answers": [
+        {"text": "Steven advises a customer that Simpson Electronics does not provide personal information to other companies without the customer's consent"},
+        {"text": "Melinda and two of her coworkers talk about their plans to work overtime next weekend"},
+        {"text": "Bob's new employer asks him to share confidential information about product-development processes that his previous employer uses"},
+        {"text": "A customer asks Kate to email a comprehensive price list to their business"}
+      ],
+      "explanation": "In many situations, employers require employees to sign a nondisclosure agreement, which is a promise to maintain the confidentiality of the business's trade secrets.",
+      "answerType": AnswerType.C,
+      "category": "MARKETING"
+    },
+    {
+      "text": "Analyzing data with Simpson's Paradox in mind can help account for",
+      "answers": [
+        {"text": "unconsidered variables or dimensions"},
+        {"text": "inconsistencies in data generation"},
+        {"text": "human error"},
+        {"text": "incorrect assumptions"}
+      ],
+      "explanation": "Simpson's Paradox occurs when a trend that appears in different groups of data disappears when the groups are combined.",
+      "answerType": AnswerType.A,
+      "category": "MARKETING"
+    },
+    {
+      "text": "Which of the following is a workplace hazard?",
+      "answers": [
+        {"text": "A landscaper develops heat stroke"},
+        {"text": "An employee falls off a ladder while painting a house"},
+        {"text": "A restaurant kitchen has a slippery spot where someone spilled oil"},
+        {"text": "A receptionist is diagnosed with carpal tunnel syndrome"}
+      ],
+      "explanation": "A workplace hazard is defined as anything that can harm an employee, whether mentally or physically.",
+      "answerType": AnswerType.C,
+      "category": "MARKETING"
+    },
+    {
+      "text": "Which of the following is the last step in the industrial purchasing process?",
+      "answers": [
+        {"text": "Negotiate discounts"},
+        {"text": "Select supplier"},
+        {"text": "Identify needs"},
+        {"text": "Confirm delivery"}
+      ],
+      "explanation": "The final step in the industrial purchasing process is expediting, or following up, to confirm delivery.",
+      "answerType": AnswerType.D,
+      "category": "MARKETING"
+    },
+    {
+      "text": "What type of production process would be best suited for a company that makes wool coats and socks that are not in constant demand?",
+      "answers": [
+        {"text": "Intermittent"},
+        {"text": "Continuous"},
+        {"text": "Routing"},
+        {"text": "Unit"}
+      ],
+      "explanation": "Intermittent production occurs when production periodically stops and restarts. It is generally used for products that are not in constant demand all of the time.",
+      "answerType": AnswerType.A,
+      "category": "MARKETING"
+    },
+    {
+      "text": "Which of the following is a way that businesses often are able to save additional money?",
+      "answers": [
+        {"text": "By paying bills on time"},
+        {"text": "By increasing wages and benefits"},
+        {"text": "By renovating facilities"},
+        {"text": "By conducting research"}
+      ],
+      "explanation": "Controlling expenses not only helps the business to have the necessary funds to pay its bills but to pay them on time and control its expenses even further.",
+      "answerType": AnswerType.A,
+      "category": "MARKETING"
+    },
+    {
+      "text": "Which of the following situations is an example of employees coordinating their work efforts?",
+      "answers": [
+        {"text": "Gavin orders inventory based on the forecast that Madelyn has prepared for him"},
+        {"text": "Ed reviews his monthly financial report to verify his calculations"},
+        {"text": "Bob unpacks a shipment and places the items on shelves in the warehouse"},
+        {"text": "Sarah calls a vendor to verify the delivery date of an order, while Shelley sells products"}
+      ],
+      "explanation": "Gavin and Madelyn's work activities are interdependent—they must work together and coordinate their work efforts to achieve the business's goals.",
+      "answerType": AnswerType.A,
+      "category": "MARKETING"
+    },
+    {
+      "text": "Self-understanding helps you raise your level of self-esteem because it",
+      "answers": [
+        {"text": "identifies social activities you enjoy"},
+        {"text": "helps you develop personal interests"},
+        {"text": "compares your skills with others' skills"},
+        {"text": "gives you a true picture of yourself"}
+      ],
+      "explanation": "Self-understanding involves identifying both your strengths and your weaknesses. When you recognize your strengths, it is easier to accept your weaknesses.",
+      "answerType": AnswerType.D,
+      "category": "MARKETING"
+    },
+    {
+      "text": "What trait is the most important for marketers who work in marketing operations?",
+      "answers": [
+        {"text": "Communication skills"},
+        {"text": "Analytical skills"},
+        {"text": "Creativity"},
+        {"text": "Tech skills"}
+      ],
+      "explanation": "Marketing operations is based less on creativity and more on analysis, data, and research. Because of this, analytical skills are extremely important for market researchers.",
+      "answerType": AnswerType.B,
+      "category": "MARKETING"
+    },
+    {
+      "text": "What is one of the benefits of sending a job interview follow-up letter?",
+      "answers": [
+        {"text": "Allows the applicant to include a resume"},
+        {"text": "Lets the applicant submit test scores"},
+        {"text": "Reminds the interviewer of the applicant"},
+        {"text": "Provides the interviewer with references"}
+      ],
+      "explanation": "Applicants should send follow-up letters immediately after the job interview to thank the interviewers for their time. Follow-up letters also remind the interviewer of the specific applicant and help create a favorable impression.",
+      "answerType": AnswerType.C,
+      "category": "MARKETING"
+    },
+    {
+      "text": "Which of the following guidelines for writing cover letters is true?",
+      "answers": [
+        {"text": "Customize your cover letter to the position you are applying for"},
+        {"text": "Include personal information like your marital status in your cover letter"},
+        {"text": "Do not include your job qualifications and experience in your cover letter"},
+        {"text": "In your cover letter, repeat the exact information from your resume"}
+      ],
+      "explanation": "Cover letters are intended to give employers a better sense of your unique skills and experiences and should be customized to each specific job.",
+      "answerType": AnswerType.A,
+      "category": "MARKETING"
+    },
+    {
+      "text": "Why is accepting responsibility for your own actions important to effective human relations skills?",
+      "answers": [
+        {"text": "People will not take advantage of you"},
+        {"text": "People will be able to depend on you"},
+        {"text": "It helps you be enthusiastic"},
+        {"text": "It helps you be objective"}
+      ],
+      "explanation": "Taking full responsibility for your own actions and never blaming others for your mistakes means you are reliable. People will know they can depend on you to do what you say you will do.",
+      "answerType": AnswerType.B,
+      "category": "MARKETING"
+    },
+    {
+      "text": "What are a business's organizational goals based on?",
+      "answers": [
+        {"text": "The employees' input"},
+        {"text": "The customers' opinions"},
+        {"text": "The industry's needs"},
+        {"text": "The business's purpose"}
+      ],
+      "explanation": "Effective organizational goals should align with and reflect the business's purpose—why the business exists in the first place.",
+      "answerType": AnswerType.D,
+      "category": "MARKETING"
+    },
+    {
+      "text": "Businesses might consider increasing their prices during times when",
+      "answers": [
+        {"text": "customers have less disposable income"},
+        {"text": "goods and services are plentiful"},
+        {"text": "many people are unemployed"},
+        {"text": "economic conditions are good"}
+      ],
+      "explanation": "When economic conditions are good, the business might increase its prices because customers are less cautious with their spending.",
+      "answerType": AnswerType.D,
+      "category": "MARKETING"
+    },
+    {
+      "text": "In which kind of market does more competition exist than in any other kind of market?",
+      "answers": [
+        {"text": "Oligopoly"},
+        {"text": "Monopolistic competition"},
+        {"text": "Pure competition"},
+        {"text": "Monopoly"}
+      ],
+      "explanation": "In a pure competitive market, there are a great many buyers and sellers of nearly identical products, and marketers have very little control over pricing.",
+      "answerType": AnswerType.C,
+      "category": "MARKETING"
+    },
+    {
+      "text": "Competing businesses that agree to coordinate the discounts and credit terms that they offer their customers are",
+      "answers": [
+        {"text": "target pricing"},
+        {"text": "unit pricing"},
+        {"text": "price fixing"},
+        {"text": "price planning"}
+      ],
+      "explanation": "Price fixing is an illegal business arrangement in which businesses agree on prices of their goods or services, resulting in little choice for the consumer.",
+      "answerType": AnswerType.C,
+      "category": "MARKETING"
+    },
+    {
+      "text": "One of the main differences between goods and services is that services are",
+      "answers": [
+        {"text": "tangible"},
+        {"text": "physical"},
+        {"text": "produced"},
+        {"text": "performed"}
+      ],
+      "explanation": "Goods and services are both products. However, services are intangible products, which means that they cannot be tasted, felt, seen, heard, or smelled.",
+      "answerType": AnswerType.D,
+      "category": "MARKETING"
+    },
+    {
+      "text": "Which of the following is a way a business can classify a product line?",
+      "answers": [
+        {"text": "Width"},
+        {"text": "Customer group"},
+        {"text": "Depth"},
+        {"text": "Trading up"}
+      ],
+      "explanation": "Product lines that are classified by customer group contain products that appeal to a certain market, such as the consumer market or the commercial market.",
+      "answerType": AnswerType.B,
+      "category": "MARKETING"
+    },
+    {
+      "text": "A common method of determining a product's safety is",
+      "answers": [
+        {"text": "developing warranties"},
+        {"text": "testing the product"},
+        {"text": "evaluating the product's appeal"},
+        {"text": "complying with local regulations"}
+      ],
+      "explanation": "Testing the product involves using the product in a variety of situations or ways in order to evaluate its performance.",
+      "answerType": AnswerType.B,
+      "category": "MARKETING"
+    },
+    {
+      "text": "A trade association agrees to a set of standards and grades that will apply to products developed by its members. How will consumers of the products benefit from these standards?",
+      "answers": [
+        {"text": "Guarantee of the same price"},
+        {"text": "Ease of comparison shopping"},
+        {"text": "Assurance of buyers' satisfaction"},
+        {"text": "Guarantee of product availability"}
+      ],
+      "explanation": "Consumers could easily compare similar products developed by the various members of the trade association because all of the products would meet the same standards.",
+      "answerType": AnswerType.B,
+      "category": "MARKETING"
+    },
+    {
+      "text": "Which of the following is a purpose of warranties and guarantees?",
+      "answers": [
+        {"text": "To avoid a customer-oriented focus for the business"},
+        {"text": "To protect the producer and the seller"},
+        {"text": "To decrease consumer confidence about purchases"},
+        {"text": "To decrease feedback from customers"}
+      ],
+      "explanation": "A purpose of warranties and guarantees is to protect the producer and the seller. Producers and sellers are protected by well-written warranties and guarantees because their responsibilities to the customer are clearly defined.",
+      "answerType": AnswerType.B,
+      "category": "MARKETING"
+    },
+    {
+      "text": "The Kelp Company always uses a stuffed teddy bear on labels of their products and in their television commercials. Which of the following is the Kelp Company using?",
+      "answers": [
+        {"text": "Brand name"},
+        {"text": "Trademark"},
+        {"text": "Trade character"},
+        {"text": "Trade name"}
+      ],
+      "explanation": "A trade character is a brand mark that has been personified (e.g., the Pillsbury doughboy and Toucan Sam).",
+      "answerType": AnswerType.C,
+      "category": "MARKETING"
+    },
+    {
+      "text": "During which stage of the product life cycle is the product failure rate the highest?",
+      "answers": [
+        {"text": "Introduction"},
+        {"text": "Growth"},
+        {"text": "Decline"},
+        {"text": "Maturity"}
+      ],
+      "explanation": "The product failure rate is highest during the introduction stage of the product life cycle.",
+      "answerType": AnswerType.A,
+      "category": "MARKETING"
+    },
+    {
+      "text": "Strident Technologies recently released a new model of its popular desktop computer that functions using a brand new software system. Customers interested in purchasing the new computer will have to buy the new software, too. This is an example of",
+      "answers": [
+        {"text": "destructive advertising"},
+        {"text": "poor marketing"},
+        {"text": "product exposure"},
+        {"text": "planned obsolescence"}
+      ],
+      "explanation": "Planned obsolescence is the practice of designing a product to become obsolete, or outdated or useless, before it should reasonably need replacement.",
+      "answerType": AnswerType.D,
+      "category": "MARKETING"
+    },
+    {
+      "text": "Which of the following is an appropriate reason to reposition a product?",
+      "answers": [
+        {"text": "Marketers are getting bored with the current position"},
+        {"text": "The competitive environment has changed"},
+        {"text": "The company is going out of business"},
+        {"text": "The Christmas season is around the corner"}
+      ],
+      "explanation": "When the competitive environment changes, it's sometimes necessary to reposition a product.",
+      "answerType": AnswerType.B,
+      "category": "MARKETING"
+    },
+    {
+      "text": "Identifying new product opportunities usually requires a person to be",
+      "answers": [
+        {"text": "indifferent"},
+        {"text": "aware"},
+        {"text": "decisive"},
+        {"text": "emotional"}
+      ],
+      "explanation": "A product opportunity is a favorable circumstance that presents itself to provide a good or service that consumers are willing to buy. People identify product opportunities by being attentive to their surroundings, by being aware.",
+      "answerType": AnswerType.B,
+      "category": "MARKETING"
+    },
+    {
+      "text": "Which of the following is an example of a touchpoint?",
+      "answers": [
+        {"text": "A reply to a customer question on social media"},
+        {"text": "A company-wide email from the CEO"},
+        {"text": "An in-house health insurance brochure"},
+        {"text": "A staff meeting to discuss brand values"}
+      ],
+      "explanation": "Touchpoints are all the opportunities that businesses have to connect with customers and reinforce their brand. This includes interactions with customers on social media.",
+      "answerType": AnswerType.A,
+      "category": "MARKETING"
+    },
+    {
+      "text": "Pat's Pizza Place has introduced a new, low-fat pizza crust. In its advertising, it describes how tasty and healthy the low-fat crust is. Pat's Pizza Place is using which of the following promotional communication characteristics?",
+      "answers": [
+        {"text": "Factual"},
+        {"text": "Persuasive"},
+        {"text": "Relevance"},
+        {"text": "Repetitious"}
+      ],
+      "explanation": "To be a success, promotional messages should be persuasive and convince buyers that the product that is being sold can meet their needs.",
+      "answerType": AnswerType.B,
+      "category": "MARKETING"
+    },
+    {
+      "text": "An ad featuring a business's support of the Red Cross is an example of __________ advertising.",
+      "answers": [
+        {"text": "free"},
+        {"text": "costly"},
+        {"text": "promotional"},
+        {"text": "institutional"}
+      ],
+      "explanation": "Institutional advertising creates a certain image in the eyes of consumers. In this case, promoting the business's support of a nonprofit humanitarian organization is intended to develop goodwill.",
+      "answerType": AnswerType.D,
+      "category": "MARKETING"
+    },
+    {
+      "text": "Which of the following is true about the promotional mix?",
+      "answers": [
+        {"text": "The promotional mix should always stay the same over time"},
+        {"text": "All businesses can benefit from the same promotional mix"},
+        {"text": "The promotional mix plays a key role in obtaining customers"},
+        {"text": "Advertising is the best promotional mix element"}
+      ],
+      "explanation": "An appropriate blend of the promotional elements enables businesses to communicate effectively with customers.",
+      "answerType": AnswerType.C,
+      "category": "MARKETING"
+    },
+    {
+      "text": "Patrick wants to keep a certain amount of his money in a safe place where he can earn interest on his savings, and also be able to withdraw his funds without experiencing sizable financial penalties. In what type of financial institution should Patrick consider placing his money?",
+      "answers": [
+        {"text": "The stock market"},
+        {"text": "A holding company"},
+        {"text": "A retirement fund"},
+        {"text": "A retail bank"}
+      ],
+      "explanation": "Retail banks provide a variety of financial services, including savings and checking accounts for individuals.",
+      "answerType": AnswerType.D,
+      "category": "MARKETING"
+    },
+    {
+      "text": "Ad copy that says a car is 'the only sports coupe named to Car and Driver's ten-best list three years in a row' is",
+      "answers": [
+        {"text": "showing uses"},
+        {"text": "making a claim"},
+        {"text": "using a testimonial"},
+        {"text": "giving features"}
+      ],
+      "explanation": "This kind of copy makes a general or specific claim for the product.",
+      "answerType": AnswerType.B,
+      "category": "MARKETING"
+    },
+    {
+      "text": "Jenny Bee, who owns a small clothing company, is sending out an email to all of her former customers to offer them a discount on her newest T-shirt designs. What form of marketing is Jenny Bee using?",
+      "answers": [
+        {"text": "Word-of-mouth marketing"},
+        {"text": "Cause marketing"},
+        {"text": "Indirect marketing"},
+        {"text": "Direct marketing"}
+      ],
+      "explanation": "Direct marketing, which uses direct mail, telemarketing, emails, etc. that are sent directly to a consumer's home or business, seeks a specific measureable action from a targeted group of consumers.",
+      "answerType": AnswerType.D,
+      "category": "MARKETING"
+    },
+    {
+      "text": "When a business uses a generalized portrayal of someone in its advertising, it's likely reinforcing",
+      "answers": [
+        {"text": "sugging"},
+        {"text": "socialization"},
+        {"text": "equity labels"},
+        {"text": "a stereotype"}
+      ],
+      "explanation": "A stereotype is a set image or an assumption about a person or thing.",
+      "answerType": AnswerType.D,
+      "category": "MARKETING"
+    },
+    {
+      "text": "Which of the following is an advantage of using the internet as a promotional tool for your business?",
+      "answers": [
+        {"text": "It reaches fewer people than traditional promotion"},
+        {"text": "Tracking results is difficult and slow"},
+        {"text": "It is more cost effective than traditional advertising"},
+        {"text": "It can make it easier for hackers to find information"}
+      ],
+      "explanation": "Using the internet to promote your business is often less expensive than buying traditional advertisements in newspapers, magazines, or on television or radio.",
+      "answerType": AnswerType.C,
+      "category": "MARKETING"
+    },
+    {
+      "text": "What is the government likely to do if it determines that a company has engaged in deceptive advertising?",
+      "answers": [
+        {"text": "Rewrite the existing advertising copy"},
+        {"text": "Require the company to place corrective advertising"},
+        {"text": "Imprison the company's chief executive officer"},
+        {"text": "Increase the company's sales-tax rate"}
+      ],
+      "explanation": "Corrective advertising involves placing messages in various media to retract an inaccurate statement or to correct the public's false impression about a product's features or abilities.",
+      "answerType": AnswerType.B,
+      "category": "MARKETING"
+    },
+    {
+      "text": "Where might a salesperson most likely obtain firsthand product information?",
+      "answers": [
+      {"text": "At the library"},
+      {"text": "From competitors"},
+      {"text": "At the factory"},
+      {"text": "From customers"}
+      ],
+      "explanation": "Satisfied customers are usually quite willing to share their product information and experiences.",
+      "answerType": AnswerType.D,
+      "category": "MARKETING"
+      },
+      {
+      "text": "Which of the following is a key to effective sales presentations?",
+      "answers": [
+      {"text": "Using high-pressure tactics"},
+      {"text": "Making a hard sell"},
+      {"text": "Building rapport with the customer"},
+      {"text": "Talking about the product's features only"}
+      ],
+      "explanation": "Building rapport with the customer is essential to creating a positive and persuading sales presentation.",
+      "answerType": AnswerType.C,
+      "category": "MARKETING"
+      },
+      {
+      "text": "What is the primary goal of a salesperson during the introduction stage of a sales presentation?",
+      "answers": [
+      {"text": "To make a hard sell"},
+      {"text": "To build rapport with the customer"},
+      {"text": "To discuss the product's features"},
+      {"text": "To close the sale"}
+      ],
+      "explanation": "The primary goal of a salesperson during the introduction stage is to build rapport with the customer and establish a connection.",
+      "answerType": AnswerType.B,
+      "category": "MARKETING"
+      },
+      {
+      "text": "Which of the following is a benefit of using a sales script?",
+      "answers": [
+      {"text": "It allows the salesperson to be more spontaneous"},
+      {"text": "It helps the salesperson to build rapport with the customer"},
+      {"text": "It ensures that the salesperson covers all the key points"},
+      {"text": "It makes the salesperson sound more robotic"}
+      ],
+      "explanation": "A sales script helps the salesperson to ensure that they cover all the key points and present the product in a clear and concise manner.",
+      "answerType": AnswerType.C,
+      "category": "MARKETING"
+      },
+      {
+      "text": "What is the purpose of a sales forecast?",
+      "answers": [
+      {"text": "To predict the company's profits"},
+      {"text": "To determine the company's pricing strategy"},
+      {"text": "To estimate the demand for a product"},
+      {"text": "To evaluate the sales team's performance"}
+      ],
+      "explanation": "A sales forecast is used to estimate the demand for a product and make informed decisions about production and inventory.",
+      "answerType": AnswerType.C,
+      "category": "MARKETING"
+      },
+      {
+      "text": "Which of the following is a type of sales promotion?",
+      "answers": [
+      {"text": "Advertising"},
+      {"text": "Personal selling"},
+      {"text": "Public relations"},
+      {"text": "Sales promotion"}
+      ],
+      "explanation": "Sales promotion includes tactics such as discounts, free samples, and loyalty programs.",
+      "answerType": AnswerType.D,
+      "category": "MARKETING"
+      },
+      {
+      "text": "What is the primary goal of a marketing research study?",
+      "answers": [
+      {"text": "To increase sales"},
+      {"text": "To gather information about customers and markets"},
+      {"text": "To develop new products"},
+      {"text": "To reduce costs"}
+      ],
+      "explanation": "The primary goal of a marketing research study is to gather information about customers and markets to inform business decisions.",
+      "answerType": AnswerType.B,
+      "category": "MARKETING"
+      },
+      {
+      "text": "Which of the following is a type of marketing research design?",
+      "answers": [
+      {"text": "Exploratory research"},
+      {"text": "Descriptive research"},
+      {"text": "Causal research"},
+      {"text": "All of the above"}
+      ],
+      "explanation": "There are several types of marketing research designs, including exploratory, descriptive, and causal research.",
+      "answerType": AnswerType.D,
+      "category": "MARKETING"
+      },
+      {
+      "text": "What is the purpose of a marketing mix?",
+      "answers": [
+      {"text": "To create a product"},
+      {"text": "To promote a product"},
+      {"text": "To price a product"},
+      {"text": "To combine elements to achieve marketing goals"}
+      ],
+      "explanation": "The marketing mix, also known as the 4Ps, combines elements such as product, price, promotion, and place to achieve marketing goals.",
+      "answerType": AnswerType.D,
+      "category": "MARKETING"
+      },
+      {
+      "text": "Which of the following is a benefit of using social media marketing?",
+      "answers": [
+      {"text": "It is a one-way form of communication"},
+      {"text": "It is a costly form of advertising"},
+      {"text": "It allows for two-way communication with customers"},
+      {"text": "It is only used for business-to-business marketing"}
+      ],
+      "explanation": "Social media marketing allows for two-way communication with customers, which can help build relationships and increase engagement.",
+      "answerType": AnswerType.C,
+      "category": "MARKETING"
+      },
+      {
+      "text": "What is the primary goal of a public relations campaign?",
+      "answers": [
+      {"text": "To increase sales"},
+      {"text": "To build brand awareness"},
+      {"text": "To manage a company's reputation"},
+      {"text": "To create a new product"}
+      ],
+      "explanation": "The primary goal of a public relations campaign is to manage a company's reputation and build positive relationships with stakeholders.",
+      "answerType": AnswerType.C,
+      "category": "MARKETING"
+      },
+      {
+      "text": "Which of the following is a type of digital marketing?",
+      "answers": [
+      {"text": "Email marketing"},
+      {"text": "Search engine optimization"},
+      {"text": "Pay-per-click advertising"},
+      {"text": "All of the above"}
+      ],
+      "explanation": "Digital marketing includes tactics such as email marketing, search engine optimization, and pay-per-click advertising.",
+      "answerType": AnswerType.D,
+      "category": "MARKETING"
+      },
+      {
+      "text": "What is the purpose of a customer relationship management (CRM) system?",
+      "answers": [
+      {"text": "To manage customer interactions"},
+      {"text": "To increase sales"},
+      {"text": "To reduce costs"},
+      {"text": "To improve product quality"}
+      ],
+      "explanation": "A CRM system is used to manage customer interactions and improve customer relationships.",
+      "answerType": AnswerType.A,
+      "category": "MARKETING"
+      },
+      {
+      "text": "Which of the following is a benefit of using data analytics in marketing?",
+      "answers": [
+      {"text": "It provides a general overview of customer behavior"},
+      {"text": "It helps to identify trends and patterns"},
+      {"text": "It is a costly and time-consuming process"},
+      {"text": "It is only used for large companies"}
+      ],
+      "explanation": "Data analytics helps to identify trends and patterns in customer behavior, which can inform marketing decisions.",
+      "answerType": AnswerType.B,
+      "category": "MARKETING"
+      },
+      {
+      "text": "What is the primary goal of a brand management strategy?",
+      "answers": [
+      {"text": "To increase sales"},
+      {"text": "To build brand awareness"},
+      {"text": "To manage a company's reputation"},
+      {"text": "To create a new product"}
+      ],
+      "explanation": "The primary goal of a brand management strategy is to build and maintain a positive brand image.",
+      "answerType": AnswerType.B,
+      "category": "MARKETING"
+      },
+      {
+      "text": "Which of the following is a type of marketing metric?",
+      "answers": [
+      {"text": "Return on investment (ROI)"},
+      {"text": "Customer acquisition cost (CAC)"},
+      {"text": "Customer lifetime value (CLV)"},
+      {"text": "All of the above"}
+      ],
+      "explanation": "Marketing metrics include metrics such as ROI, CAC, and CLV, which are used to measure the effectiveness of marketing campaigns.",
+      "answerType": AnswerType.D,
+      "category": "MARKETING"
+      },
+      {
+      "text": "What is the purpose of a marketing audit?",
+      "answers": [
+      {"text": "To evaluate the effectiveness of a marketing campaign"},
+      {"text": "To identify areas for improvement in a marketing strategy"},
+      {"text": "To develop a new marketing plan"},
+      {"text": "To increase sales"}
+      ],
+      "explanation": "A marketing audit is used to evaluate the effectiveness of a marketing campaign and identify areas for improvement.",
+      "answerType": AnswerType.B,
+      "category": "MARKETING"
+      },
+      {
+      "text": "Which of the following is a benefit of using social media listening?",
+      "answers": [
+      {"text": "It allows companies to promote their products"},
+      {"text": "It helps companies to monitor customer conversations"},
+      {"text": "It is a costly and time-consuming process"},
+      {"text": "It is only used for large companies"}
+      ],
+      "explanation": "Social media listening helps companies to monitor customer conversations and respond to customer feedback.",
+      "answerType": AnswerType.B,
+      "category": "MARKETING"
+      },
+      {
+      "text": "What is the primary goal of a content marketing strategy?",
+      "answers": [
+      {"text": "To increase sales"},
+      {"text": "To build brand awareness"},
+      {"text": "To create valuable and relevant content"},
+      {"text": "To manage a company's reputation"}
+      ],
+      "explanation": "The primary goal of a content marketing strategy is to create valuable and relevant content that attracts and retains a clearly defined audience.",
+      "answerType": AnswerType.C,
+      "category": "MARKETING"
+      },
+      {
+      "text": "Which of the following is a type of content marketing?",
+      "answers": [
+      {"text": "Blog posts"},
+      {"text": "Social media posts"},
+      {"text": "Email newsletters"},
+      {"text": "All of the above"}
+      ],
+      "explanation": "Content marketing includes tactics such as blog posts, social media posts, and email newsletters.",
+      "answerType": AnswerType.D,
+      "category": "MARKETING"
+      },
+      {
+      "text": "What is the purpose of a marketing funnel?",
+      "answers": [
+      {"text": "To increase sales"},
+      {"text": "To build brand awareness"},
+      {"text": "To guide customers through the buying process"},
+      {"text": "To manage a company's reputation"}
+      ],
+      "explanation": "A marketing funnel is used to guide customers through the buying process and increase the chances of conversion.",
+      "answerType": AnswerType.C,
+      "category": "MARKETING"
+      },
+      {
+      "text": "Which of the following is a benefit of using marketing automation?",
+      "answers": [
+      {"text": "It allows companies to personalize their marketing messages"},
+      {"text": "It helps companies to save time and increase efficiency"},
+      {"text": "It is a costly and time-consuming process"},
+      {"text": "It is only used for large companies"}
+      ],
+      "explanation": "Marketing automation helps companies to personalize their marketing messages and save time and increase efficiency.",
+      "answerType": AnswerType.B,
+      "category": "MARKETING"
+      },
+      {
+      "text": "What is the primary goal of a customer experience strategy?",
+      "answers": [
+      {"text": "To increase sales"},
+      {"text": "To build brand awareness"},
+      {"text": "To create a positive and memorable experience for customers"},
+      {"text": "To manage a company's reputation"}
+      ],
+      "explanation": "The primary goal of a customer experience strategy is to create a positive and memorable experience for customers.",
+      "answerType": AnswerType.C,
+      "category": "MARKETING"
+      },
+      {
+      "text": "Which of the following is a type of customer experience metric?",
+      "answers": [
+      {"text": "Net promoter score (NPS)"},
+      {"text": "Customer satisfaction (CSAT)"},
+      {"text": "Customer effort score (CES)"},
+      {"text": "All of the above"}
+      ],
+      "explanation": "Customer experience metrics include metrics such as NPS, CSAT, and CES, which are used to measure the quality of the customer experience.",
+      "answerType": AnswerType.D,
+      "category": "MARKETING"
+      },
+      {
+      "text": "What is the purpose of a marketing dashboard?",
+      "answers": [
+      {"text": "To track website traffic"},
+      {"text": "To monitor social media engagement"},
+      {"text": "To provide a centralized view of marketing metrics and KPIs"},
+      {"text": "To increase sales"}
+      ],
+      "explanation": "A marketing dashboard provides a centralized view of marketing metrics and KPIs, allowing marketers to track and analyze their performance.",
+      "answerType": AnswerType.C,
+      "category": "MARKETING"
+      },
+      {
+      "text": "Which of the following is a benefit of using data-driven marketing?",
+      "answers": [
+      {"text": "It allows companies to make decisions based on intuition"},
+      {"text": "It helps companies to measure the effectiveness of their marketing campaigns"},
+      {"text": "It is a costly and time-consuming process"},
+      {"text": "It is only used for large companies"}
+      ],
+      "explanation": "Data-driven marketing helps companies to measure the effectiveness of their marketing campaigns and make informed decisions.",
+      "answerType": AnswerType.B,
+      "category": "MARKETING"
+      },
+      {
+      "text": "What is the primary goal of a marketing analytics strategy?",
+      "answers": [
+      {"text": "To increase sales"},
+      {"text": "To build brand awareness"},
+      {"text": "To measure and analyze the effectiveness of marketing campaigns"},
+      {"text": "To manage a company's reputation"}
+      ],
+      "explanation": "The primary goal of a marketing analytics strategy is to measure and analyze the effectiveness of marketing campaigns.",
+      "answerType": AnswerType.C,
+      "category": "MARKETING"
+      },
+      {
+      "text": "Which of the following is a type of marketing analytics tool?",
+      "answers": [
+      {"text": "Google Analytics"},
+      {"text": "Adobe Analytics"},
+      {"text": "Marketo"},
+      {"text": "All of the above"}
+      ],
+      "explanation": "Marketing analytics tools include tools such as Google Analytics, Adobe Analytics, and Marketo, which are used to measure and analyze marketing data.",
+      "answerType": AnswerType.D,
+      "category": "MARKETING"
+      },
+      {
+      "text": "What is the purpose of a marketing attribution model?",
+      "answers": [
+      {"text": "To measure the effectiveness of a single marketing campaign"},
+      {"text": "To attribute the credit for a conversion to a single marketing touchpoint"},
+      {"text": "To provide a comprehensive view of the customer journey"},
+      {"text": "To increase sales"}
+      ],
+      "explanation": "A marketing attribution model is used to attribute the credit for a conversion to a single marketing touchpoint, providing a comprehensive view of the customer journey.",
+      "answerType": AnswerType.C,
+      "category": "MARKETING"
+      },
+      {
+      "text": "Which of the following is a benefit of using marketing automation platforms?",
+      "answers": [
+      {"text": "It allows companies to personalize their marketing messages"},
+      {"text": "It helps companies to save time and increase efficiency"},
+      {"text": "It is a costly and time-consuming process"},
+      {"text": "It is only used for large companies"}
+      ],
+      "explanation": "Marketing automation platforms help companies to personalize their marketing messages and save time and increase efficiency.",
+      "answerType": AnswerType.B,
+      "category": "MARKETING"
+      },
+      {
+      "text": "What is the primary goal of a customer journey mapping strategy?",
+      "answers": [
+      {"text": "To increase sales"},
+      {"text": "To build brand awareness"},
+      {"text": "To create a visual representation of the customer's experience"},
+      {"text": "To manage a company's reputation"}
+      ],
+      "explanation": "The primary goal of a customer journey mapping strategy is to create a visual representation of the customer's experience, identifying pain points and areas for improvement.",
+      "answerType": AnswerType.C,
+      "category": "MARKETING"
+      },
+      {
+      "text": "Which of the following is a type of customer journey mapping technique?",
+      "answers": [
+      {"text": "Personas"},
+      {"text": "Customer journey maps"},
+      {"text": "Service blueprints"},
+      {"text": "All of the above"}
+      ],
+      "explanation": "Customer journey mapping techniques include personas, customer journey maps, and service blueprints, which are used to create a visual representation of the customer's experience.",
+      "answerType": AnswerType.D,
+      "category": "MARKETING"
+      },
+      {
+      "text": "What is the purpose of a marketing metrics dashboard?",
+      "answers": [
+      {"text": "To track website traffic"},
+      {"text": "To monitor social media engagement"},
+      {"text": "To provide a centralized view of marketing metrics and KPIs"},
+      {"text": "To increase sales"}
+      ],
+      "explanation": "A marketing metrics dashboard provides a centralized view of marketing metrics and KPIs, allowing marketers to track and analyze their performance.",
+      "answerType": AnswerType.C,
+      "category": "MARKETING"
+      },
+      {
+      "text": "Which of the following is a benefit of using data-driven marketing?",
+      "answers": [
+      {"text": "It allows companies to make decisions based on intuition"},
+      {"text": "It helps companies to measure the effectiveness of their marketing campaigns"},
+      {"text": "It is a costly and time-consuming process"},
+      {"text": "It is only used for large companies"}
+      ],
+      "explanation": "Data-driven marketing helps companies to measure the effectiveness of their marketing campaigns and make informed decisions.",
+      "answerType": AnswerType.B,
+      "category": "MARKETING"
+      },
+      {
+      "text": "What is the primary goal of a marketing optimization strategy?",
+      "answers": [
+      {"text": "To increase sales"},
+      {"text": "To build brand awareness"},
+      {"text": "To improve the performance of marketing campaigns"},
+      {"text": "To manage a company's reputation"}
+      ],
+      "explanation": "The primary goal of a marketing optimization strategy is to improve the performance of marketing campaigns, increasing their effectiveness and efficiency.",
+      "answerType": AnswerType.C,
+      "category": "MARKETING"
+      },
+      {
+      "text": "Which of the following is a type of marketing optimization technique?",
+      "answers": [
+      {"text": "A/B testing"},
+      {"text": "Multivariate testing"},
+      {"text": "Personalization"},
+      {"text": "All of the above"}
+      ],
+      "explanation": "Marketing optimization techniques include A/B testing, multivariate testing, and personalization, which are used to improve the performance of marketing campaigns.",
+      "answerType": AnswerType.D,
+      "category": "MARKETING"
+      },
+      {
+      "text": "What is the purpose of a marketing analytics platform?",
+      "answers": [
+      {"text": "To track website traffic"},
+      {"text": "To monitor social media engagement"},
+      {"text": "To provide a comprehensive view of customer behavior and marketing performance"},
+      {"text": "To increase sales"}
+      ],
+      "explanation": "A marketing analytics platform provides a comprehensive view of customer behavior and marketing performance, allowing marketers to make data-driven decisions.",
+      "answerType": AnswerType.C,
+      "category": "MARKETING"
+      },
+      {
+      "text": "Which of the following is a benefit of using marketing automation?",
+      "answers": [
+      {"text": "It allows companies to personalize their marketing messages"},
+      {"text": "It helps companies to save time and increase efficiency"},
+      {"text": "It is a costly and time-consuming process"},
+      {"text": "It is only used for large companies"}
+      ],
+      "explanation": "Marketing automation helps companies to personalize their marketing messages and save time and increase efficiency.",
+      "answerType": AnswerType.B,
+      "category": "MARKETING"
+      },
+      {
+      "text": "What is the primary goal of a customer experience strategy?",
+      "answers": [
+      {"text": "To increase sales"},
+      {"text": "To build brand awareness"},
+      {"text": "To create a positive and memorable experience for customers"},
+      {"text": "To manage a company's reputation"}
+      ],
+      "explanation": "The primary goal of a customer experience strategy is to create a positive and memorable experience for customers.",
+      "answerType": AnswerType.C,
+      "category": "MARKETING"
+      },
+      {
+      "text": "Which of the following is a type of customer experience metric?",
+      "answers": [
+      {"text": "Net promoter score (NPS)"},
+      {"text": "Customer satisfaction (CSAT)"},
+      {"text": "Customer effort score (CES)"},
+      {"text": "All of the above"}
+      ],
+      "explanation": "Customer experience metrics include metrics such as NPS, CSAT, and CES, which are used to measure the quality of the customer experience.",
+      "answerType": AnswerType.D,
+      "category": "MARKETING"
+      }
+
 ]
 
