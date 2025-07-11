@@ -41,6 +41,8 @@ export default function TestPage({ params, searchParams }: PageProps) {
  const updateQuestionStats = async (isCorrect: boolean) => {
    if (!user) return
 
+   const statsKey = `questionStats_${user.uid}`
+
    // Update Firestore only if the answer is correct
    if (isCorrect) {
      const userDocRef = doc(db, 'users', user.uid)
