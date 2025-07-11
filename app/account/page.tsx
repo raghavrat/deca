@@ -148,7 +148,7 @@ export default function AccountPage() {
               </div>
             </div>
             <h3 className="text-2xl font-bold text-gray-800">{stats.totalQuestions}</h3>
-            <p className="text-gray-600 text-sm">Total Correct Answers</p>
+            <p className="text-gray-600 text-sm">Total Questions Attempted</p>
           </div>
 
           <div className="bg-white rounded-lg shadow-sm p-6">
