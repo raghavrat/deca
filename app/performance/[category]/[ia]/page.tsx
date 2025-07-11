@@ -16,11 +16,11 @@ const InstructionalArea = dynamic(
 )
 
 type PageProps = {
-  params: {
+  params: Promise<{
     category: string
     ia: string
-  },
-  searchParams: { [key: string]: string | string[] | undefined }
+  }>,
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 }
 
 const getOriginalName = (slug: string) => {
@@ -39,16 +39,18 @@ const getOriginalName = (slug: string) => {
     .join(' ')
 }
 
-export default function IAPage({ params, searchParams }: PageProps) {
+export default function IAPage({ params: paramsPromise, searchParams: searchParamsPromise }: PageProps) {
   const [category, setCategory] = useState('')
   const [ia, setIa] = useState('')
   const [filteredData, setFilteredData] = useState<Datashape[]>([])
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    setCategory(capitalizeWords(params.category))
-    setIa(getOriginalName(params.ia))
-  }, [params])
+    paramsPromise.then((params) => {
+      setCategory(capitalizeWords(params.category))
+      setIa(getOriginalName(params.ia))
+    })
+  }, [paramsPromise])
 
   useEffect(() => {
     if (category && ia) {
