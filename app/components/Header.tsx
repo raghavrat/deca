@@ -52,6 +52,9 @@ export default function Header() {
             <Link href="/test" className="text-gray-600 hover:text-[#0066cc] transition-colors duration-300">
               Test
             </Link>
+            <Link href="/leaderboard" className="text-gray-600 hover:text-[#0066cc] transition-colors duration-300">
+              Leaderboard
+            </Link>
           </nav>
 
           {/* User Icon - Desktop */}
@@ -127,6 +130,13 @@ export default function Header() {
                 onClick={() => setIsMenuOpen(false)}
               >
                 Test
+              </Link>
+              <Link 
+                href="/leaderboard" 
+                className="block px-3 py-2 text-gray-600 hover:text-[#0066cc] transition-colors duration-300"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Leaderboard
               </Link>
               {user ? (
                 <>

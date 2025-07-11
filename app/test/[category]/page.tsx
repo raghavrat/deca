@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react'
 import { questions, Question } from '../../questions'
 import { useAuth } from '../../context/AuthContext'
+import { doc, getDoc, setDoc, increment } from 'firebase/firestore'
+import { db } from '../../firebase/config'
 
 type PageProps = {
  params: Promise<{
@@ -36,10 +38,18 @@ export default function TestPage({ params, searchParams }: PageProps) {
    initParams()
  }, [params])
 
- const updateQuestionStats = () => {
+ const updateQuestionStats = async (isCorrect: boolean) => {
    if (!user) return
 
-   const statsKey = `questionStats_${user.uid}`
+   // Update Firestore only if the answer is correct
+   if (isCorrect) {
+     const userDocRef = doc(db, 'users', user.uid)
+     try {
+       await setDoc(userDocRef, { problemsCompleted: increment(1) }, { merge: true })
+     } catch (error) {
+       console.error('Error updating problems completed count:', error)
+     }
+   }
    const existingStats = localStorage.getItem(statsKey)
    
    let stats = existingStats ? JSON.parse(existingStats) : {
@@ -93,9 +103,10 @@ export default function TestPage({ params, searchParams }: PageProps) {
  }
 
  const handleSubmit = () => {
-   if (selectedAnswer !== null) {
+   if (selectedAnswer !== null && currentQuestion) {
+     const isCorrect = selectedAnswer === currentQuestion.answerType
      setShowResults(true)
-     updateQuestionStats()
+     updateQuestionStats(isCorrect)
    }
  }
 

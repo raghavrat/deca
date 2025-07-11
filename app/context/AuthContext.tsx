@@ -9,7 +9,8 @@ import {
   sendEmailVerification,
   User
 } from 'firebase/auth';
-import { auth } from '../firebase/config';
+import { auth, db } from '../firebase/config';
+import { doc, setDoc } from 'firebase/firestore';
 import { useRouter } from 'next/navigation';
 import { isEmailAllowed } from '../config/allowedEmails';
 
@@ -49,6 +50,16 @@ export function AuthContextProvider({ children }: { children: React.ReactNode })
     }
     
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    
+    // Create a user document in Firestore
+    const userDocRef = doc(db, 'users', userCredential.user.uid);
+    await setDoc(userDocRef, {
+      email: userCredential.user.email,
+      name: '', // Initially empty, user can set it in their account page
+      problemsCompleted: 0,
+      createdAt: new Date(),
+    });
+
     await sendEmailVerification(userCredential.user);
     return true;
   };
