@@ -103,7 +103,7 @@ export default function AccountPage() {
 
         {/* Name Section */}
         <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
-          <h2 class="text-xl font-bold text-gray-800 mb-4">Display Name</h2>
+          <h2 className="text-xl font-bold text-gray-800 mb-4">Display Name</h2>
           {!isEditingName ? (
             <div className="flex items-center justify-between">
               <div className="flex items-center">
