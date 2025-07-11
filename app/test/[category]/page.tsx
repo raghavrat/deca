@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { questions, Question } from '../../questions'
+import { useAuth } from '../../context/AuthContext'
 
 type PageProps = {
  params: Promise<{
@@ -11,6 +12,7 @@ type PageProps = {
 }
 
 export default function TestPage({ params, searchParams }: PageProps) {
+ const { user } = useAuth()
  const [category, setCategory] = useState('')
  const [filteredQuestions, setFilteredQuestions] = useState<Question[]>([])
  const [remainingQuestions, setRemainingQuestions] = useState<Question[]>([])
@@ -34,9 +36,66 @@ export default function TestPage({ params, searchParams }: PageProps) {
    initParams()
  }, [params])
 
+ const updateQuestionStats = () => {
+   if (!user) return
+
+   const statsKey = `questionStats_${user.uid}`
+   const existingStats = localStorage.getItem(statsKey)
+   
+   let stats = existingStats ? JSON.parse(existingStats) : {
+     totalQuestions: 0,
+     byCategory: {},
+     lastAttempt: null,
+     streak: 0
+   }
+
+   // Update total questions
+   stats.totalQuestions += 1
+
+   // Update category count
+   const categoryUpper = category.toUpperCase()
+   
+   // Handle both old format (number) and new format (object)
+   if (typeof stats.byCategory[categoryUpper] === 'object') {
+     // If it's an object from the previous implementation, just increment the total
+     stats.byCategory[categoryUpper].total = (stats.byCategory[categoryUpper].total || 0) + 1
+   } else {
+     // If it's a number or doesn't exist, treat it as a number
+     stats.byCategory[categoryUpper] = (stats.byCategory[categoryUpper] || 0) + 1
+   }
+
+   // Update streak
+   const today = new Date().toDateString()
+   const lastAttemptDate = stats.lastAttempt ? new Date(stats.lastAttempt).toDateString() : null
+   
+   if (lastAttemptDate === today) {
+     // Already attempted today, maintain streak
+   } else if (lastAttemptDate) {
+     const yesterday = new Date()
+     yesterday.setDate(yesterday.getDate() - 1)
+     if (lastAttemptDate === yesterday.toDateString()) {
+       // Attempted yesterday, increment streak
+       stats.streak = (stats.streak || 0) + 1
+     } else {
+       // Missed days, reset streak
+       stats.streak = 1
+     }
+   } else {
+     // First attempt
+     stats.streak = 1
+   }
+
+   // Update last attempt
+   stats.lastAttempt = new Date().toISOString()
+
+   // Save to localStorage
+   localStorage.setItem(statsKey, JSON.stringify(stats))
+ }
+
  const handleSubmit = () => {
    if (selectedAnswer !== null) {
      setShowResults(true)
+     updateQuestionStats()
    }
  }
 

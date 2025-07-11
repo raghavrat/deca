@@ -31,21 +31,9 @@ export function AuthContextProvider({ children }: { children: React.ReactNode })
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
-        try {
-          // Create session cookie
-          const idToken = await user.getIdToken(true);  // Force refresh token
-          await fetch('/api/auth/session', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ idToken }),
-          });
-          setUser(user);
-        } catch (error) {
-          console.error('Session creation error:', error);
-          await logout();  // Logout if session creation fails
-        }
+        // Only create session if user just signed in (not on every auth state change)
+        // The signIn method already handles session creation
+        setUser(user);
       } else {
         setUser(null);
       }
@@ -70,6 +58,9 @@ export function AuthContextProvider({ children }: { children: React.ReactNode })
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       console.log('User signed in:', userCredential.user.uid);
   
+      // Wait a moment for Firebase auth state to stabilize
+      await new Promise(resolve => setTimeout(resolve, 100));
+  
       const idToken = await userCredential.user.getIdToken();
       console.log('ID token obtained');
   
@@ -88,7 +79,11 @@ export function AuthContextProvider({ children }: { children: React.ReactNode })
         throw new Error('Failed to create session');
       }
   
-      setUser(userCredential.user);
+      // Don't manually set user here - let onAuthStateChanged handle it
+      // This prevents race conditions
+      
+      // Wait for auth state to update before navigation
+      await new Promise(resolve => setTimeout(resolve, 200));
       router.push('/');
     } catch (error) {
       console.error('Sign in error:', error);

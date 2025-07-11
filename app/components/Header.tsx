@@ -38,14 +38,14 @@ export default function Header() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <div className="flex-shrink-0">
+          <div className="flex-1 flex items-center">
             <Link href="/" className="text-2xl font-bold text-gray-800 hover:text-[#0066cc] transition-colors duration-300">
               Deca Pal
             </Link>
           </div>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-8">
+          <nav className="hidden md:flex flex-1 items-center justify-center space-x-8">
             <Link href="/performance" className="text-gray-600 hover:text-[#0066cc] transition-colors duration-300">
               Performance
             </Link>
@@ -55,7 +55,7 @@ export default function Header() {
           </nav>
 
           {/* User Icon - Desktop */}
-          <div className="hidden md:flex items-center relative" ref={dropdownRef}>
+          <div className="hidden md:flex flex-1 items-center justify-end relative" ref={dropdownRef}>
             <button 
               onClick={() => setIsProfileOpen(!isProfileOpen)}
               className="text-gray-600 hover:text-[#0066cc] transition-colors duration-300 transform hover:scale-110"
@@ -71,6 +71,14 @@ export default function Header() {
                     <div className="px-4 py-2 text-sm text-gray-700 border-b border-gray-100 break-words">
                       {user.email}
                     </div>
+                    <Link
+                      href="/account"
+                      onClick={() => setIsProfileOpen(false)}
+                      className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    >
+                      <UserCircle size={16} className="mr-2 flex-shrink-0" />
+                      Account
+                    </Link>
                     <button
                       onClick={handleLogout}
                       className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
@@ -125,6 +133,14 @@ export default function Header() {
                   <div className="px-3 py-2 text-sm text-gray-700 border-t border-gray-100 break-words">
                     {user.email}
                   </div>
+                  <Link 
+                    href="/account"
+                    className="flex items-center w-full px-3 py-2 text-gray-600 hover:text-[#0066cc] transition-colors duration-300"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    <UserCircle size={20} className="mr-2 flex-shrink-0" />
+                    Account
+                  </Link>
                   <button 
                     className="flex items-center w-full px-3 py-2 text-gray-600 hover:text-[#0066cc] transition-colors duration-300"
                     onClick={handleLogout}

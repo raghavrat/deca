@@ -9,16 +9,32 @@ export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const { signIn } = useAuth();
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError('');
+    setIsLoading(true);
     try {
       await signIn(email, password);
-      router.push('/');
-    } catch (err) {
-      setError('Failed to sign in');
+      // Navigation is handled in the signIn method
+    } catch (err: any) {
+      console.error('Login error:', err);
+      if (err.code === 'auth/wrong-password') {
+        setError('Incorrect password');
+      } else if (err.code === 'auth/user-not-found') {
+        setError('No account found with this email');
+      } else if (err.code === 'auth/invalid-email') {
+        setError('Invalid email address');
+      } else if (err.message && err.message.includes('Email not verified')) {
+        setError('Please verify your email before signing in');
+      } else {
+        setError('Failed to sign in. Please try again.');
+      }
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -57,9 +73,10 @@ export default function Login() {
 
           <button
             type="submit"
-            className="btn btn-primary w-full"
+            disabled={isLoading}
+            className="btn btn-primary w-full disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Sign in
+            {isLoading ? 'Signing in...' : 'Sign in'}
           </button>
         </form>
         <div className="text-center">
