@@ -16,7 +16,9 @@ export function getInstructionalAreasByCategory(category: string): Instructional
     'MARKETING': 'MARKETING',
     'HOSPITALITY': 'HOSPITALITY',
     'MANAGEMENT': 'MANAGEMENT',
-    'ENTREPRENEUR': 'ENTREPRENEURSHIP'
+    'MANAGMENT': 'MANAGEMENT',
+    'ENTREPRENEUR': 'ENTREPRENEURSHIP',
+    'ENTREPRENEURSHIP': 'ENTREPRENEURSHIP'
   }
   
   const mappedCategory = categoryMapping[category] || 'MANAGEMENT'
@@ -63,7 +65,9 @@ export function getPerformanceIndicatorsByAreas(category: string, selectedAreas:
     'MARKETING': 'MARKETING',
     'HOSPITALITY': 'HOSPITALITY',
     'MANAGEMENT': 'MANAGEMENT',
-    'ENTREPRENEUR': 'ENTREPRENEURSHIP'
+    'MANAGMENT': 'MANAGEMENT',
+    'ENTREPRENEUR': 'ENTREPRENEURSHIP',
+    'ENTREPRENEURSHIP': 'ENTREPRENEURSHIP'
   }
   
   const mappedCategory = categoryMapping[category] || 'MANAGEMENT'

@@ -79,7 +79,9 @@ export async function POST(request: NextRequest) {
       'MARKETING': 'MARKETING',
       'HOSPITALITY': 'HOSPITALITY',
       'MANAGEMENT': 'MANAGEMENT',
-      'ENTREPRENEUR': 'ENTREPRENEURSHIP'
+      'MANAGMENT': 'MANAGEMENT',
+      'ENTREPRENEUR': 'ENTREPRENEURSHIP',
+      'ENTREPRENEURSHIP': 'ENTREPRENEURSHIP'
     }
     const mappedCategory = categoryMapping[category] || 'MANAGEMENT'
     
