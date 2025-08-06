@@ -82,7 +82,8 @@ export class RateLimiter {
     const now = Date.now()
     let cleanedCount = 0
 
-    for (const [identifier, timestamp] of this.store.entries()) {
+    const entries = Array.from(this.store.entries())
+    for (const [identifier, timestamp] of entries) {
       if (now - timestamp > this.windowMs) {
         this.store.delete(identifier)
         cleanedCount++
