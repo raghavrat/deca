@@ -1,31 +1,37 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { DECAScenario } from '../../../types'
 import { getEventById } from '../../../data/decaEvents'
-import { RateLimiter } from '../../../utils/rateLimiter'
 import { getPerformanceIndicatorsByAreas, getInstructionalAreasByCategory } from '../../../utils/instructionalAreas'
+import { cookies } from 'next/headers'
 
 const OPENROUTER_API_URL = 'https://openrouter.ai/api/v1/chat/completions'
 
-// Create a single rate limiter instance (1 request per 5 minutes)
-const rateLimiter = new RateLimiter(5 * 60 * 1000)
+// Rate limit: 1 request per 5 minutes per cookie
+const RATE_LIMIT_DURATION = 5 * 60 * 1000 // 5 minutes in milliseconds
 
 export async function POST(request: NextRequest) {
   try {
-    // Check rate limit before processing request (but don't record yet)
-    const rateLimitResult = rateLimiter.checkRateLimit(request)
-
-    if (!rateLimitResult.allowed) {
-      console.log(`Rate limit blocked request from ${rateLimitResult.identifier}`)
-      return NextResponse.json(
-        {
-          error: 'Rate limit exceeded. Please wait a few minutes before generating another scenario.',
-          timeRemaining: rateLimitResult.timeRemaining
-        },
-        { status: 429 }
-      )
+    // Check rate limit using cookies
+    const cookieStore = cookies()
+    const lastRequestTime = cookieStore.get('roleplay_last_request')?.value
+    const now = Date.now()
+    
+    if (lastRequestTime) {
+      const timeSinceLastRequest = now - parseInt(lastRequestTime)
+      if (timeSinceLastRequest < RATE_LIMIT_DURATION) {
+        const timeRemaining = Math.ceil((RATE_LIMIT_DURATION - timeSinceLastRequest) / 1000)
+        console.log(`Rate limit blocked request, ${timeRemaining}s remaining`)
+        return NextResponse.json(
+          {
+            error: 'Rate limit exceeded. Please wait a few minutes before generating another scenario.',
+            timeRemaining
+          },
+          { status: 429 }
+        )
+      }
     }
 
-    console.log(`Processing request from ${rateLimitResult.identifier}`)
+    console.log('Processing roleplay generation request')
 
     const { category, eventId, selectedInstructionalArea } = await request.json()
 
@@ -372,11 +378,17 @@ Make sure the scenario is:
       createdAt: new Date()
     }
 
-    // Record the request only after successful generation
-    rateLimiter.recordRequest(request)
-    console.log(`Successfully generated scenario for ${rateLimitResult.identifier}`)
-
-    return NextResponse.json({ scenario })
+    // Record the request timestamp in cookie after successful generation
+    const jsonResponse = NextResponse.json({ scenario })
+    jsonResponse.cookies.set('roleplay_last_request', now.toString(), {
+      maxAge: RATE_LIMIT_DURATION / 1000,
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax'
+    })
+    
+    console.log('Successfully generated scenario')
+    return jsonResponse
 
   } catch (error) {
     console.error('Error generating roleplay scenario:', error)
