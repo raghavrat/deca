@@ -3,7 +3,6 @@ import type { NextRequest } from 'next/server'
 
 export function middleware(request: NextRequest) {
   const session = request.cookies.get('session')
-  console.log('Session cookie:', session)
   const currentPath = request.nextUrl.pathname
 
   // Paths that don't require authentication

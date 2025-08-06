@@ -6,6 +6,17 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 This is a Next.js 15 application called "Deca Pal" - an educational platform for DECA (Distributive Education Clubs of America) students. It provides performance indicators and practice tests across various business categories.
 
+## 📚 Comprehensive Documentation
+
+For detailed documentation on various aspects of the project, please refer to the `/docs` directory:
+
+- **[/docs/README.md](./docs/README.md)** - Documentation overview and navigation guide
+- **[/docs/architecture.md](./docs/architecture.md)** - System design, technical stack, and infrastructure details
+- **[/docs/spec.md](./docs/spec.md)** - Product specifications, features, and business model
+- **[/docs/userflow.md](./docs/userflow.md)** - User journeys, personas, and engagement mechanics
+- **[/docs/tasks.md](./docs/tasks.md)** - Development roadmap, priorities, and resource allocation
+- **[/docs/changes.md](./docs/changes.md)** - Release history, version tracking, and deployment procedures
+
 ## Key Commands
 
 ```bash

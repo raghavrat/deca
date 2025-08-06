@@ -45,12 +45,15 @@ export default function Header() {
           </div>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex flex-1 items-center justify-center space-x-8">
-            <Link href="/performance" className="text-gray-600 hover:text-[#0066cc] transition-colors duration-300">
-              Performance
+          <nav className="hidden md:flex flex-1 items-center justify-center space-x-6">
+            <Link href="/performance" className="text-gray-600 hover:text-[#0066cc] transition-colors duration-300 whitespace-nowrap">
+              Performance Indicators
             </Link>
             <Link href="/test" className="text-gray-600 hover:text-[#0066cc] transition-colors duration-300">
-              Test
+              Tests
+            </Link>
+            <Link href="/roleplay" className="text-gray-600 hover:text-[#0066cc] transition-colors duration-300">
+              Roleplays
             </Link>
             <Link href="/leaderboard" className="text-gray-600 hover:text-[#0066cc] transition-colors duration-300">
               Leaderboard
@@ -61,7 +64,7 @@ export default function Header() {
           <div className="hidden md:flex flex-1 items-center justify-end relative" ref={dropdownRef}>
             <button 
               onClick={() => setIsProfileOpen(!isProfileOpen)}
-              className="text-gray-600 hover:text-[#0066cc] transition-colors duration-300 transform hover:scale-110"
+              className="text-gray-600 hover:text-[#0066cc] transition-colors duration-200 click-animation"
             >
               <UserCircle size={32} />
             </button>
@@ -77,14 +80,14 @@ export default function Header() {
                     <Link
                       href="/account"
                       onClick={() => setIsProfileOpen(false)}
-                      className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 click-animation"
                     >
                       <UserCircle size={16} className="mr-2 flex-shrink-0" />
                       Account
                     </Link>
                     <button
                       onClick={handleLogout}
-                      className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 click-animation"
                     >
                       <LogOut size={16} className="mr-2 flex-shrink-0" />
                       Logout
@@ -93,7 +96,7 @@ export default function Header() {
                 ) : (
                   <Link
                     href="/login"
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 click-animation"
                   >
                     Login
                   </Link>
@@ -106,7 +109,7 @@ export default function Header() {
           <div className="md:hidden">
             <button 
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="text-gray-600 hover:text-[#0066cc] transition-colors duration-300"
+              className="text-gray-600 hover:text-[#0066cc] transition-colors duration-200 click-animation"
             >
               {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
@@ -122,14 +125,21 @@ export default function Header() {
                 className="block px-3 py-2 text-gray-600 hover:text-[#0066cc] transition-colors duration-300"
                 onClick={() => setIsMenuOpen(false)}
               >
-                Performance
+                PIs
               </Link>
               <Link 
                 href="/test" 
                 className="block px-3 py-2 text-gray-600 hover:text-[#0066cc] transition-colors duration-300"
                 onClick={() => setIsMenuOpen(false)}
               >
-                Test
+                Tests
+              </Link>
+              <Link 
+                href="/roleplay" 
+                className="block px-3 py-2 text-gray-600 hover:text-[#0066cc] transition-colors duration-300"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Roleplays
               </Link>
               <Link 
                 href="/leaderboard" 
@@ -138,6 +148,7 @@ export default function Header() {
               >
                 Leaderboard
               </Link>
+              
               {user ? (
                 <>
                   <div className="px-3 py-2 text-sm text-gray-700 border-t border-gray-100 break-words">
@@ -145,14 +156,14 @@ export default function Header() {
                   </div>
                   <Link 
                     href="/account"
-                    className="flex items-center w-full px-3 py-2 text-gray-600 hover:text-[#0066cc] transition-colors duration-300"
+                    className="flex items-center w-full px-3 py-2 text-gray-600 hover:text-[#0066cc] transition-colors duration-200 click-animation"
                     onClick={() => setIsMenuOpen(false)}
                   >
                     <UserCircle size={20} className="mr-2 flex-shrink-0" />
                     Account
                   </Link>
                   <button 
-                    className="flex items-center w-full px-3 py-2 text-gray-600 hover:text-[#0066cc] transition-colors duration-300"
+                    className="flex items-center w-full px-3 py-2 text-gray-600 hover:text-[#0066cc] transition-colors duration-200 click-animation"
                     onClick={handleLogout}
                   >
                     <LogOut size={20} className="mr-2 flex-shrink-0" />

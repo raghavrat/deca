@@ -166,7 +166,7 @@ export default function PerformancePage() {
         </div>
         <button 
           onClick={handleSearch}
-          className="p-3 bg-white rounded-full shadow-sm hover:shadow-md transition-shadow duration-200"
+          className="p-3 bg-white rounded-full shadow-sm hover:shadow-md transition-shadow duration-200 click-animation"
         >
           <Search className="h-5 w-5 text-gray-400" />
         </button>
@@ -177,7 +177,7 @@ export default function PerformancePage() {
           <div key={cluster} className="relative">
             <button
               onClick={() => handleClusterClick(cluster)}
-              className={`w-full bg-white hover:bg-gray-50 text-gray-800 font-semibold py-4 px-6 rounded-[15px] shadow-md text-center transition-all duration-300 ease-in-out transform hover:scale-102 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0066cc] flex justify-between items-center ${
+              className={`w-full bg-white hover:bg-gray-50 text-gray-800 font-semibold py-4 px-6 rounded-[15px] shadow-md text-center transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0066cc] flex justify-between items-center click-animation ${
                 selectedCluster === cluster ? 'bg-gray-50' : ''
               }`}
             >
@@ -195,7 +195,7 @@ export default function PerformancePage() {
                 <Link
                   key={ia}
                   href={`/performance/${cluster.toLowerCase()}/${formatUrlSlug(ia)}`}
-                  className="block w-full bg-[#0066cc] hover:bg-[#0052a3] text-white font-semibold py-3 px-6 rounded-[15px] shadow-md text-center transition-all duration-300 ease-in-out transform hover:scale-102 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0066cc]"
+                  className="block w-full bg-[#0066cc] hover:bg-[#0052a3] text-white font-semibold py-3 px-6 rounded-[15px] shadow-md text-center transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0066cc] click-animation"
                 >
                   {ia}
                 </Link>

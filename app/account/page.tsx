@@ -67,10 +67,10 @@ export default function AccountPage() {
 
   const getCategoryDisplayName = (category: string) => {
     const displayNames: { [key: string]: string } = {
-      'MANAGMENT': 'Management',
+      'MANAGEMENT': 'Management',
       'MARKETING': 'Marketing',
       'FINANCE': 'Finance',
-      'HOSPITIALITY': 'Hospitality',
+      'HOSPITALITY': 'Hospitality',
       'ENTREPRENEUR': 'Entrepreneurship'
     }
     return displayNames[category] || category
