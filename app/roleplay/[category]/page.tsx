@@ -374,76 +374,9 @@ export default function CategoryRoleplayPage() {
                 </div>
               </div>
 
-              {/* Scoring Rubric */}
-              <div className="mb-8">
-                <h3 className="text-lg font-semibold text-gray-800 mb-4">JUDGE'S EVALUATION FORM</h3>
-
-                <div className="mb-8">
-                  <h4 className="font-semibold text-gray-800 mb-4">PERFORMANCE INDICATORS</h4>
-                  <div className="overflow-x-auto">
-                    <table className="w-full border-collapse border-2 border-gray-400">
-                      <thead>
-                        <tr className="bg-gray-200">
-                          <th className="border-2 border-gray-400 p-3 text-left font-bold text-gray-800">Did the participant:</th>
-                          <th className="border-2 border-gray-400 p-3 text-center font-bold text-red-700">Little/No Value<br /><span className="text-sm font-normal">0-4</span></th>
-                          <th className="border-2 border-gray-400 p-3 text-center font-bold text-yellow-700">Below Expectations<br /><span className="text-sm font-normal">5-8</span></th>
-                          <th className="border-2 border-gray-400 p-3 text-center font-bold text-blue-700">Meets Expectations<br /><span className="text-sm font-normal">9-11</span></th>
-                          <th className="border-2 border-gray-400 p-3 text-center font-bold text-green-700">Exceeds Expectations<br /><span className="text-sm font-normal">12-14</span></th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {scenario.scoringRubric.performanceIndicators.map((indicator, index) => (
-                          <tr key={index} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-                            <td className="border-2 border-gray-400 p-3 font-medium text-gray-800">{index + 1}. {indicator.name}</td>
-                            <td className="border-2 border-gray-400 p-3 text-center bg-red-50 font-mono">0-1-2-3-4</td>
-                            <td className="border-2 border-gray-400 p-3 text-center bg-yellow-50 font-mono">5-6-7-8</td>
-                            <td className="border-2 border-gray-400 p-3 text-center bg-blue-50 font-mono">9-10-11</td>
-                            <td className="border-2 border-gray-400 p-3 text-center bg-green-50 font-mono">12-13-14</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-
-                <div className="mb-8">
-                  <h4 className="font-semibold text-gray-800 mb-4">21st CENTURY SKILLS</h4>
-                  <div className="overflow-x-auto">
-                    <table className="w-full border-collapse border-2 border-gray-400">
-                      <thead>
-                        <tr className="bg-gray-200">
-                          <th className="border-2 border-gray-400 p-3 text-left font-bold text-gray-800">Skill</th>
-                          <th className="border-2 border-gray-400 p-3 text-center font-bold text-red-700">Little/No Value<br /><span className="text-sm font-normal">0-1</span></th>
-                          <th className="border-2 border-gray-400 p-3 text-center font-bold text-yellow-700">Below Expectations<br /><span className="text-sm font-normal">2-3</span></th>
-                          <th className="border-2 border-gray-400 p-3 text-center font-bold text-blue-700">Meets Expectations<br /><span className="text-sm font-normal">4</span></th>
-                          <th className="border-2 border-gray-400 p-3 text-center font-bold text-green-700">Exceeds Expectations<br /><span className="text-sm font-normal">5-6</span></th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {scenario.scoringRubric.centurySkills.map((skill, index) => (
-                          <tr key={index} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-                            <td className="border-2 border-gray-400 p-3 font-medium text-gray-800">{index + 6}. {skill.name}</td>
-                            <td className="border-2 border-gray-400 p-3 text-center bg-red-50 font-mono">0-1</td>
-                            <td className="border-2 border-gray-400 p-3 text-center bg-yellow-50 font-mono">2-3</td>
-                            <td className="border-2 border-gray-400 p-3 text-center bg-blue-50 font-mono">4</td>
-                            <td className="border-2 border-gray-400 p-3 text-center bg-green-50 font-mono">5-6</td>
-                          </tr>
-                        ))}
-                        <tr className="bg-gray-100">
-                          <td className="border-2 border-gray-400 p-3 font-medium text-gray-800">10. Overall impression and responses to the judge's questions</td>
-                          <td className="border-2 border-gray-400 p-3 text-center bg-red-50 font-mono">0-1</td>
-                          <td className="border-2 border-gray-400 p-3 text-center bg-yellow-50 font-mono">2-3</td>
-                          <td className="border-2 border-gray-400 p-3 text-center bg-blue-50 font-mono">4</td>
-                          <td className="border-2 border-gray-400 p-3 text-center bg-green-50 font-mono">5-6</td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-
-                <div className="text-center p-4 bg-gray-100 rounded-lg">
-                  <p className="text-xl font-bold text-gray-800">TOTAL SCORE: _____ / 100</p>
-                </div>
+              {/* Total Score Display */}
+              <div className="text-center p-4 bg-gray-100 rounded-lg mb-8">
+                <p className="text-xl font-bold text-gray-800">TOTAL SCORE: {Object.values(scores).reduce((sum, score) => sum + score, 0).toFixed(0)} / 100</p>
               </div>
 
               <div className="text-center">
@@ -481,29 +414,26 @@ export default function CategoryRoleplayPage() {
                         {scenario.performanceIndicators.map((indicator, index) => (
                           <div key={index} className="border rounded-lg p-4">
                             <p className="font-medium text-gray-700 mb-2">{index + 1}. {indicator}</p>
-                            <div className="flex space-x-4">
-                              {[
-                                { label: 'Little/No Value', range: '0-4', color: 'bg-red-100 text-red-800' },
-                                { label: 'Below Expectations', range: '5-8', color: 'bg-yellow-100 text-yellow-800' },
-                                { label: 'Meets Expectations', range: '9-11', color: 'bg-blue-100 text-blue-800' },
-                                { label: 'Exceeds Expectations', range: '12-14', color: 'bg-green-100 text-green-800' }
-                              ].map((level) => (
-                                <label key={level.label} className={`flex items-center space-x-2 p-2 rounded cursor-pointer ${level.color}`}>
-                                  <input
-                                    type="radio"
-                                    name={`indicator-${index}`}
-                                    value={level.range}
-                                    onChange={() => {
-                                      const midPoint = level.range === '0-4' ? 2 : level.range === '5-8' ? 6.5 : level.range === '9-11' ? 10 : 13;
-                                      setScores(prev => ({ ...prev, [`indicator-${index}`]: midPoint }));
-                                    }}
-                                  />
-                                  <span className="text-sm">
-                                    {level.label}<br />
-                                    <span className="font-mono">{level.range}</span>
-                                  </span>
-                                </label>
-                              ))}
+                            <div className="flex items-center space-x-4">
+                              <input
+                                type="number"
+                                min="0"
+                                max="14"
+                                step="1"
+                                value={scores[`indicator-${index}`] || 0}
+                                onChange={(e) => {
+                                  const value = Math.min(14, Math.max(0, parseInt(e.target.value) || 0));
+                                  setScores(prev => ({ ...prev, [`indicator-${index}`]: value }));
+                                }}
+                                className="w-20 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                              />
+                              <span className="text-sm text-gray-600">/ 14 points</span>
+                              <div className="flex-1 flex space-x-2 text-xs">
+                                <span className="px-2 py-1 bg-red-100 text-red-800 rounded">0-4: Little/No</span>
+                                <span className="px-2 py-1 bg-yellow-100 text-yellow-800 rounded">5-8: Below</span>
+                                <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded">9-11: Meets</span>
+                                <span className="px-2 py-1 bg-green-100 text-green-800 rounded">12-14: Exceeds</span>
+                              </div>
                             </div>
                           </div>
                         ))}
@@ -517,29 +447,26 @@ export default function CategoryRoleplayPage() {
                         {scenario.centurySkills.map((skill, index) => (
                           <div key={index} className="border rounded-lg p-4">
                             <p className="font-medium text-gray-700 mb-2">{index + 6}. {skill}</p>
-                            <div className="flex space-x-4">
-                              {[
-                                { label: 'Little/No Value', range: '0-1', color: 'bg-red-100 text-red-800' },
-                                { label: 'Below Expectations', range: '2-3', color: 'bg-yellow-100 text-yellow-800' },
-                                { label: 'Meets Expectations', range: '4', color: 'bg-blue-100 text-blue-800' },
-                                { label: 'Exceeds Expectations', range: '5-6', color: 'bg-green-100 text-green-800' }
-                              ].map((level) => (
-                                <label key={level.label} className={`flex items-center space-x-2 p-2 rounded cursor-pointer ${level.color}`}>
-                                  <input
-                                    type="radio"
-                                    name={`skill-${index}`}
-                                    value={level.range}
-                                    onChange={() => {
-                                      const midPoint = level.range === '0-1' ? 0.5 : level.range === '2-3' ? 2.5 : level.range === '4' ? 4 : 5.5;
-                                      setScores(prev => ({ ...prev, [`skill-${index}`]: midPoint }));
-                                    }}
-                                  />
-                                  <span className="text-sm">
-                                    {level.label}<br />
-                                    <span className="font-mono">{level.range}</span>
-                                  </span>
-                                </label>
-                              ))}
+                            <div className="flex items-center space-x-4">
+                              <input
+                                type="number"
+                                min="0"
+                                max="6"
+                                step="1"
+                                value={scores[`skill-${index}`] || 0}
+                                onChange={(e) => {
+                                  const value = Math.min(6, Math.max(0, parseInt(e.target.value) || 0));
+                                  setScores(prev => ({ ...prev, [`skill-${index}`]: value }));
+                                }}
+                                className="w-20 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                              />
+                              <span className="text-sm text-gray-600">/ 6 points</span>
+                              <div className="flex-1 flex space-x-2 text-xs">
+                                <span className="px-2 py-1 bg-red-100 text-red-800 rounded">0-1: Little/No</span>
+                                <span className="px-2 py-1 bg-yellow-100 text-yellow-800 rounded">2-3: Below</span>
+                                <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded">4: Meets</span>
+                                <span className="px-2 py-1 bg-green-100 text-green-800 rounded">5-6: Exceeds</span>
+                              </div>
                             </div>
                           </div>
                         ))}
@@ -551,29 +478,26 @@ export default function CategoryRoleplayPage() {
                       <h4 className="font-semibold text-gray-800 mb-3">Overall Impression (0-6 points)</h4>
                       <div className="border rounded-lg p-4">
                         <p className="font-medium text-gray-700 mb-2">10. Overall impression and responses to the judge's questions</p>
-                        <div className="flex space-x-4">
-                          {[
-                            { label: 'Little/No Value', range: '0-1', color: 'bg-red-100 text-red-800' },
-                            { label: 'Below Expectations', range: '2-3', color: 'bg-yellow-100 text-yellow-800' },
-                            { label: 'Meets Expectations', range: '4', color: 'bg-blue-100 text-blue-800' },
-                            { label: 'Exceeds Expectations', range: '5-6', color: 'bg-green-100 text-green-800' }
-                          ].map((level) => (
-                            <label key={level.label} className={`flex items-center space-x-2 p-2 rounded cursor-pointer ${level.color}`}>
-                              <input
-                                type="radio"
-                                name="overall"
-                                value={level.range}
-                                onChange={() => {
-                                  const midPoint = level.range === '0-1' ? 0.5 : level.range === '2-3' ? 2.5 : level.range === '4' ? 4 : 5.5;
-                                  setScores(prev => ({ ...prev, overall: midPoint }));
-                                }}
-                              />
-                              <span className="text-sm">
-                                {level.label}<br />
-                                <span className="font-mono">{level.range}</span>
-                              </span>
-                            </label>
-                          ))}
+                        <div className="flex items-center space-x-4">
+                          <input
+                            type="number"
+                            min="0"
+                            max="6"
+                            step="1"
+                            value={scores['overall'] || 0}
+                            onChange={(e) => {
+                              const value = Math.min(6, Math.max(0, parseInt(e.target.value) || 0));
+                              setScores(prev => ({ ...prev, overall: value }));
+                            }}
+                            className="w-20 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          />
+                          <span className="text-sm text-gray-600">/ 6 points</span>
+                          <div className="flex-1 flex space-x-2 text-xs">
+                            <span className="px-2 py-1 bg-red-100 text-red-800 rounded">0-1: Little/No</span>
+                            <span className="px-2 py-1 bg-yellow-100 text-yellow-800 rounded">2-3: Below</span>
+                            <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded">4: Meets</span>
+                            <span className="px-2 py-1 bg-green-100 text-green-800 rounded">5-6: Exceeds</span>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -582,7 +506,7 @@ export default function CategoryRoleplayPage() {
                     <div className="mb-6 p-4 bg-gray-100 rounded-lg">
                       <h4 className="font-semibold text-gray-800 mb-2">Total Score</h4>
                       <p className="text-2xl font-bold text-gray-800">
-                        {Object.values(scores).reduce((sum, score) => sum + score, 0).toFixed(1)} / 100
+                        {Object.values(scores).reduce((sum, score) => sum + score, 0)} / 100
                       </p>
                     </div>
 
@@ -597,7 +521,7 @@ export default function CategoryRoleplayPage() {
                       <button
                         onClick={() => {
                           // Save scores logic here
-                          alert(`Performance scored: ${Object.values(scores).reduce((sum, score) => sum + score, 0).toFixed(1)}/100`);
+                          alert(`Performance scored: ${Object.values(scores).reduce((sum, score) => sum + score, 0)}/100`);
                           setShowScoring(false);
                         }}
                         className="px-6 py-2 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-[15px] transition-colors click-animation"

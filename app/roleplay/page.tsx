@@ -127,16 +127,6 @@ export default function RoleplayPage() {
               </Link>
             ))}
           </div>
-
-          <div className="text-center">
-            <Link
-              href="/roleplay/history"
-              className="inline-flex items-center px-6 py-3 bg-gray-600 hover:bg-gray-700 text-white font-semibold rounded-[15px] shadow-md transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 click-animation"
-            >
-              View Roleplay History
-              <ChevronRight className="ml-2 h-4 w-4" />
-            </Link>
-          </div>
         </div>
       </div>
     )
