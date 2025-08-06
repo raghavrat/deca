@@ -1,7 +1,4 @@
 {
   "/api/roleplay/generate/route": "app/api/roleplay/generate/route.js",
-  "/_not-found/page": "app/_not-found/page.js",
-  "/roleplay/page": "app/roleplay/page.js",
-  "/roleplay/[category]/page": "app/roleplay/[category]/page.js",
-  "/page": "app/page.js"
+  "/roleplay/[category]/page": "app/roleplay/[category]/page.js"
 }

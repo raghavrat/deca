@@ -12,7 +12,7 @@ const RATE_LIMIT_DURATION = 5 * 60 * 1000 // 5 minutes in milliseconds
 export async function POST(request: NextRequest) {
   try {
     // Check rate limit using cookies
-    const cookieStore = cookies()
+    const cookieStore = await cookies()
     const lastRequestTime = cookieStore.get('roleplay_last_request')?.value
     const now = Date.now()
     
