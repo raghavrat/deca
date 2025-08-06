@@ -250,7 +250,7 @@ Make sure the scenario is:
         { role: 'user', content: userPrompt }
       ],
       temperature: 0.8,
-      max_tokens: 3000,
+      max_tokens: 5000,
       provider: {
         order: ['Fireworks']
       }
