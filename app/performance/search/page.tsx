@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo, useEffect, useRef } from 'react'
+import { useState, useMemo, useEffect, useRef, Suspense } from 'react'
 import { Search, ChevronDown } from 'lucide-react'
 import { performanceIndicators } from '../../performanceIndicators'
 import Link from 'next/link'
@@ -13,7 +13,7 @@ const formatUrlSlug = (text: string) => {
     .replace(/\s+/g, '-') // Replace spaces with dashes
 }
 
-export default function SearchPage() {
+function SearchContent() {
   const searchParams = useSearchParams()
   const router = useRouter()
   const [searchQuery, setSearchQuery] = useState(searchParams.get('query') || '')
@@ -274,5 +274,13 @@ export default function SearchPage() {
         )}
       </div>
     </div>
+  )
+}
+
+export default function SearchPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <SearchContent />
+    </Suspense>
   )
 } 
