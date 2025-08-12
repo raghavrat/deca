@@ -69,9 +69,6 @@ export function AuthContextProvider({ children }: { children: React.ReactNode })
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       console.log('User signed in:', userCredential.user.uid);
   
-      // Wait a moment for Firebase auth state to stabilize
-      await new Promise(resolve => setTimeout(resolve, 100));
-  
       const idToken = await userCredential.user.getIdToken();
       console.log('ID token obtained');
   
@@ -90,12 +87,9 @@ export function AuthContextProvider({ children }: { children: React.ReactNode })
         throw new Error('Failed to create session');
       }
   
-      // Don't manually set user here - let onAuthStateChanged handle it
-      // This prevents race conditions
-      
-      // Wait for auth state to update before navigation
-      await new Promise(resolve => setTimeout(resolve, 200));
-      router.push('/');
+      // Force a page reload to ensure the session cookie is properly recognized
+      // This prevents race conditions between client auth and server session
+      window.location.href = '/';
     } catch (error) {
       console.error('Sign in error:', error);
       throw error;
@@ -111,7 +105,7 @@ export function AuthContextProvider({ children }: { children: React.ReactNode })
 
   return (
     <AuthContext.Provider value={{ user, loading, signUp, signIn, logout }}>
-      {!loading && children}
+      {children}
     </AuthContext.Provider>
   );
 }
