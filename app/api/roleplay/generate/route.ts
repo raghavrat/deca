@@ -158,7 +158,7 @@ You must return ONLY valid JSON in the following official DECA format. Do not in
     "Communication – Communicate clearly.",
     "Creativity and Innovation – Show evidence of creativity."
   ],
-  "performanceIndicators": ["Select exactly ${piCount} performance indicators from the list above that are most relevant to the business scenario you create. Use the exact wording from the list."],
+  "performanceIndicators": ["YOU MUST COPY EXACTLY ${piCount} INDICATORS FROM THE LIST PROVIDED - DO NOT CREATE YOUR OWN"],
   "eventSituation": {
     "roleDescription": "You are to assume the role of [specific job title] at [company name], a [company description]. The [stakeholder] (judge) [situation context].",
     "companyBackground": "Detailed 2-3 paragraph description of the company, its history, current market position, and relevant business context.",
@@ -175,9 +175,10 @@ You must return ONLY valid JSON in the following official DECA format. Do not in
 
 CRITICAL INSTRUCTIONS FOR PERFORMANCE INDICATORS:
 1. First, create the complete business scenario (company background, business challenge, task description, etc.)
-2. Then, based on the specific business scenario you created, select exactly ${piCount} performance indicators from the provided list that directly relate to the skills needed to solve the business challenge
-3. Use the exact wording from the list - do not modify the indicators
-4. Choose indicators that a DECA competitor would actually need to demonstrate to successfully complete the specific business task you created
+2. Then for "performanceIndicators" field, you MUST copy EXACTLY ${piCount} indicators word-for-word from the numbered list I provided above
+3. DO NOT write placeholder text like "Select indicators" or create your own indicators
+4. The performanceIndicators array should contain exactly ${piCount} strings, each one copied directly from my list
+5. Example of correct format: ["Explain the nature of business ethics", "Demonstrate ethical work habits", ...] - with actual indicators from the list
 
 Make sure the scenario is:
 - Realistic and relevant to modern business
@@ -208,7 +209,7 @@ You must return ONLY valid JSON in the following official DECA format. Do not in
     "Communication – Communicate clearly.",
     "Creativity and Innovation – Show evidence of creativity."
   ],
-  "performanceIndicators": ["Select exactly ${piCount} performance indicators from the list above that are most relevant to the business scenario you create. Use the exact wording from the list."],
+  "performanceIndicators": ["YOU MUST COPY EXACTLY ${piCount} INDICATORS FROM THE LIST PROVIDED - DO NOT CREATE YOUR OWN"],
   "eventSituation": {
     "roleDescription": "You are to assume the role of [specific job title] at [company name], a [company description]. The [stakeholder] (judge) [situation context].",
     "companyBackground": "Detailed 2-3 paragraph description of the company, its history, current market position, and relevant business context.",
@@ -225,9 +226,10 @@ You must return ONLY valid JSON in the following official DECA format. Do not in
 
 CRITICAL INSTRUCTIONS FOR PERFORMANCE INDICATORS:
 1. First, create the complete business scenario (company background, business challenge, task description, etc.)
-2. Then, based on the specific business scenario you created, select exactly ${piCount} performance indicators from the provided list that directly relate to the skills needed to solve the business challenge
-3. Use the exact wording from the list - do not modify the indicators
-4. Choose indicators that a DECA competitor would actually need to demonstrate to successfully complete the specific business task you created
+2. Then for "performanceIndicators" field, you MUST copy EXACTLY ${piCount} indicators word-for-word from the numbered list I provided above
+3. DO NOT write placeholder text like "Select indicators" or create your own indicators
+4. The performanceIndicators array should contain exactly ${piCount} strings, each one copied directly from my list
+5. Example of correct format: ["Explain the nature of business ethics", "Demonstrate ethical work habits", ...] - with actual indicators from the list
 
 Make sure the scenario is:
 - Realistic and relevant to modern business
@@ -313,6 +315,39 @@ Make sure the scenario is:
       
       scenarioData = JSON.parse(jsonContent)
       console.log('Successfully parsed JSON:', Object.keys(scenarioData))
+      
+      // Validate and fix performance indicators
+      if (scenarioData.performanceIndicators) {
+        // Check if PIs are placeholder strings
+        const hasPlaceholder = scenarioData.performanceIndicators.some((pi: any) => 
+          typeof pi === 'string' && (
+            pi.toLowerCase().includes('select') || 
+            pi.toLowerCase().includes('choose') ||
+            pi.includes('[') ||
+            pi.length > 200 // Suspiciously long PI
+          )
+        )
+        
+        if (hasPlaceholder || scenarioData.performanceIndicators.length !== piCount) {
+          console.log('Invalid PIs detected, selecting random ones from the list')
+          // Select random PIs from the relevant list
+          const shuffled = [...relevantPIs].sort(() => Math.random() - 0.5)
+          scenarioData.performanceIndicators = shuffled.slice(0, piCount)
+        }
+      }
+      
+      // Validate centurySkills - ensure they're the standard 4
+      const standardCenturySkills = [
+        "Critical Thinking – Reason effectively and use systems thinking.",
+        "Problem Solving – Make judgments and decisions, and solve problems.",
+        "Communication – Communicate clearly.",
+        "Creativity and Innovation – Show evidence of creativity."
+      ]
+      
+      if (!scenarioData.centurySkills || scenarioData.centurySkills.length !== 4) {
+        scenarioData.centurySkills = standardCenturySkills
+      }
+      
     } catch (parseError) {
       console.error('JSON parsing failed:', parseError)
       console.log('Full content that failed to parse:', content)

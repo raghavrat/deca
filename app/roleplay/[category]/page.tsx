@@ -914,6 +914,13 @@ export default function CategoryRoleplayPage() {
                                             return
                                           }
                                           
+                                          // Check for grading error
+                                          if (errorData.error === 'grading_failed') {
+                                            alert(`AI Grading Error: ${errorData.message}\n\n${errorData.details || 'Please try submitting again.'}`)
+                                            setIsSubmitting(false)
+                                            return
+                                          }
+                                          
                                           throw new Error(errorData.message || errorData.error || `Failed to process audio`)
                                         }
                                         

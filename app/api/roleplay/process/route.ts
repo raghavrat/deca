@@ -122,45 +122,43 @@ Return ONLY a JSON object with this format:
     // STEP 2: Grade with GPT OSS
     console.log('Step 2: Grading with GPT OSS...')
     
-    const gradingPrompt = `You are an expert DECA competition judge. Grade this roleplay performance.
+    const gradingPrompt = `Grade this DECA roleplay performance based ONLY on what the student actually said.
 
-ROLEPLAY SCENARIO PROVIDED TO STUDENT:
-${JSON.stringify(scenario, null, 2)}
-
-STUDENT'S ACTUAL RESPONSE (TRANSCRIPT):
-${transcript.map((t: any) => `[${t.timestamp}] ${t.text}`).join('\n')}
-
-${images?.length > 0 ? '\nNote: Student showed visual aids/diagrams during presentation.' : ''}
-
-GRADING TASK:
-You MUST grade ALL of these Performance Indicators (each out of 14):
+PERFORMANCE INDICATORS TO GRADE (each 0-14 points):
 ${scenario.performanceIndicators.map((pi: string, i: number) => `${i + 1}. ${pi}`).join('\n')}
 
-You MUST grade ALL of these 21st Century Skills (each out of 6):
+21ST CENTURY SKILLS TO GRADE (each 0-6 points):
 ${scenario.centurySkills.map((skill: string, i: number) => `${i + 1}. ${skill}`).join('\n')}
 
-Grade based on what the student said. If they didn't address something, give it 0-4 points.
+STUDENT TRANSCRIPT:
+${transcript.map((t: any) => `${t.text}`).join(' ')}
 
-Return EXACTLY this JSON structure with ALL indicators and skills:
+SCORING RULES:
+- 12-14: Exceeds expectations, extremely professional
+- 9-11: Meets expectations, acceptable performance  
+- 5-8: Below expectations, needs improvement
+- 0-4: Little/no demonstration of the indicator
+
+Return ONLY this exact JSON with actual scores and feedback:
 {
   "scores": {
     "performanceIndicators": [
-${scenario.performanceIndicators.map((pi: string) => `      {"indicator": "${pi}", "score": NUMBER_0_TO_14, "feedback": "Your feedback here"}`).join(',\n')}
+${scenario.performanceIndicators.map((pi: string) => `      {"indicator": "${pi}", "score": <0-14>, "feedback": "<1-2 sentences>"}`).join(',\n')}
     ],
     "centurySkills": [
-${scenario.centurySkills.map((skill: string) => `      {"skill": "${skill}", "score": NUMBER_0_TO_6, "feedback": "Your feedback here"}`).join(',\n')}
+${scenario.centurySkills.map((skill: string) => `      {"skill": "${skill}", "score": <0-6>, "feedback": "<1 sentence>"}`).join(',\n')}
     ],
     "overallImpression": {
-      "score": NUMBER_0_TO_6,
-      "feedback": "Overall assessment here"
+      "score": <0-6>,
+      "feedback": "<1-2 sentences>"
     }
   },
   "timestampedFeedback": [
-    {"timestamp": "00:00", "type": "positive", "feedback": "What was good"},
-    {"timestamp": "00:30", "type": "improvement", "feedback": "What could improve"}
+    {"timestamp": "00:00", "type": "positive", "feedback": "<specific positive>"},
+    {"timestamp": "00:15", "type": "improvement", "feedback": "<specific improvement>"}
   ],
-  "strengths": ["strength 1", "strength 2", "strength 3"],
-  "improvements": ["improvement 1", "improvement 2", "improvement 3"]
+  "strengths": ["<strength 1>", "<strength 2>", "<strength 3>"],
+  "improvements": ["<improvement 1>", "<improvement 2>", "<improvement 3>"]
 }`
     
     let result
@@ -179,13 +177,27 @@ ${scenario.centurySkills.map((skill: string) => `      {"skill": "${skill}", "sc
         ],
         response_format: { type: 'json_object' },
         temperature: 0.3,
-        max_tokens: 3000,
+        max_tokens: 5000,
         provider: {
           order: ['Fireworks']
         }
       } as any)
       
-      const gradingResult = JSON.parse(gradingResponse.choices[0].message.content || '{}')
+      const responseContent = gradingResponse.choices[0]?.message?.content
+      
+      if (!responseContent || responseContent.length < 100) {
+        console.error('GPT OSS returned insufficient content:', responseContent)
+        throw new Error('AI grading failed - response too short. Please try again.')
+      }
+      
+      const gradingResult = JSON.parse(responseContent)
+      
+      // Validate the response structure
+      if (!gradingResult.scores?.performanceIndicators || 
+          gradingResult.scores.performanceIndicators.length !== scenario.performanceIndicators.length) {
+        console.error('Invalid grading structure - missing or incomplete performance indicators')
+        throw new Error('AI grading failed - invalid response structure. Please try again.')
+      }
       
       console.log('Grading result structure:', {
         hasScores: !!gradingResult.scores,
@@ -209,7 +221,15 @@ ${scenario.centurySkills.map((skill: string) => `      {"skill": "${skill}", "sc
       console.log('Grading complete')
     } catch (error: any) {
       console.error('Grading error:', error)
-      throw new Error(`Grading failed: ${error.message}`)
+      // Return specific error to frontend
+      return NextResponse.json(
+        { 
+          error: 'grading_failed', 
+          message: error.message || 'AI grading failed. Please try again.',
+          details: 'The AI judge was unable to properly evaluate your performance. This is a temporary issue - please try submitting again.'
+        },
+        { status: 500 }
+      )
     }
 
     // Calculate total score
