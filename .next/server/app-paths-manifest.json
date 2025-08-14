@@ -1,7 +1,7 @@
 {
-  "/api/auth/session/route": "app/api/auth/session/route.js",
   "/login/page": "app/login/page.js",
   "/auth/action/page": "app/auth/action/page.js",
+  "/roleplay/[category]/page": "app/roleplay/[category]/page.js",
   "/page": "app/page.js",
   "/forgot-password/page": "app/forgot-password/page.js"
 }
