@@ -122,15 +122,24 @@ Return ONLY a JSON object with this format:
     // STEP 2: Grade with GPT OSS
     console.log('Step 2: Grading with GPT OSS...')
     
-    // Concise prompt for GPT OSS
-    const studentTranscript = transcript.map((t: any) => t.text).join(' ').substring(0, 1000) // Limit transcript length
+    // Grading prompt with essential context
+    const studentTranscript = transcript.map((t: any) => t.text).join(' ')
     
-    const gradingPrompt = `Score this DECA roleplay (0-14 per PI, 0-6 per skill).
+    const gradingPrompt = `Grade this DECA roleplay performance.
 
-PIs: ${scenario.performanceIndicators.map((pi: string, i: number) => `${i+1}. ${pi.substring(0, 50)}`).join(', ')}
-Skills: ${scenario.centurySkills.map((s: string, i: number) => `${i+1}. ${s.split('–')[0].trim()}`).join(', ')}
+SCENARIO CONTEXT:
+Role: ${scenario.eventSituation.roleDescription.substring(0, 200)}
+Challenge: ${scenario.eventSituation.businessChallenge.substring(0, 200)}
+Task: ${scenario.eventSituation.taskDescription.substring(0, 200)}
 
-Transcript: "${studentTranscript}"
+PERFORMANCE INDICATORS TO EVALUATE (0-14 points each):
+${scenario.performanceIndicators.map((pi: string, i: number) => `${i+1}. ${pi}`).join('\n')}
+
+21ST CENTURY SKILLS (0-6 points each):
+${scenario.centurySkills.map((s: string, i: number) => `${i+1}. ${s}`).join('\n')}
+
+STUDENT'S RESPONSE:
+"${studentTranscript.substring(0, 2000)}"
 
 Return ONLY this JSON:
 {
@@ -154,7 +163,7 @@ Return ONLY this JSON:
         messages: [
           {
             role: 'system',
-            content: 'You are a DECA judge. Score the student performance and return valid JSON only. Be concise.'
+            content: 'You are an experienced DECA judge. Evaluate how well the student addressed the business challenge and demonstrated each performance indicator. Score fairly based on what was actually said. Return valid JSON only.'
           },
           {
             role: 'user',
