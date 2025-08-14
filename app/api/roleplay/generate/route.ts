@@ -128,65 +128,43 @@ export async function POST(request: NextRequest) {
     
     console.log(`Using ${areaPIs.length} PIs from ${actualInstructionalArea} + ${relevantPIs.length - areaPIs.length} other PIs`)
 
-    // Create official DECA format system prompt
+    // Create clearer prompt for GPT OSS
     const systemPrompt = selectedEvent
-      ? `You are a DECA competition scenario generator. Generate a realistic business roleplay scenario for the ${selectedEvent.name} (${selectedEvent.id}) event following the official DECA format.
+      ? `Generate a DECA competition roleplay scenario for ${selectedEvent.name} (${selectedEvent.id}).
 
-Event Information:
-- Event: ${selectedEvent.name}
+Event Details:
 - Career Cluster: ${selectedEvent.careerCluster}
 - Career Pathway: ${selectedEvent.careerPathway}
-- Description: ${selectedEvent.description}
 
-AVAILABLE PERFORMANCE INDICATORS (select exactly ${piCount} that are most relevant to your scenario):
+PERFORMANCE INDICATORS - Select exactly ${piCount} from this list:
 ${relevantPIs.map((pi, index) => `${index + 1}. ${pi}`).join('\n')}
 
-You must return ONLY valid JSON in the following official DECA format. Do not include any markdown formatting, explanations, or text outside the JSON:
+INSTRUCTIONS:
+1. Create a realistic business scenario
+2. Copy exactly ${piCount} performance indicators from the list above
+3. Return ONLY valid JSON
+
+JSON FORMAT:
 {
   "eventCode": "${selectedEvent.id}",
   "careerCluster": "${selectedEvent.careerCluster}",
   "careerPathway": "${selectedEvent.careerPathway}",
-  "participantInstructions": [
-    "The event will be presented to you through your reading of the 21st Century Skills, Performance Indicators and Event Situation. You will have up to 10 minutes to review this information and prepare your presentation. You may make notes to use during your presentation.",
-    "You will have up to 10 minutes to make your presentation to the judge (you may have more than one judge).",
-    "You will be evaluated on how well you meet the performance indicators of this event.",
-    "Turn in all of your notes and event materials when you have completed the event."
-  ],
-  "centurySkills": [
-    "Critical Thinking – Reason effectively and use systems thinking.",
-    "Problem Solving – Make judgments and decisions, and solve problems.",
-    "Communication – Communicate clearly.",
-    "Creativity and Innovation – Show evidence of creativity."
-  ],
-  "performanceIndicators": ["YOU MUST COPY EXACTLY ${piCount} INDICATORS FROM THE LIST PROVIDED - DO NOT CREATE YOUR OWN"],
+  "participantInstructions": ["The event will be presented to you through your reading of the 21st Century Skills, Performance Indicators and Event Situation. You will have up to 10 minutes to review this information and prepare your presentation. You may make notes to use during your presentation.", "You will have up to 10 minutes to make your presentation to the judge (you may have more than one judge).", "You will be evaluated on how well you meet the performance indicators of this event.", "Turn in all of your notes and event materials when you have completed the event."],
+  "centurySkills": ["Critical Thinking – Reason effectively and use systems thinking.", "Problem Solving – Make judgments and decisions, and solve problems.", "Communication – Communicate clearly.", "Creativity and Innovation – Show evidence of creativity."],
+  "performanceIndicators": [Copy exactly ${piCount} indicators from the numbered list above],
   "eventSituation": {
-    "roleDescription": "You are to assume the role of [specific job title] at [company name], a [company description]. The [stakeholder] (judge) [situation context].",
-    "companyBackground": "Detailed 2-3 paragraph description of the company, its history, current market position, and relevant business context.",
-    "businessChallenge": "Specific business challenge or decision that needs to be addressed, including why it's important and what factors are involved.",
-    "taskDescription": "Clear description of what the participant needs to analyze, decide, or recommend to address the business challenge.",
-    "presentationContext": "You will present your analysis and recommendation to the [stakeholder] (judge) in a role-play to take place in the [setting]. The [stakeholder] (judge) will begin the role-play by greeting you and asking to hear your ideas. After you have presented your recommendation and have answered the [stakeholder's] (judge's) questions, the [stakeholder] (judge) will conclude the role-play by thanking you for your work."
+    "roleDescription": "You are to assume the role of [job title] at [company]. The [judge role] wants [objective].",
+    "companyBackground": "[2-3 paragraphs about company history, market position, and context]",
+    "businessChallenge": "[Specific challenge that needs addressing and why it matters]",
+    "taskDescription": "[What participant must analyze/recommend]",
+    "presentationContext": "You will present to the [judge role] in [location]. The judge will greet you and ask for your ideas. After your presentation and questions, they will thank you."
   },
   "judgeInstructions": {
-    "roleCharacterization": "You are to assume the role of [stakeholder title] of [company name]. [Detailed description of the judge's character, motivations, concerns, and perspective on the business challenge.]",
-    "questionsToAsk": ["Generate 3 specific questions the judge should ask each participant during the roleplay"],
-    "evaluationCriteria": "The participant will present ideas to you in a role-play to take place in your [location]. You will begin the role-play by greeting the participant and asking to hear about his/her ideas. Once the participant has presented an analysis and have answered your questions, you will conclude the role-play by thanking the participant for the work. You are not to make any comments after the event is over except to thank the participant."
+    "roleCharacterization": "You are the [title] of [company]. [Description of judge's perspective and concerns]",
+    "questionsToAsk": ["[Specific question 1]", "[Specific question 2]", "[Specific question 3]"],
+    "evaluationCriteria": "The participant will present in your [location]. Greet them, listen to their ideas, ask questions, then thank them. Make no other comments after the event."
   }
-}
-
-CRITICAL INSTRUCTIONS FOR PERFORMANCE INDICATORS:
-1. First, create the complete business scenario (company background, business challenge, task description, etc.)
-2. Then for "performanceIndicators" field, you MUST copy EXACTLY ${piCount} indicators word-for-word from the numbered list I provided above
-3. DO NOT write placeholder text like "Select indicators" or create your own indicators
-4. The performanceIndicators array should contain exactly ${piCount} strings, each one copied directly from my list
-5. Example of correct format: ["Explain the nature of business ethics", "Demonstrate ethical work habits", ...] - with actual indicators from the list
-
-Make sure the scenario is:
-- Realistic and relevant to modern business
-- Appropriate for high school DECA competitors
-- Challenging but achievable
-- Focused on the ${selectedEvent.name} event requirements
-- Performance indicators directly match the business challenge created
-- Follows official DECA competition format exactly`
+}`
       : `You are a DECA competition scenario generator. Generate a realistic business roleplay scenario for the ${category} category following the official DECA format.
 
 AVAILABLE PERFORMANCE INDICATORS (select exactly ${piCount} that are most relevant to your scenario):
@@ -240,8 +218,8 @@ Make sure the scenario is:
 - Follows official DECA competition format exactly`
 
     const userPrompt = selectedEvent
-      ? `Create a ${selectedEvent.name} roleplay scenario where the core business challenge and tasks directly involve ${actualInstructionalArea.toLowerCase()} concepts and skills. The participant's main objective and the solutions they need to propose should be centered around ${actualInstructionalArea.toLowerCase()}. After creating the scenario, select ${piCount} performance indicators: Choose ${piCount - 2} to ${piCount - 1} indicators that are directly from the ${actualInstructionalArea.toLowerCase()} area, and 1-2 complementary indicators from other areas that would naturally support solving this business challenge.`
-      : `Create a DECA ${category.toLowerCase()} roleplay scenario where the core business challenge and tasks directly involve ${actualInstructionalArea.toLowerCase()} concepts and skills. The participant's main objective and the solutions they need to propose should be centered around ${actualInstructionalArea.toLowerCase()}. After creating the scenario, select ${piCount} performance indicators: Choose ${piCount - 2} to ${piCount - 1} indicators that are directly from the ${actualInstructionalArea.toLowerCase()} area, and 1-2 complementary indicators from other areas that would naturally support solving this business challenge.`
+      ? `Create a ${selectedEvent.name} roleplay scenario focused on ${actualInstructionalArea}. Copy exactly ${piCount} performance indicators from the list.`
+      : `Create a ${category} roleplay scenario focused on ${actualInstructionalArea}. Copy exactly ${piCount} performance indicators from the list.`
     
     console.log('DEBUG: User prompt PI count:', { piCount, expectedCount: piCount })
 

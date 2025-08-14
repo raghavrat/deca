@@ -122,32 +122,25 @@ Return ONLY a JSON object with this format:
     // STEP 2: Grade with GPT OSS
     console.log('Step 2: Grading with GPT OSS...')
     
-    // Simplified prompt for GPT OSS
-    const studentTranscript = transcript.map((t: any) => t.text).join(' ')
+    // Concise prompt for GPT OSS
+    const studentTranscript = transcript.map((t: any) => t.text).join(' ').substring(0, 1000) // Limit transcript length
     
-    const gradingPrompt = `Grade this DECA roleplay transcript. Give each performance indicator a score 0-14 and each skill a score 0-6.
+    const gradingPrompt = `Score this DECA roleplay (0-14 per PI, 0-6 per skill).
 
-Performance Indicators:
-${scenario.performanceIndicators.map((pi: string, i: number) => `PI${i + 1}: ${pi}`).join('\n')}
-
-21st Century Skills:
-${scenario.centurySkills.map((skill: string, i: number) => `S${i + 1}: ${skill}`).join('\n')}
+PIs: ${scenario.performanceIndicators.map((pi: string, i: number) => `${i+1}. ${pi.substring(0, 50)}`).join(', ')}
+Skills: ${scenario.centurySkills.map((s: string, i: number) => `${i+1}. ${s.split('–')[0].trim()}`).join(', ')}
 
 Transcript: "${studentTranscript}"
 
-Return JSON only:
+Return ONLY this JSON:
 {
   "scores": {
-    "performanceIndicators": [
-${scenario.performanceIndicators.map((pi: string, i: number) => `      {"indicator": "${pi}", "score": NUMBER, "feedback": "SHORT_FEEDBACK"}`).join(',\n')}
-    ],
-    "centurySkills": [
-${scenario.centurySkills.map((skill: string, i: number) => `      {"skill": "${skill}", "score": NUMBER, "feedback": "SHORT_FEEDBACK"}`).join(',\n')}
-    ],
-    "overallImpression": {"score": NUMBER, "feedback": "SHORT_FEEDBACK"}
+    "performanceIndicators": [${scenario.performanceIndicators.map((_, i) => `{"indicator": "PI${i+1}", "score": 0-14, "feedback": "1 sentence"}`).join(', ')}],
+    "centurySkills": [${scenario.centurySkills.map((_, i) => `{"skill": "S${i+1}", "score": 0-6, "feedback": "few words"}`).join(', ')}],
+    "overallImpression": {"score": 0-6, "feedback": "1 sentence"}
   },
-  "strengths": ["strength1", "strength2", "strength3"],
-  "improvements": ["improvement1", "improvement2", "improvement3"],
+  "strengths": ["item1", "item2", "item3"],
+  "improvements": ["item1", "item2", "item3"],
   "timestampedFeedback": []
 }`
     
@@ -170,16 +163,15 @@ ${scenario.centurySkills.map((skill: string, i: number) => `      {"skill": "${s
         ],
         response_format: { type: 'json_object' },
         temperature: 0.5,
-        max_tokens: 8000,
+        max_tokens: 5000,
         provider: {
           order: ['Fireworks']
         }
       } as any)
       
-      console.log('GPT OSS raw response:', JSON.stringify(gradingResponse, null, 2))
       const responseContent = gradingResponse.choices[0]?.message?.content
-      console.log('Response content length:', responseContent?.length || 0, 'characters')
-      console.log('Response content preview:', responseContent?.substring(0, 200))
+      console.log('GPT OSS response received - Length:', responseContent?.length || 0, 'characters')
+      console.log('Response starts with:', responseContent?.substring(0, 50) + '...')
       
       if (!responseContent) {
         console.error('GPT OSS returned no content - model may be unavailable')
@@ -242,6 +234,23 @@ ${scenario.centurySkills.map((skill: string, i: number) => `      {"skill": "${s
         centurySkillsCount: gradingResult.scores?.centurySkills?.length || 0,
         hasOverallImpression: !!gradingResult.scores?.overallImpression
       })
+      
+      // Map abbreviated indicators back to full names
+      if (gradingResult.scores?.performanceIndicators) {
+        gradingResult.scores.performanceIndicators = gradingResult.scores.performanceIndicators.map((pi: any, i: number) => ({
+          indicator: scenario.performanceIndicators[i],
+          score: pi.score || 0,
+          feedback: pi.feedback || ''
+        }))
+      }
+      
+      if (gradingResult.scores?.centurySkills) {
+        gradingResult.scores.centurySkills = gradingResult.scores.centurySkills.map((skill: any, i: number) => ({
+          skill: scenario.centurySkills[i],
+          score: skill.score || 0,
+          feedback: skill.feedback || ''
+        }))
+      }
       
       result = {
         transcript: transcript,
