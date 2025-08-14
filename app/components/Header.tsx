@@ -36,9 +36,10 @@ export default function Header() {
   }
 
   return (
-    <header className="bg-white dark:bg-gray-800 shadow-md fixed top-0 left-0 right-0 z-10 transition-colors">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
+    <header className="hidden md:block fixed top-4 left-4 right-4 z-10">
+      <div className="bg-white dark:bg-gray-800 shadow-lg rounded-[20px] transition-colors max-w-7xl mx-auto">
+        <div className="px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <div className="flex-1 flex items-center">
             <Link href="/" className="text-2xl font-bold text-gray-800 dark:text-white hover:text-[#0066cc] dark:hover:text-[#4d94ff] transition-colors duration-300">
@@ -130,7 +131,7 @@ export default function Header() {
         {/* Mobile Navigation */}
         {isMenuOpen && (
           <div className="md:hidden">
-            <div className="px-2 pt-2 pb-3 space-y-1 bg-white border-t">
+            <div className="px-2 pt-2 pb-3 space-y-1 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
               <Link 
                 href="/performance" 
                 className="block px-3 py-2 text-gray-600 hover:text-[#0066cc] transition-colors duration-300"
@@ -202,6 +203,7 @@ export default function Header() {
             </div>
           </div>
         )}
+        </div>
       </div>
     </header>
   )

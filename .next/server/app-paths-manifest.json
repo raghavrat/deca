@@ -1,10 +1,9 @@
 {
-  "/api/roleplay/generate/route": "app/api/roleplay/generate/route.js",
-  "/test/page": "app/test/page.js",
-  "/performance/[category]/[ia]/page": "app/performance/[category]/[ia]/page.js",
-  "/roleplay/page": "app/roleplay/page.js",
-  "/test/[category]/page": "app/test/[category]/page.js",
-  "/roleplay/[category]/page": "app/roleplay/[category]/page.js",
   "/leaderboard/page": "app/leaderboard/page.js",
+  "/roleplay/[category]/page": "app/roleplay/[category]/page.js",
+  "/account/page": "app/account/page.js",
+  "/page": "app/page.js",
+  "/test/page": "app/test/page.js",
+  "/roleplay/page": "app/roleplay/page.js",
   "/performance/page": "app/performance/page.js"
 }

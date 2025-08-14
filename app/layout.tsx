@@ -23,7 +23,7 @@ export default function RootLayout({
           <AuthContextProvider>
             <div className="min-h-screen bg-gray-100 dark:bg-gray-900 flex flex-col transition-colors">
               <Header />
-              <main className="flex-grow pt-16">
+              <main className="flex-grow pt-4 md:pt-16">
                 {children}
               </main>
             </div>

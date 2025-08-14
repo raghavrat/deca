@@ -5,7 +5,7 @@ import { Trophy } from 'lucide-react'
 
 export default function LeaderboardPage() {
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-4">
+    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-4 pt-8 md:pt-12">
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-16 h-16 bg-[#0066cc]/10 rounded-full mb-4">
