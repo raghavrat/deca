@@ -135,8 +135,8 @@ Transcript: "${studentTranscript}"
 Return ONLY this JSON:
 {
   "scores": {
-    "performanceIndicators": [${scenario.performanceIndicators.map((_, i) => `{"indicator": "PI${i+1}", "score": 0-14, "feedback": "1 sentence"}`).join(', ')}],
-    "centurySkills": [${scenario.centurySkills.map((_, i) => `{"skill": "S${i+1}", "score": 0-6, "feedback": "few words"}`).join(', ')}],
+    "performanceIndicators": [${scenario.performanceIndicators.map((_: any, i: number) => `{"indicator": "PI${i+1}", "score": 0-14, "feedback": "1 sentence"}`).join(', ')}],
+    "centurySkills": [${scenario.centurySkills.map((_: any, i: number) => `{"skill": "S${i+1}", "score": 0-6, "feedback": "few words"}`).join(', ')}],
     "overallImpression": {"score": 0-6, "feedback": "1 sentence"}
   },
   "strengths": ["item1", "item2", "item3"],
