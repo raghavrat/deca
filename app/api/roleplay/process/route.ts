@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import OpenAI from 'openai'
-import { adminAuth } from '../../../firebase/admin'
-import { getFirestore } from 'firebase-admin/firestore'
+import { adminAuth, adminDb } from '../../../firebase/admin'
 
 const openai = new OpenAI({
   baseURL: 'https://openrouter.ai/api/v1',
@@ -107,7 +106,13 @@ Return ONLY a JSON object with this format:
       })
       
       if (transcript.length === 0 || transcriptionResult.audioQuality === 'silent') {
-        throw new Error('No audio content detected in recording')
+        return NextResponse.json(
+          { 
+            error: 'silent_audio', 
+            message: 'No audio detected in your recording. Please ensure your microphone is working and try again.' 
+          },
+          { status: 400 }
+        )
       }
     } catch (error: any) {
       console.error('Transcription error:', error)
@@ -235,8 +240,6 @@ ${scenario.centurySkills.map((skill: string) => `      {"skill": "${skill}", "sc
     
     result.scores.total = totalScore
 
-    // Get Firestore instance
-    const adminDb = getFirestore()
     
     // Generate a unique ID for this roleplay session
     const sessionId = `roleplay_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`

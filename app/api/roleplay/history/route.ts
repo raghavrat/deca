@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { adminAuth } from '../../../firebase/admin'
-import { getFirestore } from 'firebase-admin/firestore'
+import { adminAuth, adminDb } from '../../../firebase/admin'
 
 export async function GET(request: NextRequest) {
   try {
@@ -12,9 +11,6 @@ export async function GET(request: NextRequest) {
     }
     
     console.log('Fetching roleplay history for:', email)
-    
-    // Get Firestore instance
-    const adminDb = getFirestore()
     
     // Fetch all roleplays for this user
     const docRef = adminDb.collection('roleplays').doc(email)

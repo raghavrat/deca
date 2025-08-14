@@ -901,9 +901,20 @@ export default function CategoryRoleplayPage() {
                                         console.log('Response status:', response.status)
                                         
                                         if (!response.ok) {
-                                          const errorText = await response.text()
-                                          console.error('API Error response:', errorText)
-                                          throw new Error(`Failed to process audio: ${errorText}`)
+                                          const errorData = await response.json()
+                                          console.error('API Error response:', errorData)
+                                          
+                                          // Check for silent audio error
+                                          if (errorData.error === 'silent_audio') {
+                                            alert(errorData.message || 'No audio detected in your recording. Please ensure your microphone is working and try again.')
+                                            // Reset recording states for retry
+                                            setRecordedAudioBlob(null)
+                                            setRecordingDuration(0)
+                                            setIsSubmitting(false)
+                                            return
+                                          }
+                                          
+                                          throw new Error(errorData.message || errorData.error || `Failed to process audio`)
                                         }
                                         
                                         const responseData = await response.json()
