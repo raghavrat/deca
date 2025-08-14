@@ -122,53 +122,46 @@ Return ONLY a JSON object with this format:
     // STEP 2: Grade with GPT OSS
     console.log('Step 2: Grading with GPT OSS...')
     
-    const gradingPrompt = `Grade this DECA roleplay performance based ONLY on what the student actually said.
+    // Simplified prompt for GPT OSS
+    const studentTranscript = transcript.map((t: any) => t.text).join(' ')
+    
+    const gradingPrompt = `Grade this DECA roleplay transcript. Give each performance indicator a score 0-14 and each skill a score 0-6.
 
-PERFORMANCE INDICATORS TO GRADE (each 0-14 points):
-${scenario.performanceIndicators.map((pi: string, i: number) => `${i + 1}. ${pi}`).join('\n')}
+Performance Indicators:
+${scenario.performanceIndicators.map((pi: string, i: number) => `PI${i + 1}: ${pi}`).join('\n')}
 
-21ST CENTURY SKILLS TO GRADE (each 0-6 points):
-${scenario.centurySkills.map((skill: string, i: number) => `${i + 1}. ${skill}`).join('\n')}
+21st Century Skills:
+${scenario.centurySkills.map((skill: string, i: number) => `S${i + 1}: ${skill}`).join('\n')}
 
-STUDENT TRANSCRIPT:
-${transcript.map((t: any) => `${t.text}`).join(' ')}
+Transcript: "${studentTranscript}"
 
-SCORING RULES:
-- 12-14: Exceeds expectations, extremely professional
-- 9-11: Meets expectations, acceptable performance  
-- 5-8: Below expectations, needs improvement
-- 0-4: Little/no demonstration of the indicator
-
-Return ONLY this exact JSON with actual scores and feedback:
+Return JSON only:
 {
   "scores": {
     "performanceIndicators": [
-${scenario.performanceIndicators.map((pi: string) => `      {"indicator": "${pi}", "score": <0-14>, "feedback": "<1-2 sentences>"}`).join(',\n')}
+${scenario.performanceIndicators.map((pi: string, i: number) => `      {"indicator": "${pi}", "score": NUMBER, "feedback": "SHORT_FEEDBACK"}`).join(',\n')}
     ],
     "centurySkills": [
-${scenario.centurySkills.map((skill: string) => `      {"skill": "${skill}", "score": <0-6>, "feedback": "<1 sentence>"}`).join(',\n')}
+${scenario.centurySkills.map((skill: string, i: number) => `      {"skill": "${skill}", "score": NUMBER, "feedback": "SHORT_FEEDBACK"}`).join(',\n')}
     ],
-    "overallImpression": {
-      "score": <0-6>,
-      "feedback": "<1-2 sentences>"
-    }
+    "overallImpression": {"score": NUMBER, "feedback": "SHORT_FEEDBACK"}
   },
-  "timestampedFeedback": [
-    {"timestamp": "00:00", "type": "positive", "feedback": "<specific positive>"},
-    {"timestamp": "00:15", "type": "improvement", "feedback": "<specific improvement>"}
-  ],
-  "strengths": ["<strength 1>", "<strength 2>", "<strength 3>"],
-  "improvements": ["<improvement 1>", "<improvement 2>", "<improvement 3>"]
+  "strengths": ["strength1", "strength2", "strength3"],
+  "improvements": ["improvement1", "improvement2", "improvement3"],
+  "timestampedFeedback": []
 }`
     
     let result
     try {
+      console.log('Sending grading request to GPT OSS...')
+      console.log('Prompt length:', gradingPrompt.length, 'characters')
+      
       const gradingResponse = await openai.chat.completions.create({
         model: 'openai/gpt-oss-20b',
         messages: [
           {
             role: 'system',
-            content: 'You are a professional DECA judge. Evaluate fairly based on the actual performance, not what could have been said.'
+            content: 'You are a DECA judge. Score the student performance and return valid JSON only. Be concise.'
           },
           {
             role: 'user',
@@ -176,14 +169,17 @@ ${scenario.centurySkills.map((skill: string) => `      {"skill": "${skill}", "sc
           }
         ],
         response_format: { type: 'json_object' },
-        temperature: 0.3,
-        max_tokens: 5000,
+        temperature: 0.5,
+        max_tokens: 4000,
         provider: {
           order: ['Fireworks']
         }
       } as any)
       
+      console.log('GPT OSS raw response:', JSON.stringify(gradingResponse, null, 2))
       const responseContent = gradingResponse.choices[0]?.message?.content
+      console.log('Response content length:', responseContent?.length || 0, 'characters')
+      console.log('Response content preview:', responseContent?.substring(0, 200))
       
       if (!responseContent) {
         console.error('GPT OSS returned no content - model may be unavailable')
