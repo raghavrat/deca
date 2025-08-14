@@ -6,7 +6,7 @@ export function middleware(request: NextRequest) {
   const currentPath = request.nextUrl.pathname
 
   // Paths that don't require authentication
-  const publicPaths = ['/login', '/signup', '/api/auth/session']
+  const publicPaths = ['/login', '/signup', '/forgot-password', '/auth/action', '/api/auth/session']
   
   // Allow public paths and API routes
   if (publicPaths.includes(currentPath) || currentPath.startsWith('/api/')) {

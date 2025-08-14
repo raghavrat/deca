@@ -9,8 +9,10 @@ export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const { signIn } = useAuth();
+  const [showResetPassword, setShowResetPassword] = useState(false);
+  const { signIn, resetPassword } = useAuth();
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -79,10 +81,16 @@ export default function Login() {
             {isLoading ? 'Signing in...' : 'Sign in'}
           </button>
         </form>
-        <div className="text-center">
+        <div className="text-center space-y-2">
+          <Link 
+            href="/forgot-password" 
+            className="text-[#0066cc] hover:text-[#0052a3] font-semibold transition-colors duration-300 block"
+          >
+            Forgot your password?
+          </Link>
           <Link 
             href="/signup" 
-            className="text-[#0066cc] hover:text-[#0052a3] font-semibold transition-colors duration-300"
+            className="text-[#0066cc] hover:text-[#0052a3] font-semibold transition-colors duration-300 block"
           >
             Don't have an account? Sign up
           </Link>

@@ -101,3 +101,4 @@ When modifying authentication:
 - Client auth logic: `/app/context/AuthContext.tsx`
 - Server session handling: `/app/api/auth/session/route.ts`
 - Protected route middleware: `/middleware.ts`
+- Never try to run the code
