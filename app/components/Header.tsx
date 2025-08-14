@@ -36,7 +36,7 @@ export default function Header() {
   }
 
   return (
-    <header className="hidden md:block fixed top-4 left-4 right-4 z-10">
+    <header className="fixed top-4 left-4 right-4 z-10">
       <div className="bg-white dark:bg-gray-800 shadow-lg rounded-[20px] transition-colors max-w-7xl mx-auto">
         <div className="px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
