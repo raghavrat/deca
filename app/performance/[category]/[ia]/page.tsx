@@ -73,18 +73,18 @@ export default function IAPage({ params: paramsPromise, searchParams: searchPara
 
   return (
     <div className="py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-      <Link href="/performance" className="mb-6 inline-flex items-center text-[#0066cc] hover:text-[#0052a3] transition-colors duration-200">
+      <Link href="/performance" className="mb-6 inline-flex items-center text-[#0066cc] dark:text-[#4d94ff] hover:text-[#0052a3] dark:hover:text-[#6ba3ff] transition-colors duration-200">
         <ChevronLeft className="mr-1" />
         Back to Clusters
       </Link>
-      <h2 className="text-3xl font-bold mb-6 text-gray-800">{category} - {ia}</h2>
+      <h2 className="text-3xl font-bold mb-6 text-gray-800 dark:text-white">{category} - {ia}</h2>
       <Suspense fallback={<div className="animate-pulse bg-gray-200 h-96 rounded-lg"></div>}>
         {isLoading ? (
           <div className="animate-pulse bg-gray-200 h-96 rounded-lg"></div>
         ) : filteredData.length > 0 ? (
           <InstructionalArea area={ia} indicators={filteredData} />
         ) : (
-          <p className="text-gray-600">No performance indicators found for this instructional area.</p>
+          <p className="text-gray-600 dark:text-gray-400">No performance indicators found for this instructional area.</p>
         )}
       </Suspense>
     </div>

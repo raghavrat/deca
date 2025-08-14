@@ -150,25 +150,25 @@ export default function PerformancePage() {
 
   return (
     <div className="py-12 px-4 sm:px-6 lg:px-8 min-h-screen flex flex-col items-center justify-center">
-      <h1 className="text-4xl font-bold mb-12 text-center text-gray-800">Performance Indicators</h1>
+      <h1 className="text-4xl font-bold mb-12 text-center text-gray-800 dark:text-white">Performance Indicators</h1>
       
       <div className="w-full max-w-md mb-8 flex items-center justify-between">
-        <div className="flex-grow relative bg-white rounded-[15px] border border-gray-200 shadow-sm mr-4">
+        <div className="flex-grow relative bg-white dark:bg-gray-800 rounded-[15px] border border-gray-200 dark:border-gray-700 shadow-sm mr-4">
           <input
             type="text"
             placeholder="Search performance indicators..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             onKeyPress={handleKeyPress}
-            className="w-full px-4 py-3 pl-12 text-gray-800 bg-white rounded-[15px] focus:outline-none placeholder-gray-500"
+            className="w-full px-4 py-3 pl-12 text-gray-800 dark:text-white bg-white dark:bg-gray-800 rounded-[15px] focus:outline-none placeholder-gray-500 dark:placeholder-gray-400"
           />
-          <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+          <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 h-5 w-5" />
         </div>
         <button 
           onClick={handleSearch}
-          className="p-3 bg-white rounded-full shadow-sm hover:shadow-md transition-shadow duration-200 click-animation"
+          className="p-3 bg-white dark:bg-gray-800 rounded-full shadow-sm hover:shadow-md transition-shadow duration-200 click-animation"
         >
-          <Search className="h-5 w-5 text-gray-400" />
+          <Search className="h-5 w-5 text-gray-400 dark:text-gray-500" />
         </button>
       </div>
 
@@ -177,13 +177,13 @@ export default function PerformancePage() {
           <div key={cluster} className="relative">
             <button
               onClick={() => handleClusterClick(cluster)}
-              className={`w-full bg-white hover:bg-gray-50 text-gray-800 font-semibold py-4 px-6 rounded-[15px] shadow-md text-center transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0066cc] flex justify-between items-center click-animation ${
-                selectedCluster === cluster ? 'bg-gray-50' : ''
+              className={`w-full bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-800 dark:text-white font-semibold py-4 px-6 rounded-[15px] shadow-md text-center transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0066cc] dark:focus:ring-[#4d94ff] flex justify-between items-center click-animation ${
+                selectedCluster === cluster ? 'bg-gray-50 dark:bg-gray-700' : ''
               }`}
             >
               <span>{cluster}</span>
               {selectedCluster === cluster && (
-                isOpen ? <ChevronUp className="h-5 w-5 text-gray-400" /> : <ChevronDown className="h-5 w-5 text-gray-400" />
+                isOpen ? <ChevronUp className="h-5 w-5 text-gray-400 dark:text-gray-500" /> : <ChevronDown className="h-5 w-5 text-gray-400 dark:text-gray-500" />
               )}
             </button>
             <div className={`mt-2 space-y-2 overflow-hidden transition-all duration-300 ease-in-out ${

@@ -44,33 +44,33 @@ export default function LeaderboardDisplay() {
   }, [])
 
   return (
-    <div className="bg-white rounded-lg shadow-sm p-6">
+    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
       <div className="flex items-center mb-4">
         <Trophy className="h-6 w-6 text-yellow-500 mr-2" />
-        <h2 className="text-2xl font-bold text-gray-800">Leaderboard</h2>
+        <h2 className="text-2xl font-bold text-gray-800 dark:text-white">Leaderboard</h2>
       </div>
-      <p className="text-gray-600 mb-4">
+      <p className="text-gray-600 dark:text-gray-400 mb-4">
         Top users by problems completed.
       </p>
 
       {loading && (
-        <div className="text-center text-gray-500">Loading leaderboard...</div>
+        <div className="text-center text-gray-500 dark:text-gray-400">Loading leaderboard...</div>
       )}
-      {error && <div className="text-center text-red-500">{error}</div>}
+      {error && <div className="text-center text-red-500 dark:text-red-400">{error}</div>}
 
       {!loading && !error && (
-        <ul role="list" className="divide-y divide-gray-200">
+        <ul role="list" className="divide-y divide-gray-200 dark:divide-gray-700">
           {leaderboard.map((user, index) => (
             <li key={user.id} className="py-3 flex items-center justify-between">
               <div className="flex items-center">
-                <div className="text-md font-bold text-gray-600 w-8 text-center">
+                <div className="text-md font-bold text-gray-600 dark:text-gray-400 w-8 text-center">
                   {index + 1}
                 </div>
                 <div className="ml-3">
-                  <div className="text-md font-medium text-gray-800">{user.name}</div>
+                  <div className="text-md font-medium text-gray-800 dark:text-white">{user.name}</div>
                 </div>
               </div>
-              <div className="text-lg font-bold text-blue-600">
+              <div className="text-lg font-bold text-blue-600 dark:text-blue-400">
                 {user.problemsCompleted}
               </div>
             </li>

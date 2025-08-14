@@ -57,25 +57,25 @@ export default function RoleplayPage() {
 
   if (showEvents && selectedCategory) {
     return (
-      <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center p-4">
+      <div className="min-h-screen bg-gray-100 dark:bg-gray-900 flex flex-col items-center justify-center p-4">
         <div className="w-full max-w-4xl">
           <div className="flex items-center mb-6">
             <button
               onClick={handleBackToCategories}
-              className="flex items-center text-gray-600 hover:text-[#0066cc] transition-colors mr-4"
+              className="flex items-center text-gray-600 dark:text-gray-400 hover:text-[#0066cc] dark:hover:text-[#4d94ff] transition-colors mr-4"
             >
               <ChevronRight className="h-5 w-5 mr-1 rotate-180" />
               Back to Categories
             </button>
-            <h1 className="text-3xl font-bold text-gray-800">
+            <h1 className="text-3xl font-bold text-gray-800 dark:text-white">
               {selectedCategoryData?.displayName} Events
             </h1>
           </div>
 
-          <div className="mb-8 bg-white rounded-[15px] shadow-md p-6">
+          <div className="mb-8 bg-white dark:bg-gray-800 rounded-[15px] shadow-md p-6">
             <div className={`${selectedCategoryData?.color} h-2 w-full rounded-t-[15px] -mx-6 -mt-6 mb-4`}></div>
-            <p className="text-gray-600 mb-4">{selectedCategoryData?.description}</p>
-            <p className="text-sm text-gray-500">
+            <p className="text-gray-600 dark:text-gray-400 mb-4">{selectedCategoryData?.description}</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
               Choose a specific DECA event below for a more targeted roleplay experience, or select "General Category Practice" for broader scenarios.
             </p>
           </div>
@@ -84,18 +84,18 @@ export default function RoleplayPage() {
             {/* General Category Option */}
             <Link
               href={`/roleplay/${selectedCategory.toLowerCase()}`}
-              className="group block bg-white rounded-[15px] shadow-md hover:shadow-lg transition-shadow duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0066cc] overflow-hidden click-animation"
+              className="group block bg-white dark:bg-gray-800 rounded-[15px] shadow-md hover:shadow-lg transition-shadow duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0066cc] overflow-hidden click-animation"
             >
               <div className="bg-gray-500 h-2 w-full"></div>
               <div className="p-6">
                 <div className="flex items-center justify-between mb-3">
-                  <h3 className="text-xl font-semibold text-gray-800 flex items-center">
+                  <h3 className="text-xl font-semibold text-gray-800 dark:text-white flex items-center">
                     <Users className="h-5 w-5 mr-2" />
                     General Category Practice
                   </h3>
-                  <ChevronRight className="h-5 w-5 text-gray-400 group-hover:text-[#0066cc] transition-colors" />
+                  <ChevronRight className="h-5 w-5 text-gray-400 group-hover:text-[#0066cc] dark:group-hover:text-[#4d94ff] transition-colors" />
                 </div>
-                <p className="text-gray-600 text-sm leading-relaxed">
+                <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">
                   Practice with general {selectedCategoryData?.displayName.toLowerCase()} scenarios covering various business situations and challenges.
                 </p>
               </div>
@@ -106,21 +106,21 @@ export default function RoleplayPage() {
               <Link
                 key={event.id}
                 href={`/roleplay/${selectedCategory.toLowerCase()}?event=${event.id}`}
-                className="group block bg-white rounded-[15px] shadow-md hover:shadow-lg transition-shadow duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0066cc] overflow-hidden click-animation"
+                className="group block bg-white dark:bg-gray-800 rounded-[15px] shadow-md hover:shadow-lg transition-shadow duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0066cc] overflow-hidden click-animation"
               >
                 <div className={`${selectedCategoryData?.color} h-2 w-full`}></div>
                 <div className="p-6">
                   <div className="flex items-center justify-between mb-3">
-                    <h3 className="text-lg font-semibold text-gray-800 flex items-center">
+                    <h3 className="text-lg font-semibold text-gray-800 dark:text-white flex items-center">
                       <Trophy className="h-4 w-4 mr-2" />
                       {event.name}
                     </h3>
-                    <ChevronRight className="h-5 w-5 text-gray-400 group-hover:text-[#0066cc] transition-colors" />
+                    <ChevronRight className="h-5 w-5 text-gray-400 group-hover:text-[#0066cc] dark:group-hover:text-[#4d94ff] transition-colors" />
                   </div>
-                  <p className="text-gray-600 text-sm leading-relaxed mb-3">
+                  <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed mb-3">
                     {event.description}
                   </p>
-                  <div className="text-xs text-gray-500">
+                  <div className="text-xs text-gray-500 dark:text-gray-400">
                     <span className="font-medium">Event ID:</span> {event.id}
                   </div>
                 </div>
@@ -133,11 +133,11 @@ export default function RoleplayPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center p-4">
+    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 flex flex-col items-center justify-center p-4">
       <div className="w-full max-w-4xl">
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold mb-4 text-gray-800">Practice Roleplays</h1>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+          <h1 className="text-4xl font-bold mb-4 text-gray-800 dark:text-white">Practice Roleplays</h1>
+          <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
             Practice DECA competition scenarios with AI-powered roleplay simulations. 
             Choose a category to see available events and generate realistic business scenarios.
           </p>
@@ -148,20 +148,20 @@ export default function RoleplayPage() {
             <button
               key={cluster.name}
               onClick={() => handleCategoryClick(cluster.name)}
-              className="group block bg-white rounded-[15px] shadow-md hover:shadow-lg transition-shadow duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0066cc] overflow-hidden w-full text-left click-animation"
+              className="group block bg-white dark:bg-gray-800 rounded-[15px] shadow-md hover:shadow-lg transition-shadow duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0066cc] overflow-hidden w-full text-left click-animation"
             >
               <div className={`${cluster.color} h-2 w-full`}></div>
               <div className="p-6">
                 <div className="flex items-center justify-between mb-3">
-                  <h3 className="text-xl font-semibold text-gray-800">
+                  <h3 className="text-xl font-semibold text-gray-800 dark:text-white">
                     {cluster.displayName}
                   </h3>
-                  <ChevronRight className="h-5 w-5 text-gray-400 group-hover:text-[#0066cc] transition-colors" />
+                  <ChevronRight className="h-5 w-5 text-gray-400 group-hover:text-[#0066cc] dark:group-hover:text-[#4d94ff] transition-colors" />
                 </div>
-                <p className="text-gray-600 text-sm leading-relaxed mb-3">
+                <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed mb-3">
                   {cluster.description}
                 </p>
-                <div className="text-xs text-[#0066cc] font-medium">
+                <div className="text-xs text-[#0066cc] dark:text-[#4d94ff] font-medium">
                   {getEventsByCategory(cluster.name).length} events available
                 </div>
               </div>

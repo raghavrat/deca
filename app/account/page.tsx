@@ -56,7 +56,7 @@ export default function AccountPage() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="text-gray-500">Loading...</div>
+        <div className="text-gray-500 dark:text-gray-400">Loading...</div>
       </div>
     )
   }
@@ -93,26 +93,26 @@ export default function AccountPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
-        <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">Account Dashboard</h1>
-          <p className="text-gray-600">{user.email}</p>
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 mb-6">
+          <h1 className="text-3xl font-bold text-gray-800 dark:text-white mb-2">Account Dashboard</h1>
+          <p className="text-gray-600 dark:text-gray-400">{user.email}</p>
         </div>
 
         {/* Name Section */}
-        <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
-          <h2 className="text-xl font-bold text-gray-800 mb-4">Display Name</h2>
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 mb-6">
+          <h2 className="text-xl font-bold text-gray-800 dark:text-white mb-4">Display Name</h2>
           {!isEditingName ? (
             <div className="flex items-center justify-between">
               <div className="flex items-center">
-                <UserIcon className="h-6 w-6 text-gray-500 mr-3" />
-                <span className="text-lg text-gray-800">{name || 'No name set'}</span>
+                <UserIcon className="h-6 w-6 text-gray-500 dark:text-gray-400 mr-3" />
+                <span className="text-lg text-gray-800 dark:text-white">{name || 'No name set'}</span>
               </div>
               <button 
                 onClick={() => setIsEditingName(true)} 
-                className="text-sm text-blue-600 hover:underline"
+                className="text-sm text-blue-600 dark:text-blue-400 hover:underline"
               >
                 Edit
               </button>
@@ -124,13 +124,13 @@ export default function AccountPage() {
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="border rounded-md px-3 py-2 w-full text-gray-800"
+                  className="border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 w-full text-gray-800 dark:text-white bg-white dark:bg-gray-700"
                   placeholder="Enter your display name"
                 />
                 <button type="submit" className="ml-3 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
                   <Save className="h-5 w-5" />
                 </button>
-                <button onClick={() => setIsEditingName(false)} className="ml-2 px-4 py-2 text-gray-600">
+                <button onClick={() => setIsEditingName(false)} className="ml-2 px-4 py-2 text-gray-600 dark:text-gray-400">
                   Cancel
                 </button>
               </div>
@@ -141,36 +141,36 @@ export default function AccountPage() {
 
         {/* Stats Overview */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-          <div className="bg-white rounded-lg shadow-sm p-6">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
             <div className="flex items-center justify-between mb-4">
               <div className="p-3 bg-blue-100 rounded-lg">
                 <Target className="h-6 w-6 text-blue-600" />
               </div>
             </div>
-            <h3 className="text-2xl font-bold text-gray-800">{stats.totalQuestions}</h3>
-            <p className="text-gray-600 text-sm">Total Questions Attempted</p>
+            <h3 className="text-2xl font-bold text-gray-800 dark:text-white">{stats.totalQuestions}</h3>
+            <p className="text-gray-600 dark:text-gray-400 text-sm">Total Questions Attempted</p>
           </div>
 
-          <div className="bg-white rounded-lg shadow-sm p-6">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
             <div className="flex items-center justify-between mb-4">
               <div className="p-3 bg-green-100 rounded-lg">
                 <TrendingUp className="h-6 w-6 text-green-600" />
               </div>
             </div>
-            <h3 className="text-2xl font-bold text-gray-800">{stats.streak || 0}</h3>
-            <p className="text-gray-600 text-sm">Day Streak</p>
+            <h3 className="text-2xl font-bold text-gray-800 dark:text-white">{stats.streak || 0}</h3>
+            <p className="text-gray-600 dark:text-gray-400 text-sm">Day Streak</p>
           </div>
 
-          <div className="bg-white rounded-lg shadow-sm p-6">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
             <div className="flex items-center justify-between mb-4">
               <div className="p-3 bg-purple-100 rounded-lg">
                 <Clock className="h-6 w-6 text-purple-600" />
               </div>
             </div>
-            <h3 className="text-lg font-semibold text-gray-800">
+            <h3 className="text-lg font-semibold text-gray-800 dark:text-white">
               {stats.lastAttempt ? new Date(stats.lastAttempt).toLocaleDateString() : 'No attempts yet'}
             </h3>
-            <p className="text-gray-600 text-sm">Last Activity</p>
+            <p className="text-gray-600 dark:text-gray-400 text-sm">Last Activity</p>
           </div>
           </div>
 
