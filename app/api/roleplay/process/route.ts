@@ -122,24 +122,35 @@ Return ONLY a JSON object with this format:
     // STEP 2: Grade with GPT OSS
     console.log('Step 2: Grading with GPT OSS...')
     
+    // Debug scenario content
+    console.log('Scenario content check:', {
+      hasEventSituation: !!scenario.eventSituation,
+      roleDescLength: scenario.eventSituation?.roleDescription?.length || 0,
+      challengeLength: scenario.eventSituation?.businessChallenge?.length || 0,
+      taskLength: scenario.eventSituation?.taskDescription?.length || 0,
+      piCount: scenario.performanceIndicators?.length || 0,
+      skillsCount: scenario.centurySkills?.length || 0
+    })
+    
     // Grading prompt with essential context
     const studentTranscript = transcript.map((t: any) => t.text).join(' ')
     
     const gradingPrompt = `Grade this DECA roleplay performance.
 
 SCENARIO CONTEXT:
-Role: ${scenario.eventSituation.roleDescription.substring(0, 200)}
-Challenge: ${scenario.eventSituation.businessChallenge.substring(0, 200)}
-Task: ${scenario.eventSituation.taskDescription.substring(0, 200)}
+Role: ${scenario.eventSituation?.roleDescription || 'No role description'}
+Company: ${scenario.eventSituation?.companyBackground?.substring(0, 300) || 'No company background'}
+Challenge: ${scenario.eventSituation?.businessChallenge || 'No challenge description'}
+Task: ${scenario.eventSituation?.taskDescription || 'No task description'}
 
 PERFORMANCE INDICATORS TO EVALUATE (0-14 points each):
-${scenario.performanceIndicators.map((pi: string, i: number) => `${i+1}. ${pi}`).join('\n')}
+${scenario.performanceIndicators?.map((pi: string, i: number) => `${i+1}. ${pi}`).join('\n') || 'No performance indicators'}
 
 21ST CENTURY SKILLS (0-6 points each):
-${scenario.centurySkills.map((s: string, i: number) => `${i+1}. ${s}`).join('\n')}
+${scenario.centurySkills?.map((s: string, i: number) => `${i+1}. ${s}`).join('\n') || 'No century skills'}
 
 STUDENT'S RESPONSE:
-"${studentTranscript.substring(0, 2000)}"
+"${studentTranscript.substring(0, 3000)}"
 
 Return ONLY this JSON:
 {
@@ -156,7 +167,13 @@ Return ONLY this JSON:
     let result
     try {
       console.log('Sending grading request to GPT OSS...')
-      console.log('Prompt length:', gradingPrompt.length, 'characters')
+      console.log('Prompt details:', {
+        totalLength: gradingPrompt.length,
+        hasRole: gradingPrompt.includes('Role:'),
+        hasChallenge: gradingPrompt.includes('Challenge:'),
+        hasPIs: gradingPrompt.includes('PERFORMANCE INDICATORS'),
+        promptPreview: gradingPrompt.substring(0, 500) + '...'
+      })
       
       const gradingResponse = await openai.chat.completions.create({
         model: 'openai/gpt-oss-20b',
