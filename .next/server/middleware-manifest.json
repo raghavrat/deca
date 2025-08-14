@@ -4,32 +4,29 @@
     "/": {
       "files": [
         "server/edge-runtime-webpack.js",
-        "server/973.js",
-        "server/64.js",
-        "server/880.js",
-        "server/153.js",
-        "server/198.js",
-        "server/457.js",
-        "server/875.js",
-        "server/535.js",
+        "server/vendors-_middleware_node_modules_next_dist_compiled_edge-runtime_cookies_index_js-_middleware-6a3160.js",
+        "server/vendors-_middleware_node_modules_next_dist_esm_api_server_js-_middleware_node_modules_next_di-fa5556.js",
+        "server/vendors-_middleware_node_modules_next_dist_esm_server_app-render_after-task-async-storage_ext-6ddb83.js",
+        "server/vendors-_middleware_node_modules_next_dist_esm_server_internal-utils_js-_middleware_node_modu-872a7c.js",
+        "server/vendors-_middleware_node_modules_next_dist_esm_server_revalidation-utils_js-_middleware_node_-42d375.js",
+        "server/vendors-_middleware_node_modules_next_dist_esm_server_web_web-on-close_js-_middleware_node_mo-0f2af2.js",
+        "server/vendors-_middleware_node_modules_opentelemetry_api_build_esm_api_metrics_js-_middleware_node_-058c1c.js",
+        "server/vendors-_middleware_node_modules_opentelemetry_api_build_esm_index_js-_middleware_node_module-72ab4d.js",
         "server/middleware.js"
       ],
       "name": "middleware",
       "page": "/",
       "matchers": [
         {
-          "regexp": "^(?:\\/(_next\\/data\\/[^/]{1,}))?(?:\\/((?!api\\/auth|_next\\/static|_next\\/image|favicon.ico).*))(\\.json)?[\\/#\\?]?$",
-          "originalSource": "/((?!api/auth|_next/static|_next/image|favicon.ico).*)"
+          "regexp": "^/.*$",
+          "originalSource": "/:path*"
         }
       ],
       "wasm": [],
       "assets": [],
       "env": {
-        "__NEXT_BUILD_ID": "PZNRQg8rBZp1pR3fukPa2",
-        "NEXT_SERVER_ACTIONS_ENCRYPTION_KEY": "fWCz51yY4saaY3Q9RXvYdMxvCZ4bIg0Mc6vrf9nXQC4=",
-        "__NEXT_PREVIEW_MODE_ID": "c13f7a016100b7937fe2897e7045661c",
-        "__NEXT_PREVIEW_MODE_ENCRYPTION_KEY": "668615cb9c22108ad1222d780713afa1080b9406c4f4f44eb488a5d2f99033b0",
-        "__NEXT_PREVIEW_MODE_SIGNING_KEY": "cd3391a2edbd8b6c354cbeb7633c04379d55efc326a9f3abffc0f5df090d4522"
+        "__NEXT_BUILD_ID": "development",
+        "NEXT_SERVER_ACTIONS_ENCRYPTION_KEY": "fWCz51yY4saaY3Q9RXvYdMxvCZ4bIg0Mc6vrf9nXQC4="
       }
     }
   },

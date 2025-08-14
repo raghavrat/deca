@@ -1,1 +1,64 @@
-globalThis.__BUILD_MANIFEST={polyfillFiles:["static/chunks/polyfills-42372ed130431b0a.js"],devFiles:[],ampDevFiles:[],lowPriorityFiles:[],rootMainFiles:["static/chunks/webpack-0dcc08a294140b9d.js","static/chunks/lib-695bc7bc-1e479f3e18fe2582.js","static/chunks/lib-924e0bc7-3c7e0f805867c063.js","static/chunks/commons-f3956634-ee126d72704a236e.js","static/chunks/commons-0892873f-9c7750537547719b.js","static/chunks/commons-b49fab05-9a0662548ddca762.js","static/chunks/commons-89d5c698-389d4e2e5bb86d5e.js","static/chunks/4288-07e12ee8a5c23932.js","static/chunks/8732-2ebe8ddc5d6b41c3.js","static/chunks/1031-dda825ce844d0dac.js","static/chunks/7544-3fa9a062bb74e192.js","static/chunks/7326-beae627bb9901982.js","static/chunks/4150-3eeafa91665c46be.js","static/chunks/2743-98b84ce81ab395f9.js","static/chunks/2427-e40dacf7fde7b400.js","static/chunks/2993-a0d504d418f67aae.js","static/chunks/2102-7663d31e4f043fd1.js","static/chunks/5495-6e027667d1bd2703.js","static/chunks/main-app-b886855ab87cc9fd.js"],rootMainFilesTree:{},pages:{"/_app":["static/chunks/webpack-0dcc08a294140b9d.js","static/chunks/framework-36598b9c-05d4bc7979ba14fb.js","static/chunks/framework-8cbd2506-110f36f342b19c51.js","static/chunks/lib-18dcbef7-ab8f52a9690a71a0.js","static/chunks/commons-f3956634-ee126d72704a236e.js","static/chunks/commons-0892873f-9c7750537547719b.js","static/chunks/commons-b49fab05-9a0662548ddca762.js","static/chunks/commons-89d5c698-389d4e2e5bb86d5e.js","static/chunks/8852-d09c9bb5fea0aa8e.js","static/chunks/4675-57f8c772a1c2ead0.js","static/chunks/501-ff1a411f605320db.js","static/chunks/4079-ca9d7393aa9367a5.js","static/chunks/1216-19e7f8277eb798ec.js","static/chunks/main-5332d6aad4497239.js","static/chunks/pages/_app-29d2cd59d8878d0b.js"],"/_error":["static/chunks/webpack-0dcc08a294140b9d.js","static/chunks/framework-36598b9c-05d4bc7979ba14fb.js","static/chunks/framework-8cbd2506-110f36f342b19c51.js","static/chunks/lib-18dcbef7-ab8f52a9690a71a0.js","static/chunks/commons-f3956634-ee126d72704a236e.js","static/chunks/commons-0892873f-9c7750537547719b.js","static/chunks/commons-b49fab05-9a0662548ddca762.js","static/chunks/commons-89d5c698-389d4e2e5bb86d5e.js","static/chunks/8852-d09c9bb5fea0aa8e.js","static/chunks/4675-57f8c772a1c2ead0.js","static/chunks/501-ff1a411f605320db.js","static/chunks/4079-ca9d7393aa9367a5.js","static/chunks/1216-19e7f8277eb798ec.js","static/chunks/main-5332d6aad4497239.js","static/chunks/pages/_error-d30578c2f6202cbc.js"]},ampFirstPages:[]},globalThis.__BUILD_MANIFEST.lowPriorityFiles=["/static/"+process.env.__NEXT_BUILD_ID+"/_buildManifest.js",,"/static/"+process.env.__NEXT_BUILD_ID+"/_ssgManifest.js"];
+globalThis.__BUILD_MANIFEST = {
+  "polyfillFiles": [
+    "static/chunks/polyfills.js"
+  ],
+  "devFiles": [],
+  "ampDevFiles": [],
+  "lowPriorityFiles": [],
+  "rootMainFiles": [
+    "static/chunks/webpack.js",
+    "static/chunks/lib-5caa17f7.js",
+    "static/chunks/lib-ac8dad15.js",
+    "static/chunks/vendors-_app-pages-browser_node_modules_next_dist_build_polyfills_process_js-_app-pages-brows-9224fe.js",
+    "static/chunks/vendors-_app-pages-browser_node_modules_next_dist_client_assign-location_js-_app-pages-browse-05ca78.js",
+    "static/chunks/vendors-_app-pages-browser_node_modules_next_dist_client_components_error-boundary_js-_app-pa-d6ea61.js",
+    "static/chunks/vendors-_app-pages-browser_node_modules_next_dist_client_components_forbidden_js-_app-pages-b-d4dafe.js",
+    "static/chunks/vendors-_app-pages-browser_node_modules_next_dist_client_components_links_js-_app-pages-brows-2e6835.js",
+    "static/chunks/vendors-_app-pages-browser_node_modules_next_dist_client_components_not-found_js-_app-pages-b-3dcd0c.js",
+    "static/chunks/vendors-_app-pages-browser_node_modules_next_dist_client_components_react-dev-overlay_ui_comp-c9b1ab.js",
+    "static/chunks/vendors-_app-pages-browser_node_modules_next_dist_client_components_react-dev-overlay_ui_comp-bd958c.js",
+    "static/chunks/vendors-_app-pages-browser_node_modules_next_dist_client_components_react-dev-overlay_ui_comp-64f3b0.js",
+    "static/chunks/vendors-_app-pages-browser_node_modules_next_dist_client_components_react-dev-overlay_ui_comp-75d8e7.js",
+    "static/chunks/vendors-_app-pages-browser_node_modules_next_dist_client_components_react-dev-overlay_ui_comp-914d92.js",
+    "static/chunks/vendors-_app-pages-browser_node_modules_next_dist_client_components_react-dev-overlay_ui_comp-fdf227.js",
+    "static/chunks/vendors-_app-pages-browser_node_modules_next_dist_client_components_react-dev-overlay_ui_comp-6f648f.js",
+    "static/chunks/vendors-_app-pages-browser_node_modules_next_dist_client_components_react-dev-overlay_ui_comp-9d3b43.js",
+    "static/chunks/vendors-_app-pages-browser_node_modules_next_dist_client_components_react-dev-overlay_ui_comp-f69274.js",
+    "static/chunks/vendors-_app-pages-browser_node_modules_next_dist_client_components_react-dev-overlay_ui_comp-eff034.js",
+    "static/chunks/vendors-_app-pages-browser_node_modules_next_dist_client_components_react-dev-overlay_ui_cont-9a8abe.js",
+    "static/chunks/vendors-_app-pages-browser_node_modules_next_dist_client_components_react-dev-overlay_ui_dev--f7322a.js",
+    "static/chunks/vendors-_app-pages-browser_node_modules_next_dist_client_components_react-dev-overlay_ui_icon-90bbfc.js",
+    "static/chunks/vendors-_app-pages-browser_node_modules_next_dist_client_components_react-dev-overlay_ui_styl-d7831b.js",
+    "static/chunks/vendors-_app-pages-browser_node_modules_next_dist_client_components_react-dev-overlay_utils_c-8fc924.js",
+    "static/chunks/vendors-_app-pages-browser_node_modules_next_dist_client_components_react-dev-overlay_utils_s-74b5ad.js",
+    "static/chunks/vendors-_app-pages-browser_node_modules_next_dist_client_components_redirect-boundary_js.js",
+    "static/chunks/vendors-_app-pages-browser_node_modules_next_dist_client_components_router-reducer_aliased-pr-24d652.js",
+    "static/chunks/vendors-_app-pages-browser_node_modules_next_dist_client_components_router-reducer_fill-cache-d4f840.js",
+    "static/chunks/vendors-_app-pages-browser_node_modules_next_dist_client_components_router-reducer_handle-mut-b8521e.js",
+    "static/chunks/vendors-_app-pages-browser_node_modules_next_dist_client_components_router-reducer_ppr-naviga-dfdde5.js",
+    "static/chunks/vendors-_app-pages-browser_node_modules_next_dist_client_components_router-reducer_prefetch-c-9e3b37.js",
+    "static/chunks/vendors-_app-pages-browser_node_modules_next_dist_client_components_router-reducer_reducers_f-3347cd.js",
+    "static/chunks/vendors-_app-pages-browser_node_modules_next_dist_client_components_router-reducer_reducers_r-b6690c.js",
+    "static/chunks/vendors-_app-pages-browser_node_modules_next_dist_client_components_router-reducer_router-red-dd815e.js",
+    "static/chunks/vendors-_app-pages-browser_node_modules_next_dist_client_components_unresolved-thenable_js-_a-612a9d.js",
+    "static/chunks/vendors-_app-pages-browser_node_modules_next_dist_client_dev_dev-build-indicator_initialize-f-039347.js",
+    "static/chunks/vendors-_app-pages-browser_node_modules_next_dist_compiled_anser_index_js-_app-pages-browser_-ab3fb4.js",
+    "static/chunks/vendors-_app-pages-browser_node_modules_next_dist_compiled_next_react-refresh-utils_dist_runt-90a367.js",
+    "static/chunks/vendors-_app-pages-browser_node_modules_next_dist_compiled_react-refresh_runtime_js-_app-page-f57f5c.js",
+    "static/chunks/vendors-_app-pages-browser_node_modules_next_dist_compiled_scheduler_index_js-_app-pages-brow-bd6f3f.js",
+    "static/chunks/vendors-_app-pages-browser_node_modules_next_dist_lib_require-instrumentation-client_js-_app--f49f0c.js",
+    "static/chunks/vendors-_app-pages-browser_node_modules_next_dist_shared_lib_hash_js-_app-pages-browser_node_-313632.js",
+    "static/chunks/vendors-_app-pages-browser_node_modules_next_dist_shared_lib_segment_js-_app-pages-browser_no-14b313.js",
+    "static/chunks/main-app.js"
+  ],
+  "rootMainFilesTree": {},
+  "pages": {
+    "/_app": []
+  },
+  "ampFirstPages": []
+};
+globalThis.__BUILD_MANIFEST.lowPriorityFiles = [
+"/static/" + process.env.__NEXT_BUILD_ID + "/_buildManifest.js",
+,"/static/" + process.env.__NEXT_BUILD_ID + "/_ssgManifest.js",
+
+];

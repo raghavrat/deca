@@ -1,28 +1,25 @@
 {
-  "app/performance/[category]/[ia]/page.tsx -> ../../../components/InstructionalArea": {
-    "id": 73030,
-    "files": [
-      "static/chunks/3030.352e236e708809b7.js"
-    ]
-  },
   "app/roleplay/[category]/page.tsx -> react-media-recorder": {
-    "id": 22051,
+    "id": "app/roleplay/[category]/page.tsx -> react-media-recorder",
     "files": [
-      "static/chunks/796.e472a3ab1b81a8ba.js",
-      "static/chunks/1013.0c2d21ea6e8d7e6c.js",
-      "static/chunks/3526.e00a6ba50cc72f48.js",
-      "static/chunks/5497.d535abeb1ba512eb.js",
-      "static/chunks/9244.ce28294511f76907.js",
-      "static/chunks/2597.f4a90963f8724f8a.js",
-      "static/chunks/3669.2188fca0a19af69a.js",
-      "static/chunks/7381.bc35822d130ffe5b.js",
-      "static/chunks/1791.3dc74941a2f3f0b8.js",
-      "static/chunks/4672.fc52ea4f7b11b4e8.js",
-      "static/chunks/1389.8843cd8afe18badb.js",
-      "static/chunks/3254.e2888d34c5af2fa3.js",
-      "static/chunks/3686.01323d6fc67dc86e.js",
-      "static/chunks/3305.407ca157bcf42c08.js",
-      "static/chunks/6236.a66f83067ad11187.js"
+      "static/chunks/vendors-_app-pages-browser_node_modules_automation-events_build_es5_bundle_js-_app-pages-brow-75f6f3.js",
+      "static/chunks/vendors-_app-pages-browser_node_modules_dashify_index_js-_app-pages-browser_node_modules_exte-c3adc4.js",
+      "static/chunks/vendors-_app-pages-browser_node_modules_react-media-recorder_index_js-_app-pages-browser_node-90b9e5.js",
+      "static/chunks/vendors-_app-pages-browser_node_modules_standardized-audio-context_build_es2019_constants_js--ab8545.js",
+      "static/chunks/vendors-_app-pages-browser_node_modules_standardized-audio-context_build_es2019_factories_aud-a3fe7f.js",
+      "static/chunks/vendors-_app-pages-browser_node_modules_standardized-audio-context_build_es2019_factories_aud-ee5742.js",
+      "static/chunks/vendors-_app-pages-browser_node_modules_standardized-audio-context_build_es2019_factories_cac-db7d27.js",
+      "static/chunks/vendors-_app-pages-browser_node_modules_standardized-audio-context_build_es2019_factories_dat-f49f7f.js",
+      "static/chunks/vendors-_app-pages-browser_node_modules_standardized-audio-context_build_es2019_factories_gai-5b95aa.js",
+      "static/chunks/vendors-_app-pages-browser_node_modules_standardized-audio-context_build_es2019_factories_med-26acd5.js",
+      "static/chunks/vendors-_app-pages-browser_node_modules_standardized-audio-context_build_es2019_factories_nat-af68bf.js",
+      "static/chunks/vendors-_app-pages-browser_node_modules_standardized-audio-context_build_es2019_factories_nat-8e9df7.js",
+      "static/chunks/vendors-_app-pages-browser_node_modules_standardized-audio-context_build_es2019_factories_off-fd5df9.js",
+      "static/chunks/vendors-_app-pages-browser_node_modules_standardized-audio-context_build_es2019_factories_ste-e92787.js",
+      "static/chunks/vendors-_app-pages-browser_node_modules_standardized-audio-context_build_es2019_guards_audio--36b82e.js",
+      "static/chunks/vendors-_app-pages-browser_node_modules_standardized-audio-context_build_es2019_module_js-_ap-6303e5.js",
+      "static/chunks/vendors-_app-pages-browser_node_modules_standardized-audio-context_build_es2019_types_index_js.js",
+      "static/chunks/vendors-_app-pages-browser_node_modules_subscribable-things_build_es2019_module_js.js"
     ]
   }
 }

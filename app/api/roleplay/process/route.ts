@@ -1,11 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import OpenAI from 'openai'
 import { adminAuth, adminDb } from '../../../firebase/admin'
-
-const openai = new OpenAI({
-  baseURL: 'https://openrouter.ai/api/v1',
-  apiKey: process.env.OPENROUTER_API_KEY,
-})
 
 export async function POST(request: NextRequest) {
   try {
@@ -70,7 +64,14 @@ Return ONLY a JSON object with this format:
     
     let transcript
     try {
-      const transcriptionResponse = await openai.chat.completions.create({
+      const OPENROUTER_API_URL = 'https://openrouter.ai/api/v1/chat/completions'
+      const apiKey = process.env.OPENROUTER_API_KEY
+      
+      if (!apiKey) {
+        throw new Error('OpenRouter API key not configured')
+      }
+      
+      const transcriptionRequestBody = {
         model: 'google/gemini-2.0-flash-001',
         messages: [
           {
@@ -81,21 +82,42 @@ Return ONLY a JSON object with this format:
                 text: transcriptionPrompt
               },
               {
-                type: 'input_audio' as any,
+                type: 'input_audio',
                 input_audio: {
                   data: audioBase64,
                   format: audioFormat
                 }
               }
-            ] as any
+            ]
           }
         ],
         response_format: { type: 'json_object' },
         temperature: 0.1,
         max_tokens: 2000
-      } as any)
+      }
       
-      const transcriptionResult = JSON.parse(transcriptionResponse.choices[0].message.content || '{}')
+      const requestHeaders = {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+        'HTTP-Referer': process.env.NEXT_PUBLIC_SITE_URL || 'https://decapal.org',
+        'X-Title': 'DECA Pal'
+      }
+      
+      const transcriptionResponse = await fetch(OPENROUTER_API_URL, {
+        method: 'POST',
+        headers: requestHeaders,
+        body: JSON.stringify(transcriptionRequestBody)
+      })
+      
+      if (!transcriptionResponse.ok) {
+        const errorText = await transcriptionResponse.text()
+        throw new Error(`Transcription API error: ${transcriptionResponse.status} - ${errorText}`)
+      }
+      
+      const transcriptionData = await transcriptionResponse.json()
+      const transcriptionContent = transcriptionData.choices[0]?.message?.content
+      
+      const transcriptionResult = JSON.parse(transcriptionContent || '{}')
       transcript = transcriptionResult.transcript || []
       
       console.log('Transcription result:', {
@@ -122,80 +144,139 @@ Return ONLY a JSON object with this format:
     // STEP 2: Grade with GPT OSS
     console.log('Step 2: Grading with GPT OSS...')
     
-    // Debug scenario content
-    console.log('Scenario content check:', {
-      hasEventSituation: !!scenario.eventSituation,
-      roleDescLength: scenario.eventSituation?.roleDescription?.length || 0,
-      challengeLength: scenario.eventSituation?.businessChallenge?.length || 0,
-      taskLength: scenario.eventSituation?.taskDescription?.length || 0,
-      piCount: scenario.performanceIndicators?.length || 0,
-      skillsCount: scenario.centurySkills?.length || 0
-    })
+    // Validate scenario data
+    if (!scenario || !scenario.eventSituation || !scenario.performanceIndicators || !scenario.centurySkills) {
+      console.error('Missing scenario data:', {
+        hasScenario: !!scenario,
+        hasEventSituation: !!scenario?.eventSituation,
+        hasPerformanceIndicators: !!scenario?.performanceIndicators,
+        hasCenturySkills: !!scenario?.centurySkills
+      })
+      return NextResponse.json(
+        { 
+          error: 'grading_failed', 
+          message: 'Scenario data is incomplete',
+          details: 'The roleplay scenario information is missing. Please try generating a new scenario.'
+        },
+        { status: 400 }
+      )
+    }
     
-    // Grading prompt with essential context
+    // Build the student transcript
     const studentTranscript = transcript.map((t: any) => t.text).join(' ')
     
-    const gradingPrompt = `Grade this DECA roleplay performance.
+    // Build a comprehensive grading prompt
+    const systemPrompt = `You are an experienced DECA judge evaluating a student's roleplay performance.
 
-SCENARIO CONTEXT:
-Role: ${scenario.eventSituation?.roleDescription || 'No role description'}
-Company: ${scenario.eventSituation?.companyBackground?.substring(0, 300) || 'No company background'}
-Challenge: ${scenario.eventSituation?.businessChallenge || 'No challenge description'}
-Task: ${scenario.eventSituation?.taskDescription || 'No task description'}
+SCORING GUIDELINES:
+- Performance Indicators: 0-14 points each
+  * 12-14: Exceeds expectations, demonstrates mastery
+  * 9-11: Meets expectations, demonstrates competency  
+  * 5-8: Below expectations, needs improvement
+  * 0-4: Little to no demonstration
+  
+- 21st Century Skills: 0-6 points each
+  * 5-6: Excellent demonstration
+  * 3-4: Good demonstration
+  * 1-2: Limited demonstration
+  * 0: No demonstration
 
-PERFORMANCE INDICATORS TO EVALUATE (0-14 points each):
-${scenario.performanceIndicators?.map((pi: string, i: number) => `${i+1}. ${pi}`).join('\n') || 'No performance indicators'}
+- Overall Impression: 0-6 points
 
-21ST CENTURY SKILLS (0-6 points each):
-${scenario.centurySkills?.map((s: string, i: number) => `${i+1}. ${s}`).join('\n') || 'No century skills'}
+Evaluate based ONLY on what the student actually said in their response.`
 
-STUDENT'S RESPONSE:
-"${studentTranscript.substring(0, 3000)}"
+    const userPrompt = `Evaluate this DECA roleplay performance:
 
-Return ONLY this JSON:
+SCENARIO INFORMATION:
+Event: ${scenario.eventCode || 'General'}
+Career Cluster: ${scenario.careerCluster || 'Business'}
+
+SITUATION THE STUDENT WAS GIVEN:
+Role: ${scenario.eventSituation.roleDescription}
+Company Background: ${scenario.eventSituation.companyBackground}
+Business Challenge: ${scenario.eventSituation.businessChallenge}
+Task Required: ${scenario.eventSituation.taskDescription}
+
+PERFORMANCE INDICATORS TO EVALUATE:
+${scenario.performanceIndicators.map((pi: string, i: number) => `${i+1}. ${pi}`).join('\n')}
+
+21ST CENTURY SKILLS TO EVALUATE:
+${scenario.centurySkills.map((skill: string, i: number) => `${i+1}. ${skill}`).join('\n')}
+
+STUDENT'S ACTUAL RESPONSE (TRANSCRIPT):
+"${studentTranscript}"
+
+Based on the student's response above, provide scores and feedback in this exact JSON format:
 {
   "scores": {
-    "performanceIndicators": [${scenario.performanceIndicators.map((_: any, i: number) => `{"indicator": "PI${i+1}", "score": 0-14, "feedback": "1 sentence"}`).join(', ')}],
-    "centurySkills": [${scenario.centurySkills.map((_: any, i: number) => `{"skill": "S${i+1}", "score": 0-6, "feedback": "few words"}`).join(', ')}],
-    "overallImpression": {"score": 0-6, "feedback": "1 sentence"}
+    "performanceIndicators": [
+${scenario.performanceIndicators.map((pi: string) => `      {"indicator": "${pi}", "score": <number 0-14>, "feedback": "<specific feedback about how well they demonstrated this>"}`).join(',\n')}
+    ],
+    "centurySkills": [
+${scenario.centurySkills.map((skill: string) => `      {"skill": "${skill}", "score": <number 0-6>, "feedback": "<brief feedback>"}`).join(',\n')}
+    ],
+    "overallImpression": {
+      "score": <number 0-6>,
+      "feedback": "<overall performance feedback>"
+    }
   },
-  "strengths": ["item1", "item2", "item3"],
-  "improvements": ["item1", "item2", "item3"],
+  "strengths": ["<specific strength 1>", "<specific strength 2>", "<specific strength 3>"],
+  "improvements": ["<specific area for improvement 1>", "<specific area for improvement 2>", "<specific area for improvement 3>"],
   "timestampedFeedback": []
 }`
     
     let result
     try {
+      // Log what we're sending
       console.log('Sending grading request to GPT OSS...')
-      console.log('Prompt details:', {
-        totalLength: gradingPrompt.length,
-        hasRole: gradingPrompt.includes('Role:'),
-        hasChallenge: gradingPrompt.includes('Challenge:'),
-        hasPIs: gradingPrompt.includes('PERFORMANCE INDICATORS'),
-        promptPreview: gradingPrompt.substring(0, 500) + '...'
+      console.log('Scenario has:', {
+        performanceIndicators: scenario.performanceIndicators?.length || 0,
+        centurySkills: scenario.centurySkills?.length || 0,
+        transcriptLength: studentTranscript.length
       })
       
-      const gradingResponse = await openai.chat.completions.create({
+      // Make the API call (matching the working generation endpoint)
+      const OPENROUTER_API_URL = 'https://openrouter.ai/api/v1/chat/completions'
+      const apiKey = process.env.OPENROUTER_API_KEY
+      
+      if (!apiKey) {
+        throw new Error('OpenRouter API key not configured')
+      }
+      
+      const requestBody = {
         model: 'openai/gpt-oss-20b',
         messages: [
-          {
-            role: 'system',
-            content: 'You are an experienced DECA judge. Evaluate how well the student addressed the business challenge and demonstrated each performance indicator. Score fairly based on what was actually said. Return valid JSON only.'
-          },
-          {
-            role: 'user',
-            content: gradingPrompt
-          }
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: userPrompt }
         ],
-        response_format: { type: 'json_object' },
-        temperature: 0.5,
-        max_tokens: 5000,
+        temperature: 0.7,  // Slightly lower than generation but not too low
+        max_tokens: 5000,  // Same as generation
         provider: {
           order: ['Fireworks']
         }
-      } as any)
+        // NOTE: Removed response_format constraint - let the model respond naturally
+      }
       
-      const responseContent = gradingResponse.choices[0]?.message?.content
+      const requestHeaders = {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+        'HTTP-Referer': process.env.NEXT_PUBLIC_SITE_URL || 'https://decapal.org',
+        'X-Title': 'DECA Pal'
+      }
+      
+      const gradingResponse = await fetch(OPENROUTER_API_URL, {
+        method: 'POST',
+        headers: requestHeaders,
+        body: JSON.stringify(requestBody)
+      })
+      
+      if (!gradingResponse.ok) {
+        const errorText = await gradingResponse.text()
+        throw new Error(`OpenRouter API error: ${gradingResponse.status} - ${errorText}`)
+      }
+      
+      const data = await gradingResponse.json()
+      const responseContent = data.choices[0]?.message?.content
       console.log('GPT OSS response received - Length:', responseContent?.length || 0, 'characters')
       console.log('Response starts with:', responseContent?.substring(0, 50) + '...')
       
@@ -261,22 +342,8 @@ Return ONLY this JSON:
         hasOverallImpression: !!gradingResult.scores?.overallImpression
       })
       
-      // Map abbreviated indicators back to full names
-      if (gradingResult.scores?.performanceIndicators) {
-        gradingResult.scores.performanceIndicators = gradingResult.scores.performanceIndicators.map((pi: any, i: number) => ({
-          indicator: scenario.performanceIndicators[i],
-          score: pi.score || 0,
-          feedback: pi.feedback || ''
-        }))
-      }
-      
-      if (gradingResult.scores?.centurySkills) {
-        gradingResult.scores.centurySkills = gradingResult.scores.centurySkills.map((skill: any, i: number) => ({
-          skill: scenario.centurySkills[i],
-          score: skill.score || 0,
-          feedback: skill.feedback || ''
-        }))
-      }
+      // The response should already have full indicator/skill names
+      // No mapping needed since we're sending full names in the prompt
       
       result = {
         transcript: transcript,
