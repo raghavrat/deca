@@ -185,18 +185,57 @@ ${scenario.centurySkills.map((skill: string) => `      {"skill": "${skill}", "sc
       
       const responseContent = gradingResponse.choices[0]?.message?.content
       
-      if (!responseContent || responseContent.length < 100) {
-        console.error('GPT OSS returned insufficient content:', responseContent)
-        throw new Error('AI grading failed - response too short. Please try again.')
+      if (!responseContent) {
+        console.error('GPT OSS returned no content - model may be unavailable')
+        return NextResponse.json(
+          { 
+            error: 'grading_failed', 
+            message: 'The AI grading model did not respond. This may be a temporary issue with the service.',
+            details: 'The grading model (GPT OSS) is currently not responding. Please try again in a few moments, or contact support if the issue persists.'
+          },
+          { status: 503 }
+        )
       }
       
-      const gradingResult = JSON.parse(responseContent)
+      if (responseContent.length < 100) {
+        console.error('GPT OSS returned insufficient content:', responseContent)
+        return NextResponse.json(
+          { 
+            error: 'grading_failed', 
+            message: 'The AI grading model returned an incomplete response.',
+            details: 'The grading was incomplete. This is usually temporary - please try submitting your performance again.'
+          },
+          { status: 500 }
+        )
+      }
+      
+      let gradingResult
+      try {
+        gradingResult = JSON.parse(responseContent)
+      } catch (parseError) {
+        console.error('Failed to parse GPT OSS response as JSON:', responseContent)
+        return NextResponse.json(
+          { 
+            error: 'grading_failed', 
+            message: 'The AI grading model returned an invalid response format.',
+            details: 'The grading model response could not be processed. This is a temporary issue - please try submitting again.'
+          },
+          { status: 500 }
+        )
+      }
       
       // Validate the response structure
       if (!gradingResult.scores?.performanceIndicators || 
           gradingResult.scores.performanceIndicators.length !== scenario.performanceIndicators.length) {
         console.error('Invalid grading structure - missing or incomplete performance indicators')
-        throw new Error('AI grading failed - invalid response structure. Please try again.')
+        return NextResponse.json(
+          { 
+            error: 'grading_failed', 
+            message: 'The AI grading model returned an incomplete evaluation.',
+            details: 'The grading did not include all performance indicators. Please try submitting again.'
+          },
+          { status: 500 }
+        )
       }
       
       console.log('Grading result structure:', {
@@ -220,13 +259,13 @@ ${scenario.centurySkills.map((skill: string) => `      {"skill": "${skill}", "sc
       console.log('Final result scores:', result.scores)
       console.log('Grading complete')
     } catch (error: any) {
-      console.error('Grading error:', error)
-      // Return specific error to frontend
+      console.error('Unexpected grading error:', error)
+      // Only reached for unexpected errors since we handle specific cases above
       return NextResponse.json(
         { 
           error: 'grading_failed', 
-          message: error.message || 'AI grading failed. Please try again.',
-          details: 'The AI judge was unable to properly evaluate your performance. This is a temporary issue - please try submitting again.'
+          message: 'An unexpected error occurred during AI grading.',
+          details: error.message || 'The AI judge encountered an unexpected issue. Please try submitting again.'
         },
         { status: 500 }
       )
