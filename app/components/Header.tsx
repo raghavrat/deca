@@ -164,10 +164,10 @@ export default function Header() {
               {/* Dark Mode Toggle - Mobile */}
               <button
                 onClick={toggleDarkMode}
-                className="flex items-center w-full px-3 py-2 text-gray-600 dark:text-gray-300 hover:text-[#0066cc] dark:hover:text-[#4d94ff] transition-colors duration-200"
+                className="flex items-center w-full px-3 py-2 text-gray-600 dark:text-gray-300 hover:text-[#0066cc] dark:hover:text-[#4d94ff] transition-colors duration-300"
               >
                 {darkMode ? <Sun size={20} className="mr-2" /> : <Moon size={20} className="mr-2" />}
-                {darkMode ? 'Light Mode' : 'Dark Mode'}
+                <span className="text-gray-600 dark:text-gray-300">{darkMode ? 'Light Mode' : 'Dark Mode'}</span>
               </button>
               
               {user ? (
