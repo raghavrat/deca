@@ -170,7 +170,7 @@ ${scenario.centurySkills.map((skill: string, i: number) => `      {"skill": "${s
         ],
         response_format: { type: 'json_object' },
         temperature: 0.5,
-        max_tokens: 4000,
+        max_tokens: 8000,
         provider: {
           order: ['Fireworks']
         }
