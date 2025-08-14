@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
 export default function SignUp() {
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -15,8 +16,14 @@ export default function SignUp() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!name.trim()) {
+      setError('Please enter a display name');
+      return;
+    }
+    
     try {
-      await signUp(email, password);
+      await signUp(email, password, name.trim());
       setSuccess('Please check your email for verification before logging in');
       setError('');
       setTimeout(() => {
@@ -48,6 +55,14 @@ export default function SignUp() {
             </div>
           )}
           <div className="space-y-4">
+            <input
+              type="text"
+              required
+              className="w-full px-6 py-4 rounded-[15px] border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-[#0066cc] dark:focus:ring-[#4d94ff] focus:border-transparent"
+              placeholder="Display Name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+            />
             <input
               type="email"
               required

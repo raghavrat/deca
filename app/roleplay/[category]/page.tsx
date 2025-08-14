@@ -1,12 +1,20 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useParams, useSearchParams } from 'next/navigation'
-import { ArrowLeft, RefreshCw, Trophy, ClipboardList, ChevronUp, ChevronDown, Sparkles } from 'lucide-react'
+import { useParams, useSearchParams, useRouter } from 'next/navigation'
+import { ArrowLeft, RefreshCw, Trophy, ClipboardList, ChevronUp, ChevronDown, Sparkles, Video, Play, Square, Upload, RotateCcw, Image, X, Mic } from 'lucide-react'
 import Link from 'next/link'
+import dynamic from 'next/dynamic'
+
+// Import ReactMediaRecorder dynamically to avoid SSR issues
+const ReactMediaRecorder = dynamic(
+  () => import('react-media-recorder').then(mod => mod.ReactMediaRecorder),
+  { ssr: false }
+)
 import { DECAScenario } from '../../types'
 import { getInstructionalAreasByCategory, InstructionalArea } from '../../utils/instructionalAreas'
 import { getEventById } from '../../data/decaEvents'
+import { useAuth } from '../../context/AuthContext'
 
 const categoryDisplayNames: { [key: string]: string } = {
   managment: 'Management',
@@ -19,6 +27,8 @@ const categoryDisplayNames: { [key: string]: string } = {
 export default function CategoryRoleplayPage() {
   const params = useParams()
   const searchParams = useSearchParams()
+  const router = useRouter()
+  const { user } = useAuth()
   const category = params.category as string
   const eventId = searchParams.get('event')
 
@@ -32,9 +42,85 @@ export default function CategoryRoleplayPage() {
 
   const [showScoring, setShowScoring] = useState(false)
   const [scores, setScores] = useState<{ [key: string]: number }>({})
+  
+  // Audio recording states
+  const [showAudioRecording, setShowAudioRecording] = useState(false)
+  const [recordedAudioBlob, setRecordedAudioBlob] = useState<Blob | null>(null)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [submitSuccess, setSubmitSuccess] = useState(false)
+  const [recordingStartTime, setRecordingStartTime] = useState<Date | null>(null)
+  const [recordingDuration, setRecordingDuration] = useState(0)
+  
+  // Image context states
+  const [contextImages, setContextImages] = useState<Array<{id: string, file: File, preview: string}>>([])
 
   const displayName = categoryDisplayNames[category] || category
   const selectedEvent = eventId ? getEventById(eventId) : null
+
+  // Get time limit based on category
+  const getTimeLimitMinutes = () => {
+    const timeLimits: { [key: string]: number } = {
+      managment: 15,
+      marketing: 15,
+      finance: 15,
+      hospitiality: 10,
+      entrepreneur: 15
+    }
+    return timeLimits[category] || 15
+  }
+
+  // Format recording duration
+  const formatDuration = (seconds: number) => {
+    const mins = Math.floor(seconds / 60)
+    const secs = seconds % 60
+    return `${mins}:${secs.toString().padStart(2, '0')}`
+  }
+
+  // Submit video for processing
+  const submitVideoForGrading = async (videoBlob: Blob) => {
+    if (!scenario) return
+
+    setIsSubmitting(true)
+    try {
+      const formData = new FormData()
+      formData.append('video', videoBlob, 'roleplay-recording.webm')
+      formData.append('scenarioData', JSON.stringify({
+        id: scenario.id,
+        eventCode: scenario.eventCode,
+        performanceIndicators: scenario.performanceIndicators,
+        centurySkills: scenario.centurySkills,
+        category: category.toUpperCase(),
+        eventId: eventId,
+        selectedInstructionalArea: selectedInstructionalArea
+      }))
+
+      const response = await fetch('/api/roleplay/process', {
+        method: 'POST',
+        body: formData
+      })
+
+      if (!response.ok) {
+        throw new Error(`Failed to submit video: ${response.statusText}`)
+      }
+
+      const result = await response.json()
+      console.log('Video submitted successfully:', result)
+      setSubmitSuccess(true)
+      
+      // Reset recording states after successful submission
+      setTimeout(() => {
+        setShowAudioRecording(false)
+        setRecordedAudioBlob(null)
+        setSubmitSuccess(false)
+      }, 3000)
+
+    } catch (err) {
+      console.error('Error submitting video:', err)
+      setError(err instanceof Error ? err.message : 'Failed to submit video for grading')
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
 
   const generateScenario = async () => {
     if (!selectedInstructionalArea) {
@@ -79,6 +165,19 @@ export default function CategoryRoleplayPage() {
   }
 
 
+
+  // Timer effect for recording duration
+  useEffect(() => {
+    let interval: NodeJS.Timeout
+    if (recordingStartTime) {
+      interval = setInterval(() => {
+        setRecordingDuration(Math.floor((Date.now() - recordingStartTime.getTime()) / 1000))
+      }, 1000)
+    }
+    return () => {
+      if (interval) clearInterval(interval)
+    }
+  }, [recordingStartTime])
 
   useEffect(() => {
     console.log('useEffect triggered - loading events for category:', category)
@@ -379,7 +478,14 @@ export default function CategoryRoleplayPage() {
                 <p className="text-xl font-bold text-gray-800 dark:text-white">TOTAL SCORE: {Object.values(scores).reduce((sum, score) => sum + score, 0).toFixed(0)} / 100</p>
               </div>
 
-              <div className="text-center">
+              <div className="text-center space-y-4">
+                <button
+                  onClick={() => setShowAudioRecording(true)}
+                  className="px-8 py-4 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-[15px] shadow-md transition-colors flex items-center mx-auto click-animation"
+                >
+                  <Video className="h-5 w-5 mr-2" />
+                  Start Audio Practice
+                </button>
                 <button
                   onClick={() => setShowScoring(true)}
                   className="px-8 py-4 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-[15px] shadow-md transition-colors flex items-center mx-auto click-animation"
@@ -529,6 +635,380 @@ export default function CategoryRoleplayPage() {
                         Save Score
                       </button>
                     </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Audio Recording Modal */}
+            {showAudioRecording && scenario && (
+              <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                <div className="bg-white dark:bg-gray-800 rounded-[15px] shadow-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+                  <div className="p-6">
+                    <div className="flex items-center justify-between mb-6">
+                      <h3 className="text-xl font-semibold text-gray-800 dark:text-white">
+                        Audio Practice - {scenario.eventCode}
+                      </h3>
+                      <button
+                        onClick={() => {
+                          setShowAudioRecording(false)
+                          setRecordedAudioBlob(null)
+                          setRecordingDuration(0)
+                          setContextImages([])
+                        }}
+                        className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
+                      >
+                        ✕
+                      </button>
+                    </div>
+
+                    {ReactMediaRecorder ? (
+                    <ReactMediaRecorder
+                      audio={true}
+                      mediaRecorderOptions={{
+                        mimeType: 'audio/webm'
+                      }}
+                      askPermissionOnMount={false}
+                      render={({ status, startRecording, stopRecording, mediaBlobUrl, error }) => (
+                        <div>
+                          {/* Show error if microphone access fails */}
+                          {error && (
+                            <div className="mb-4 p-4 bg-red-100 dark:bg-red-900/20 border border-red-300 dark:border-red-700 rounded-lg">
+                              <p className="text-red-700 dark:text-red-300 font-semibold">Microphone Error</p>
+                              <p className="text-red-600 dark:text-red-400 text-sm mt-1">
+                                {error === 'permission_denied' 
+                                  ? 'Please allow microphone access in your browser settings' 
+                                  : `Error: ${error}`}
+                              </p>
+                            </div>
+                          )}
+                          
+                          {/* Recording Instructions */}
+                          {!recordedAudioBlob && status === 'idle' && (
+                            <div className="space-y-4">
+                              <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                                <h4 className="font-semibold text-gray-800 dark:text-white mb-2">Instructions</h4>
+                                <ul className="text-sm text-gray-600 dark:text-gray-300 space-y-1">
+                                  <li>• Present your solution to the scenario as if speaking to the judge</li>
+                                  <li>• Time limit: {getTimeLimitMinutes()} minutes</li>
+                                  <li>• Speak clearly and professionally</li>
+                                  <li>• Address all performance indicators</li>
+                                  <li>• Upload any diagrams or charts you would draw for the judge</li>
+                                </ul>
+                              </div>
+
+                              {/* Image Upload Section */}
+                              <div className="p-4 bg-gray-50 dark:bg-gray-900/50 rounded-lg">
+                                <h4 className="font-semibold text-gray-800 dark:text-white mb-3 flex items-center">
+                                  <Image className="w-4 h-4 mr-2" />
+                                  Add Context Images (Optional)
+                                </h4>
+                                <p className="text-xs text-gray-600 dark:text-gray-400 mb-3">
+                                  Upload diagrams, charts, or visual aids you would show during your presentation
+                                </p>
+                                
+                                {/* Image Preview Grid */}
+                                {contextImages.length > 0 && (
+                                  <div className="grid grid-cols-3 gap-2 mb-3">
+                                    {contextImages.map((img) => (
+                                      <div key={img.id} className="relative group">
+                                        <img 
+                                          src={img.preview} 
+                                          alt="Context" 
+                                          className="w-full h-24 object-cover rounded-lg"
+                                        />
+                                        <button
+                                          onClick={() => {
+                                            setContextImages(prev => prev.filter(i => i.id !== img.id))
+                                            URL.revokeObjectURL(img.preview)
+                                          }}
+                                          className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                                        >
+                                          <X className="w-3 h-3" />
+                                        </button>
+                                      </div>
+                                    ))}
+                                  </div>
+                                )}
+                                
+                                <label className="flex items-center justify-center w-full px-4 py-2 bg-white dark:bg-gray-800 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg cursor-pointer hover:border-blue-500 transition-colors">
+                                  <Image className="w-5 h-5 mr-2 text-gray-400" />
+                                  <span className="text-sm text-gray-600 dark:text-gray-400">
+                                    {contextImages.length === 0 ? 'Upload Images' : 'Add More Images'}
+                                  </span>
+                                  <input
+                                    type="file"
+                                    accept="image/*"
+                                    multiple
+                                    className="hidden"
+                                    onChange={(e) => {
+                                      const files = Array.from(e.target.files || [])
+                                      const newImages = files.map(file => ({
+                                        id: Math.random().toString(36).substr(2, 9),
+                                        file,
+                                        preview: URL.createObjectURL(file)
+                                      }))
+                                      setContextImages(prev => [...prev, ...newImages].slice(0, 5)) // Max 5 images
+                                    }}
+                                  />
+                                </label>
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Audio Playback */}
+                          {mediaBlobUrl && recordedAudioBlob && (
+                            <div className="mb-6">
+                              <audio
+                                src={mediaBlobUrl}
+                                controls
+                                className="w-full"
+                              />
+                            </div>
+                          )}
+
+                          {/* Recording Status */}
+                          {status === 'recording' && (
+                            <div className="mb-6">
+                              <div className="flex items-center justify-center mb-4">
+                                <div className="animate-pulse flex items-center space-x-3">
+                                  <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+                                  <span className="text-red-600 dark:text-red-400 font-medium">Recording...</span>
+                                </div>
+                              </div>
+                              <div className="text-center text-2xl font-mono text-gray-800 dark:text-white">
+                                {Math.floor(recordingDuration / 60).toString().padStart(2, '0')}:
+                                {(recordingDuration % 60).toString().padStart(2, '0')} / {getTimeLimitMinutes()}:00
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Action Buttons */}
+                          <div className="flex justify-center space-x-4">
+                            {status === 'idle' && !recordedAudioBlob && (
+                              <button
+                                onClick={async () => {
+                                  console.log('Starting recording...')
+                                  
+                                  // Request microphone permission explicitly
+                                  try {
+                                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+                                    console.log('Microphone access granted')
+                                    stream.getTracks().forEach(track => track.stop()) // Stop the test stream
+                                  } catch (err) {
+                                    console.error('Microphone access denied:', err)
+                                    alert('Please allow microphone access to record audio')
+                                    return
+                                  }
+                                  
+                                  setRecordingStartTime(new Date())
+                                  setRecordingDuration(0)
+                                  startRecording()
+                                  console.log('Recording started')
+                                  
+                                  // Start timer
+                                  const interval = setInterval(() => {
+                                    setRecordingDuration(prev => {
+                                      const newDuration = prev + 1
+                                      // Auto-stop at time limit
+                                      if (newDuration >= getTimeLimitMinutes() * 60) {
+                                        stopRecording()
+                                        clearInterval(interval)
+                                      }
+                                      return newDuration
+                                    })
+                                  }, 1000)
+                                }}
+                                className="flex items-center px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors"
+                              >
+                                <Play className="w-5 h-5 mr-2" />
+                                Start Recording
+                              </button>
+                            )}
+
+                            {status === 'recording' && (
+                              <button
+                                onClick={stopRecording}
+                                className="flex items-center px-6 py-3 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition-colors"
+                              >
+                                <Square className="w-5 h-5 mr-2" />
+                                Stop Recording
+                              </button>
+                            )}
+
+                            {recordedAudioBlob && status === 'stopped' && (
+                              <>
+                                <button
+                                  onClick={() => {
+                                    setRecordedAudioBlob(null)
+                                    setRecordingDuration(0)
+                                  }}
+                                  className="flex items-center px-6 py-3 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition-colors"
+                                >
+                                  <RotateCcw className="w-5 h-5 mr-2" />
+                                  Re-record
+                                </button>
+
+                                <button
+                                  onClick={async () => {
+                                    if (!recordedAudioBlob || !scenario || !user) return
+                                    
+                                    console.log('Starting submission...', {
+                                      hasAudio: !!recordedAudioBlob,
+                                      audioSize: recordedAudioBlob.size,
+                                      audioType: recordedAudioBlob.type,
+                                      hasScenario: !!scenario,
+                                      hasUser: !!user,
+                                      duration: recordingDuration
+                                    })
+                                    
+                                    setIsSubmitting(true)
+                                    try {
+                                      // Convert blob to base64
+                                      const reader = new FileReader()
+                                      reader.readAsDataURL(recordedAudioBlob)
+                                      reader.onloadend = async () => {
+                                        const base64Audio = reader.result as string
+                                        console.log('Audio converted to base64, length:', base64Audio.length)
+                                        
+                                        // Convert images to base64
+                                        const base64Images = await Promise.all(
+                                          contextImages.map(async (img) => {
+                                            return new Promise<string>((resolve) => {
+                                              const imgReader = new FileReader()
+                                              imgReader.onloadend = () => resolve(imgReader.result as string)
+                                              imgReader.readAsDataURL(img.file)
+                                            })
+                                          })
+                                        )
+                                        console.log('Images converted:', base64Images.length)
+
+                                        console.log('Sending request to API...')
+                                        const response = await fetch('/api/roleplay/process', {
+                                          method: 'POST',
+                                          headers: { 'Content-Type': 'application/json' },
+                                          body: JSON.stringify({
+                                            audio: base64Audio,
+                                            images: base64Images,
+                                            scenario,
+                                            category: displayName,
+                                            duration: recordingDuration,
+                                            userId: user.uid,
+                                            userEmail: user.email
+                                          })
+                                        })
+
+                                        console.log('Response status:', response.status)
+                                        
+                                        if (!response.ok) {
+                                          const errorText = await response.text()
+                                          console.error('API Error response:', errorText)
+                                          throw new Error(`Failed to process audio: ${errorText}`)
+                                        }
+                                        
+                                        const responseData = await response.json()
+                                        console.log('Response data received:', {
+                                          success: responseData.success,
+                                          sessionId: responseData.sessionId,
+                                          userEmail: responseData.userEmail
+                                        })
+                                        
+                                        const { sessionId, userEmail } = responseData
+                                        
+                                        if (!sessionId) {
+                                          throw new Error('No session ID returned from API')
+                                        }
+                                        
+                                        // Navigate to review page with just session ID
+                                        console.log('Navigating to review page with session ID:', sessionId)
+                                        router.push(`/roleplay/review?id=${sessionId}`)
+                                      }
+                                      
+                                      reader.onerror = (error) => {
+                                        console.error('FileReader error:', error)
+                                        alert('Failed to read audio file. Please try again.')
+                                        setIsSubmitting(false)
+                                      }
+                                    } catch (error) {
+                                      console.error('Error processing audio:', error)
+                                      alert(`Failed to process audio: ${error instanceof Error ? error.message : 'Unknown error'}`)
+                                      setIsSubmitting(false)
+                                    }
+                                  }}
+                                  disabled={isSubmitting}
+                                  className="flex items-center px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors disabled:opacity-50"
+                                >
+                                  <Upload className="w-5 h-5 mr-2" />
+                                  {isSubmitting ? 'Processing...' : 'Submit for AI Grading'}
+                                </button>
+                              </>
+                            )}
+                          </div>
+
+                          {isSubmitting && (
+                            <div className="mt-6">
+                              <div className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-lg p-6">
+                                <div className="flex flex-col items-center space-y-4">
+                                  {/* Animated Mic Icon */}
+                                  <div className="relative">
+                                    <div className="absolute inset-0 animate-ping">
+                                      <Mic className="w-12 h-12 text-blue-400 opacity-75" />
+                                    </div>
+                                    <Mic className="w-12 h-12 text-blue-600 dark:text-blue-400 relative" />
+                                  </div>
+                                  
+                                  {/* Progress Steps */}
+                                  <div className="w-full max-w-md">
+                                    <div className="flex justify-between mb-2">
+                                      <span className="text-xs text-gray-600 dark:text-gray-400">Transcribing Audio</span>
+                                      <span className="text-xs text-gray-600 dark:text-gray-400">Analyzing Performance</span>
+                                      <span className="text-xs text-gray-600 dark:text-gray-400">Generating Feedback</span>
+                                    </div>
+                                    <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                                      <div className="bg-gradient-to-r from-blue-500 to-purple-500 h-2 rounded-full animate-pulse" style={{width: '60%'}}></div>
+                                    </div>
+                                  </div>
+                                  
+                                  <div className="text-center">
+                                    <p className="text-sm font-medium text-gray-800 dark:text-white mb-1">
+                                      AI Judge is reviewing your performance...
+                                    </p>
+                                    <p className="text-xs text-gray-600 dark:text-gray-400">
+                                      This typically takes 30-60 seconds
+                                    </p>
+                                  </div>
+                                  
+                                  {/* Fun Facts While Waiting */}
+                                  <div className="bg-white/50 dark:bg-gray-800/50 rounded-lg p-3 max-w-sm">
+                                    <p className="text-xs text-gray-600 dark:text-gray-400 italic">
+                                      💡 Did you know? DECA has over 200,000 members across 3,500 schools!
+                                    </p>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                      onStop={(blobUrl, blob) => {
+                        console.log('Recording stopped:', {
+                          blobUrl,
+                          blobSize: blob.size,
+                          blobType: blob.type
+                        })
+                        if (blob.size === 0) {
+                          console.error('Recording blob is empty!')
+                          alert('Recording failed - no audio data captured. Please check your microphone.')
+                        }
+                        setRecordedAudioBlob(blob)
+                      }}
+                    />
+                    ) : (
+                      <div className="text-center py-8">
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                        <p className="text-gray-600 dark:text-gray-400">Loading recording interface...</p>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>

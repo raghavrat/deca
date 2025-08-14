@@ -12,8 +12,10 @@
     "firebase-admin": "^13.0.2",
     "lucide-react": "latest",
     "next": "^15.3.5",
+    "openai": "^5.12.2",
     "react": "^19.1.0",
-    "react-dom": "^19.1.0"
+    "react-dom": "^19.1.0",
+    "react-media-recorder": "^1.7.2"
   },
   "devDependencies": {
     "@types/node": "22.10.2",

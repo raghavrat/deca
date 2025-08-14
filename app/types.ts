@@ -131,3 +131,63 @@ export interface RoleplayMessage {
   timestamp: Date;
 }
 
+// Video Recording and AI Grading Types
+export interface TranscriptSegment {
+  id: string;
+  text: string;
+  startTime: number; // in seconds
+  endTime: number;   // in seconds
+  speaker: 'participant' | 'judge';
+}
+
+export interface FeedbackItem {
+  id: string;
+  timestamp: number; // in seconds
+  type: 'strength' | 'improvement';
+  category: 'performance_indicator' | '21st_century_skill' | 'overall_impression';
+  title: string;
+  description: string;
+  relatedIndicator?: string; // For PI-specific feedback
+}
+
+export interface AIGradingScores {
+  performanceIndicators: Array<{
+    indicator: string;
+    score: number; // 0-14
+    feedback: string;
+    level: 'exceeds' | 'meets' | 'below' | 'little';
+  }>;
+  centurySkills: Array<{
+    skill: string;
+    score: number; // 0-6
+    feedback: string;
+    level: 'exceeds' | 'meets' | 'below' | 'little';
+  }>;
+  overallImpression: {
+    score: number; // 0-6
+    feedback: string;
+    level: 'exceeds' | 'meets' | 'below' | 'little';
+  };
+  totalScore: number; // 0-100
+  overallFeedback: {
+    strengths: string[];
+    areasForImprovement: string[];
+    recommendations: string[];
+  };
+}
+
+export interface VideoSession {
+  id: string;
+  userId: string;
+  scenarioId: string;
+  scenario: DECAScenario;
+  videoUrl: string;
+  videoDuration: number; // in seconds
+  transcript: TranscriptSegment[];
+  aiGrading: AIGradingScores;
+  timestampedFeedback: FeedbackItem[];
+  createdAt: Date;
+  processedAt: Date;
+  status: 'recording' | 'processing' | 'completed' | 'failed';
+}
+

@@ -8,6 +8,7 @@ import {
   signOut,
   sendEmailVerification,
   sendPasswordResetEmail,
+  updateProfile,
   User
 } from 'firebase/auth';
 import { auth, db } from '../firebase/config';
@@ -18,7 +19,7 @@ import { isEmailAllowed } from '../config/allowedEmails';
 interface AuthContextType {
   user: User | null;
   loading: boolean;
-  signUp: (email: string, password: string) => Promise<boolean>;
+  signUp: (email: string, password: string, name: string) => Promise<boolean>;
   signIn: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
   resetPassword: (email: string) => Promise<void>;
@@ -46,18 +47,24 @@ export function AuthContextProvider({ children }: { children: React.ReactNode })
     return () => unsubscribe();
   }, []);
 
-  const signUp = async (email: string, password: string) => {
+  const signUp = async (email: string, password: string, name: string) => {
     if (!isEmailAllowed(email)) {
       throw new Error('This email domain is not allowed to register');
     }
     
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     
-    // Create a user document in Firestore
+    // Update the user's display name in Firebase Auth
+    await updateProfile(userCredential.user, {
+      displayName: name
+    });
+    
+    // Create a user document in Firestore with the name
     const userDocRef = doc(db, 'users', userCredential.user.uid);
     await setDoc(userDocRef, {
       email: userCredential.user.email,
-      name: '', // Initially empty, user can set it in their account page
+      name: name,
+      displayName: name, // Store both for compatibility
       problemsCompleted: 0,
       createdAt: new Date(),
     });
