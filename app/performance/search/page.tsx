@@ -4,6 +4,7 @@ import { useState, useMemo, useEffect, useRef, Suspense } from 'react'
 import { Search, ChevronDown } from 'lucide-react'
 import { performanceIndicators } from '../../performanceIndicators'
 import Link from 'next/link'
+import { getIndicatorAnchorId } from '../../utils/piSlug'
 import { useSearchParams, useRouter } from 'next/navigation'
 
 const formatUrlSlug = (text: string) => {
@@ -247,13 +248,14 @@ function SearchContent() {
               filteredPIs.map((pi, index) => {
                 const areaName = pi.area.split(':')[1].trim()
                 const urlSlug = formatUrlSlug(areaName)
+                const anchor = getIndicatorAnchorId(pi.indicator)
                 
                 return (
                   <div key={index} className="p-4 sm:p-6 bg-white dark:bg-black border border-gray-300 dark:border-gray-700">
                     <h4 className="font-light text-black dark:text-white mb-2 break-words">{pi.indicator}</h4>
                     <p className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap mb-2 text-sm sm:text-base">{pi.text}</p>
                     <Link 
-                      href={`/performance/${pi.category[0].toLowerCase()}/${urlSlug}`}
+                      href={`/performance/${pi.category[0].toLowerCase()}/${urlSlug}#${anchor}`}
                       className="text-sm font-medium nav-link inline-block"
                     >
                       View in {areaName}

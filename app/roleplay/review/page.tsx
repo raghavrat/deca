@@ -3,7 +3,7 @@
 import { useState, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
-import { ArrowLeft, Trophy, TrendingUp, AlertCircle, CheckCircle, Clock, MessageSquare, Star, Target, FileText } from 'lucide-react'
+import { ArrowLeft, Trophy, TrendingUp, AlertCircle, CheckCircle, Clock, MessageSquare, Star, Target, FileText, ChevronDown } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 
 interface SessionData {
@@ -47,6 +47,9 @@ function RoleplayReviewContent() {
   const { user } = useAuth()
   const [sessionData, setSessionData] = useState<SessionData | null>(null)
   const [activeTab, setActiveTab] = useState<'transcript' | 'scores' | 'feedback' | 'scenario'>('scores')
+  const [expandedIndicator, setExpandedIndicator] = useState<string | null>(null)
+  const [indicatorExplanationMap, setIndicatorExplanationMap] = useState<Record<string, string>>({})
+  const [loadingExplanation, setLoadingExplanation] = useState<Record<string, boolean>>({})
 
   useEffect(() => {
     const fetchSessionData = async () => {
@@ -108,6 +111,44 @@ function RoleplayReviewContent() {
       fetchSessionData()
     }
   }, [router, searchParams, user])
+
+  const normalizeText = (text: string) =>
+    text.trim().toLowerCase().replace(/\s+/g, ' ')
+
+  const extractCode = (indicator: string) => {
+    const match = indicator.match(/\(([A-Z]+):(\d+)\)/)
+    if (match) {
+      return { code: match[1], num: match[2] }
+    }
+    return null
+  }
+
+  const findPIExplanation = (allPIs: Array<{ indicator: string; text: string }>, indicatorName: string): string | null => {
+    const codeInfo = extractCode(indicatorName)
+    if (codeInfo) {
+      const needle = `(${codeInfo.code}:${codeInfo.num})`
+      const byCode = allPIs.find(pi => pi.indicator.includes(needle))
+      if (byCode) return byCode.text
+    }
+    const normalizedTarget = normalizeText(indicatorName)
+    const byName = allPIs.find(pi => normalizeText(pi.indicator) === normalizedTarget)
+    if (byName) return byName.text
+    return null
+  }
+
+  const ensureExplanationLoaded = async (indicatorName: string) => {
+    if (indicatorExplanationMap[indicatorName] !== undefined) return
+    setLoadingExplanation(prev => ({ ...prev, [indicatorName]: true }))
+    try {
+      const mod = await import('../../performanceIndicators')
+      const text = findPIExplanation(mod.performanceIndicators as any, indicatorName)
+      setIndicatorExplanationMap(prev => ({ ...prev, [indicatorName]: text || '' }))
+    } catch (e) {
+      setIndicatorExplanationMap(prev => ({ ...prev, [indicatorName]: '' }))
+    } finally {
+      setLoadingExplanation(prev => ({ ...prev, [indicatorName]: false }))
+    }
+  }
 
   if (!sessionData) {
     return (
@@ -281,16 +322,42 @@ function RoleplayReviewContent() {
                           (pi: any) => pi.indicator === piName
                         )
                         return (
-                          <div key={index} className="border border-gray-200 dark:border-gray-700  p-4">
-                            <div className="flex justify-between items-start mb-2">
-                              <p className="font-light text-black dark:text-white flex-1">{piName}</p>
-                              <span className={`font-light ml-4 text-black dark:text-white`}>
-                                {piScore?.score || 0}/14
-                              </span>
-                            </div>
-                            <p className="text-sm text-gray-600 dark:text-gray-400">
-                              {piScore?.feedback || 'Not graded yet'}
-                            </p>
+                          <div key={index} className="border border-gray-200 dark:border-gray-700 p-4">
+                            <button
+                              type="button"
+                              onClick={async () => {
+                                const next = expandedIndicator === piName ? null : piName
+                                setExpandedIndicator(next)
+                                if (next) {
+                                  await ensureExplanationLoaded(piName)
+                                }
+                              }}
+                              className="w-full text-left"
+                            >
+                              <div className="flex justify-between items-start">
+                                <p className="font-light text-black dark:text-white flex-1 pr-4">{piName}</p>
+                                <div className="flex items-center space-x-3">
+                                  <span className={`font-light text-black dark:text-white`}>
+                                    {piScore?.score || 0}/14
+                                  </span>
+                                  <ChevronDown className={`h-5 w-5 text-gray-500 transition-transform ${expandedIndicator === piName ? 'rotate-180' : ''}`} />
+                                </div>
+                              </div>
+                              <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
+                                {piScore?.feedback || 'Not graded yet'}
+                              </p>
+                            </button>
+                            {expandedIndicator === piName && (
+                              <div className="mt-3 border-t border-gray-200 dark:border-gray-700 pt-3">
+                                {loadingExplanation[piName] ? (
+                                  <p className="text-sm text-gray-500 dark:text-gray-400">Loading explanation...</p>
+                                ) : indicatorExplanationMap[piName] ? (
+                                  <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap">{indicatorExplanationMap[piName]}</p>
+                                ) : (
+                                  <p className="text-sm text-gray-500 dark:text-gray-400">No explanation found.</p>
+                                )}
+                              </div>
+                            )}
                           </div>
                         )
                       })

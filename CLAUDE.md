@@ -1,6 +1,12 @@
 # CLAUDE.md
 
+
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+## Practices
+-Always try to write simple, readable code with comments explaining how everything works
+-If you come across poorly written code, you MUST fix it.
+-number 1 prioritize clean code
 
 ## Project Overview
 
@@ -18,6 +24,7 @@ For detailed documentation on various aspects of the project, please refer to th
 - **[/docs/changes.md](./docs/changes.md)** - Release history, version tracking, and deployment procedures
 
 ## Key Commands
+-Do not run these commands unless asked to
 
 ```bash
 # Development
@@ -101,4 +108,3 @@ When modifying authentication:
 - Client auth logic: `/app/context/AuthContext.tsx`
 - Server session handling: `/app/api/auth/session/route.ts`
 - Protected route middleware: `/middleware.ts`
-- Never try to run the code

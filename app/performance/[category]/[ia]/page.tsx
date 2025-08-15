@@ -2,6 +2,7 @@
 
 import { useState, useEffect, Suspense } from 'react'
 import { Datashape, performanceIndicators } from '../../../performanceIndicators'
+import { getIndicatorAnchorId } from '../../../utils/piSlug'
 import Link from 'next/link'
 import { ChevronLeft } from 'lucide-react'
 import dynamic from 'next/dynamic'
@@ -44,13 +45,21 @@ export default function IAPage({ params: paramsPromise, searchParams: searchPara
   const [ia, setIa] = useState('')
   const [filteredData, setFilteredData] = useState<Datashape[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const [hash, setHash] = useState('')
 
   useEffect(() => {
     paramsPromise.then((params) => {
       setCategory(capitalizeWords(params.category))
       setIa(getOriginalName(params.ia))
     })
-  }, [paramsPromise])
+    searchParamsPromise.then((sp) => {
+      if (typeof window !== 'undefined') {
+        setHash(window.location.hash.replace('#', ''))
+      } else if (sp && typeof sp['hash'] === 'string') {
+        setHash(sp['hash'])
+      }
+    })
+  }, [paramsPromise, searchParamsPromise])
 
   useEffect(() => {
     if (category && ia) {
@@ -68,6 +77,21 @@ export default function IAPage({ params: paramsPromise, searchParams: searchPara
       }
     }
   }, [category, ia])
+
+  useEffect(() => {
+    if (!isLoading && filteredData.length > 0 && hash) {
+      const attemptScroll = () => {
+        const el = document.getElementById(hash)
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+        }
+      }
+      // Try immediately and again after next paint in case of dynamic load
+      attemptScroll()
+      const id = window.setTimeout(attemptScroll, 0)
+      return () => window.clearTimeout(id)
+    }
+  }, [isLoading, filteredData, hash])
 
   if (!category || !ia) return null
 
