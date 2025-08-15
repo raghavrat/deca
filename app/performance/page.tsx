@@ -150,52 +150,51 @@ export default function PerformancePage() {
 
   return (
     <div className="py-12 px-4 sm:px-6 lg:px-8 min-h-screen flex flex-col items-center justify-center">
-      <h1 className="text-4xl font-bold mb-12 text-center text-gray-800 dark:text-white">Performance Indicators</h1>
+      <h1 className="text-4xl font-light mb-8 text-center text-black dark:text-white">Performance Indicators</h1>
       
-      <div className="w-full max-w-md mb-8 flex items-center justify-between">
-        <div className="flex-grow relative bg-white dark:bg-gray-800 rounded-[15px] border border-gray-200 dark:border-gray-700 shadow-sm mr-4">
+      <div className="w-full max-w-md mb-8">
+        <div className="relative">
           <input
             type="text"
             placeholder="Search performance indicators..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             onKeyPress={handleKeyPress}
-            className="w-full px-4 py-3 pl-12 text-gray-800 dark:text-white bg-white dark:bg-gray-800 rounded-[15px] focus:outline-none placeholder-gray-500 dark:placeholder-gray-400"
+            className="input-minimal w-full pr-10"
           />
-          <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 h-5 w-5" />
+          <button 
+            onClick={handleSearch}
+            className="absolute right-0 top-1/2 transform -translate-y-1/2 p-2 text-gray-400 dark:text-gray-500 hover:text-black dark:hover:text-white transition-colors"
+          >
+            <Search className="h-5 w-5" />
+          </button>
         </div>
-        <button 
-          onClick={handleSearch}
-          className="p-3 bg-white dark:bg-gray-800 rounded-full shadow-sm hover:shadow-md transition-shadow duration-200 click-animation"
-        >
-          <Search className="h-5 w-5 text-gray-400 dark:text-gray-500" />
-        </button>
       </div>
 
-      <div className="w-full max-w-md space-y-4 px-2 sm:px-0">
+      <div className="w-full max-w-md space-y-4">
         {clusters.map((cluster) => (
           <div key={cluster} className="relative">
             <button
               onClick={() => handleClusterClick(cluster)}
-              className={`w-full bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-800 dark:text-white font-semibold py-4 px-6 rounded-[15px] shadow-md text-center transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0066cc] dark:focus:ring-[#4d94ff] flex justify-between items-center click-animation ${
-                selectedCluster === cluster ? 'bg-gray-50 dark:bg-gray-700' : ''
+              className={`w-full py-4 px-6 border border-gray-300 dark:border-gray-700 hover:border-black dark:hover:border-white text-black dark:text-white font-light text-center transition-all duration-200 flex justify-between items-center ${
+                selectedCluster === cluster && isOpen ? 'border-black dark:border-white' : ''
               }`}
             >
-              <span>{cluster}</span>
+              <span className="text-sm font-medium tracking-wide">{cluster}</span>
               {selectedCluster === cluster && (
-                isOpen ? <ChevronUp className="h-5 w-5 text-gray-400 dark:text-gray-500" /> : <ChevronDown className="h-5 w-5 text-gray-400 dark:text-gray-500" />
+                isOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />
               )}
             </button>
             <div className={`mt-2 space-y-2 overflow-hidden transition-all duration-300 ease-in-out ${
               isOpen && selectedCluster === cluster 
-                ? 'max-h-[2000px] opacity-100 transform translate-y-0' 
-                : 'max-h-0 opacity-0 transform -translate-y-2'
+                ? 'max-h-[2000px] opacity-100' 
+                : 'max-h-0 opacity-0'
             }`}>
               {instructionalAreas[cluster as keyof typeof instructionalAreas].map((ia) => (
                 <Link
                   key={ia}
                   href={`/performance/${cluster.toLowerCase()}/${formatUrlSlug(ia)}`}
-                  className="block w-full bg-[#0066cc] hover:bg-[#0052a3] text-white font-semibold py-3 px-6 rounded-[15px] shadow-md text-center transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0066cc] click-animation"
+                  className="block w-full py-3 px-6 border border-gray-300 dark:border-gray-700 hover:border-black dark:hover:border-white text-black dark:text-white text-sm text-center transition-colors duration-200"
                 >
                   {ia}
                 </Link>
@@ -207,4 +206,3 @@ export default function PerformancePage() {
     </div>
   )
 }
-

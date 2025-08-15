@@ -29,6 +29,8 @@ export interface DECAEvent {
   careerCluster: string; // Official DECA career cluster
   careerPathway: string; // Official career pathway
   description: string; // Event description
+  prepTime: number; // Preparation time in minutes
+  roleplayDuration: number; // Roleplay duration in minutes
 }
 
 // Official DECA Scenario Types

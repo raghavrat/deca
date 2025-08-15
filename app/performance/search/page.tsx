@@ -106,25 +106,25 @@ function SearchContent() {
 
   return (
     <div className="py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-      <h1 className="text-4xl font-bold mb-12 text-center text-gray-800 dark:text-white">Search Performance Indicators</h1>
+      <h1 className="text-4xl font-light mb-12 text-center text-black dark:text-white">Search Performance Indicators</h1>
       
       <div className="mb-4 flex items-center justify-between w-full">
-        <div className="flex-grow relative bg-white dark:bg-gray-800 rounded-[15px] border border-gray-200 dark:border-gray-700 shadow-sm mr-4">
+        <div className="flex-grow relative mr-4">
           <input
             type="text"
             placeholder="Search performance indicators..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             onKeyPress={handleKeyPress}
-            className="w-full px-4 py-3 pl-12 text-gray-800 dark:text-white font-semibold bg-transparent rounded-[15px] focus:outline-none placeholder-gray-500"
+            className="input-minimal w-full px-4 py-3 pl-12 text-black dark:text-white bg-transparent border-0 border-b border-gray-300 dark:border-gray-700 focus:outline-none focus:border-black dark:focus:border-white placeholder-gray-500 dark:placeholder-gray-400 transition-colors duration-200"
           />
-          <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+          <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 h-5 w-5" />
         </div>
         <button 
           onClick={handleSearch}
-          className="p-3 bg-white dark:bg-gray-800 rounded-full shadow-sm hover:shadow-md transition-shadow duration-200 flex-shrink-0"
+          className="p-3 border border-gray-300 dark:border-gray-700 hover:border-black dark:hover:border-white text-gray-400 dark:text-gray-500 hover:text-black dark:hover:text-white transition-colors duration-200"
         >
-          <Search className="h-5 w-5 text-gray-400" />
+          <Search className="h-5 w-5" />
         </button>
       </div>
 
@@ -141,31 +141,31 @@ function SearchContent() {
             <div className="relative" ref={clusterDropdownRef}>
               <button
                 onClick={() => setIsClusterDropdownOpen(!isClusterDropdownOpen)}
-                className="flex items-center space-x-2 px-4 py-2.5 bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 hover:border-gray-400 transition-all hover:shadow-sm"
+                className="flex items-center space-x-2 px-4 py-2.5 bg-white dark:bg-black border border-gray-300 dark:border-gray-700 hover:border-black dark:hover:border-white transition-colors duration-200"
               >
-                <span className="text-gray-800 dark:text-white font-medium">
+                <span className="text-black dark:text-white text-sm font-medium">
                   {selectedCluster === 'all' ? 'All Clusters' : selectedCluster}
                 </span>
                 <ChevronDown className={`h-4 w-4 text-gray-600 dark:text-gray-400 transition-transform ${isClusterDropdownOpen ? 'rotate-180' : ''}`} />
               </button>
               
               {isClusterDropdownOpen && (
-                <div className="absolute right-0 mt-2 w-64 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 z-10 max-h-96 overflow-y-auto">
+                <div className="absolute right-0 mt-2 w-64 bg-white dark:bg-black border border-gray-300 dark:border-gray-700 z-10 max-h-96 overflow-y-auto">
                   <div className="py-2">
                     <button
                       onClick={() => {
                         setSelectedCluster('all')
                         setIsClusterDropdownOpen(false)
                       }}
-                      className={`w-full text-left px-4 py-3 text-sm hover:bg-blue-50 dark:hover:bg-gray-700 transition-colors ${
+                      className={`w-full text-left px-4 py-3 text-sm hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors ${
                         selectedCluster === 'all' 
-                          ? 'bg-blue-50 text-blue-700 font-semibold' 
+                          ? 'bg-gray-100 dark:bg-gray-800 text-black dark:text-white font-medium' 
                           : 'text-gray-700 dark:text-gray-300'
                       }`}
                     >
                       All Clusters
                     </button>
-                    <div className="border-t border-gray-100 my-1"></div>
+                    <div className="border-t border-gray-300 dark:border-gray-700 my-1"></div>
                     {availableFilters.clusters.map(cluster => (
                       <button
                         key={cluster}
@@ -173,9 +173,9 @@ function SearchContent() {
                           setSelectedCluster(cluster)
                           setIsClusterDropdownOpen(false)
                         }}
-                        className={`w-full text-left px-4 py-3 text-sm hover:bg-blue-50 dark:hover:bg-gray-700 transition-colors ${
+                        className={`w-full text-left px-4 py-3 text-sm hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors ${
                           selectedCluster === cluster 
-                            ? 'bg-blue-50 text-blue-700 font-semibold' 
+                            ? 'bg-gray-100 dark:bg-gray-800 text-black dark:text-white font-medium' 
                             : 'text-gray-700 dark:text-gray-300'
                         }`}
                       >
@@ -191,31 +191,31 @@ function SearchContent() {
             <div className="relative" ref={areaDropdownRef}>
               <button
                 onClick={() => setIsAreaDropdownOpen(!isAreaDropdownOpen)}
-                className="flex items-center space-x-2 px-4 py-2.5 bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 hover:border-gray-400 transition-all hover:shadow-sm"
+                className="flex items-center space-x-2 px-4 py-2.5 bg-white dark:bg-black border border-gray-300 dark:border-gray-700 hover:border-black dark:hover:border-white transition-colors duration-200"
               >
-                <span className="text-gray-800 dark:text-white font-medium">
+                <span className="text-black dark:text-white text-sm font-medium">
                   {selectedInstructionalArea === 'all' ? 'All Areas' : selectedInstructionalArea}
                 </span>
                 <ChevronDown className={`h-4 w-4 text-gray-600 dark:text-gray-400 transition-transform ${isAreaDropdownOpen ? 'rotate-180' : ''}`} />
               </button>
               
               {isAreaDropdownOpen && (
-                <div className="absolute right-0 mt-2 w-80 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 z-10 max-h-96 overflow-y-auto">
+                <div className="absolute right-0 mt-2 w-80 bg-white dark:bg-black border border-gray-300 dark:border-gray-700 z-10 max-h-96 overflow-y-auto">
                   <div className="py-2">
                     <button
                       onClick={() => {
                         setSelectedInstructionalArea('all')
                         setIsAreaDropdownOpen(false)
                       }}
-                      className={`w-full text-left px-4 py-3 text-sm hover:bg-blue-50 dark:hover:bg-gray-700 transition-colors ${
+                      className={`w-full text-left px-4 py-3 text-sm hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors ${
                         selectedInstructionalArea === 'all' 
-                          ? 'bg-blue-50 text-blue-700 font-semibold' 
+                          ? 'bg-gray-100 dark:bg-gray-800 text-black dark:text-white font-medium' 
                           : 'text-gray-700 dark:text-gray-300'
                       }`}
                     >
                       All Areas
                     </button>
-                    <div className="border-t border-gray-100 my-1"></div>
+                    <div className="border-t border-gray-300 dark:border-gray-700 my-1"></div>
                     {availableFilters.areas.map(area => (
                       <button
                         key={area}
@@ -223,9 +223,9 @@ function SearchContent() {
                           setSelectedInstructionalArea(area)
                           setIsAreaDropdownOpen(false)
                         }}
-                        className={`w-full text-left px-4 py-3 text-sm hover:bg-blue-50 dark:hover:bg-gray-700 transition-colors ${
+                        className={`w-full text-left px-4 py-3 text-sm hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors ${
                           selectedInstructionalArea === area 
-                            ? 'bg-blue-50 text-blue-700 font-semibold' 
+                            ? 'bg-gray-100 dark:bg-gray-800 text-black dark:text-white font-medium' 
                             : 'text-gray-700 dark:text-gray-300'
                         }`}
                       >
@@ -249,12 +249,12 @@ function SearchContent() {
                 const urlSlug = formatUrlSlug(areaName)
                 
                 return (
-                  <div key={index} className="p-4 sm:p-6 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
-                    <h4 className="font-semibold text-[#0066cc] dark:text-[#4d94ff] mb-2 break-words">{pi.indicator}</h4>
+                  <div key={index} className="p-4 sm:p-6 bg-white dark:bg-black border border-gray-300 dark:border-gray-700">
+                    <h4 className="font-light text-black dark:text-white mb-2 break-words">{pi.indicator}</h4>
                     <p className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap mb-2 text-sm sm:text-base">{pi.text}</p>
                     <Link 
                       href={`/performance/${pi.category[0].toLowerCase()}/${urlSlug}`}
-                      className="text-sm text-[#0066cc] dark:text-[#4d94ff] hover:text-[#0052a3] dark:hover:text-[#6ba3ff] hover:underline inline-block"
+                      className="text-sm font-medium nav-link inline-block"
                     >
                       View in {areaName}
                     </Link>

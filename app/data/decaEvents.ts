@@ -8,7 +8,9 @@ export const DECA_EVENTS: DECAEvent[] = [
     category: 'FINANCE',
     careerCluster: 'Finance',
     careerPathway: 'Accounting',
-    description: 'Individual roleplay event focusing on accounting principles and applications in business scenarios'
+    description: 'Individual roleplay event focusing on accounting principles and applications in business scenarios',
+    prepTime: 10,
+    roleplayDuration: 10
   },
   {
     id: 'BFS',
@@ -16,7 +18,9 @@ export const DECA_EVENTS: DECAEvent[] = [
     category: 'FINANCE',
     careerCluster: 'Finance',
     careerPathway: 'Business Finance',
-    description: 'Individual roleplay event focusing on business financial management and analysis'
+    description: 'Individual roleplay event focusing on business financial management and analysis',
+    prepTime: 10,
+    roleplayDuration: 10
   },
   {
     id: 'PFL',
@@ -24,7 +28,9 @@ export const DECA_EVENTS: DECAEvent[] = [
     category: 'FINANCE',
     careerCluster: 'Finance',
     careerPathway: 'Financial Planning',
-    description: 'Individual roleplay event focusing on personal finance management and financial literacy'
+    description: 'Individual roleplay event focusing on personal finance management and financial literacy',
+    prepTime: 10,
+    roleplayDuration: 10
   },
   {
     id: 'PFN',
@@ -32,7 +38,9 @@ export const DECA_EVENTS: DECAEvent[] = [
     category: 'FINANCE',
     careerCluster: 'Finance',
     careerPathway: 'Financial Services',
-    description: 'Individual roleplay event covering fundamental finance principles and concepts'
+    description: 'Individual roleplay event covering fundamental finance principles and concepts',
+    prepTime: 10,
+    roleplayDuration: 10
   },
 
   // Marketing Events
@@ -42,7 +50,9 @@ export const DECA_EVENTS: DECAEvent[] = [
     category: 'MARKETING',
     careerCluster: 'Marketing',
     careerPathway: 'Marketing Management',
-    description: 'Individual roleplay event focusing on marketing strategies for apparel and accessories retail'
+    description: 'Individual roleplay event focusing on marketing strategies for apparel and accessories retail',
+    prepTime: 10,
+    roleplayDuration: 10
   },
   {
     id: 'ASM',
@@ -50,7 +60,9 @@ export const DECA_EVENTS: DECAEvent[] = [
     category: 'MARKETING',
     careerCluster: 'Marketing',
     careerPathway: 'Marketing Management',
-    description: 'Individual roleplay event focusing on marketing strategies for automotive services and dealerships'
+    description: 'Individual roleplay event focusing on marketing strategies for automotive services and dealerships',
+    prepTime: 10,
+    roleplayDuration: 10
   },
   {
     id: 'BSM',
@@ -58,7 +70,9 @@ export const DECA_EVENTS: DECAEvent[] = [
     category: 'MARKETING',
     careerCluster: 'Marketing',
     careerPathway: 'Marketing Management',
-    description: 'Individual roleplay event focusing on marketing strategies for business-to-business services'
+    description: 'Individual roleplay event focusing on marketing strategies for business-to-business services',
+    prepTime: 10,
+    roleplayDuration: 10
   },
   {
     id: 'FMS',
@@ -66,7 +80,9 @@ export const DECA_EVENTS: DECAEvent[] = [
     category: 'MARKETING',
     careerCluster: 'Marketing',
     careerPathway: 'Marketing Management',
-    description: 'Individual roleplay event focusing on marketing strategies for food products and services'
+    description: 'Individual roleplay event focusing on marketing strategies for food products and services',
+    prepTime: 10,
+    roleplayDuration: 10
   },
   {
     id: 'MCS',
@@ -74,7 +90,9 @@ export const DECA_EVENTS: DECAEvent[] = [
     category: 'MARKETING',
     careerCluster: 'Marketing',
     careerPathway: 'Marketing Communications',
-    description: 'Individual roleplay event focusing on integrated marketing communications and promotional strategies'
+    description: 'Individual roleplay event focusing on integrated marketing communications and promotional strategies',
+    prepTime: 10,
+    roleplayDuration: 10
   },
   {
     id: 'PMK',
@@ -82,7 +100,9 @@ export const DECA_EVENTS: DECAEvent[] = [
     category: 'MARKETING',
     careerCluster: 'Marketing',
     careerPathway: 'Marketing Management',
-    description: 'Individual roleplay event covering fundamental marketing principles and concepts'
+    description: 'Individual roleplay event covering fundamental marketing principles and concepts',
+    prepTime: 10,
+    roleplayDuration: 10
   },
   {
     id: 'RMS',
@@ -90,7 +110,9 @@ export const DECA_EVENTS: DECAEvent[] = [
     category: 'MARKETING',
     careerCluster: 'Marketing',
     careerPathway: 'Merchandising',
-    description: 'Individual roleplay event focusing on retail merchandising strategies and operations'
+    description: 'Individual roleplay event focusing on retail merchandising strategies and operations',
+    prepTime: 10,
+    roleplayDuration: 10
   },
   {
     id: 'SEM',
@@ -98,7 +120,9 @@ export const DECA_EVENTS: DECAEvent[] = [
     category: 'MARKETING',
     careerCluster: 'Marketing',
     careerPathway: 'Marketing Communications',
-    description: 'Individual roleplay event focusing on marketing strategies for sports and entertainment industries'
+    description: 'Individual roleplay event focusing on marketing strategies for sports and entertainment industries',
+    prepTime: 10,
+    roleplayDuration: 10
   },
 
   // Hospitality Events
@@ -108,7 +132,9 @@ export const DECA_EVENTS: DECAEvent[] = [
     category: 'HOSPITALITY',
     careerCluster: 'Hospitality and Tourism',
     careerPathway: 'Lodging Management',
-    description: 'Individual roleplay event focusing on hotel and lodging operations management'
+    description: 'Individual roleplay event focusing on hotel and lodging operations management',
+    prepTime: 10,
+    roleplayDuration: 10
   },
   {
     id: 'PHT',
@@ -116,7 +142,9 @@ export const DECA_EVENTS: DECAEvent[] = [
     category: 'HOSPITALITY',
     careerCluster: 'Hospitality and Tourism',
     careerPathway: 'Hospitality Management',
-    description: 'Individual roleplay event covering fundamental hospitality and tourism principles'
+    description: 'Individual roleplay event covering fundamental hospitality and tourism principles',
+    prepTime: 10,
+    roleplayDuration: 10
   },
   {
     id: 'QSRM',
@@ -124,7 +152,9 @@ export const DECA_EVENTS: DECAEvent[] = [
     category: 'HOSPITALITY',
     careerCluster: 'Hospitality and Tourism',
     careerPathway: 'Restaurant Management',
-    description: 'Individual roleplay event focusing on quick service restaurant operations and management'
+    description: 'Individual roleplay event focusing on quick service restaurant operations and management',
+    prepTime: 10,
+    roleplayDuration: 10
   },
   {
     id: 'RFSM',
@@ -132,7 +162,9 @@ export const DECA_EVENTS: DECAEvent[] = [
     category: 'HOSPITALITY',
     careerCluster: 'Hospitality and Tourism',
     careerPathway: 'Restaurant and Food Service Management',
-    description: 'Individual roleplay event focusing on restaurant and food service operations management'
+    description: 'Individual roleplay event focusing on restaurant and food service operations management',
+    prepTime: 10,
+    roleplayDuration: 10
   },
 
   // Management Events
@@ -142,7 +174,9 @@ export const DECA_EVENTS: DECAEvent[] = [
     category: 'MANAGEMENT',
     careerCluster: 'Business Management and Administration',
     careerPathway: 'Human Resources Management',
-    description: 'Individual roleplay event focusing on human resources management practices and employee relations'
+    description: 'Individual roleplay event focusing on human resources management practices and employee relations',
+    prepTime: 10,
+    roleplayDuration: 10
   },
   {
     id: 'PBM',
@@ -150,7 +184,9 @@ export const DECA_EVENTS: DECAEvent[] = [
     category: 'MANAGEMENT',
     careerCluster: 'Business Management and Administration',
     careerPathway: 'General Management',
-    description: 'Individual roleplay event covering fundamental business management and administration principles'
+    description: 'Individual roleplay event covering fundamental business management and administration principles',
+    prepTime: 10,
+    roleplayDuration: 10
   },
 
   // Entrepreneurship Events
@@ -160,7 +196,9 @@ export const DECA_EVENTS: DECAEvent[] = [
     category: 'ENTREPRENEUR',
     careerCluster: 'Business Management and Administration',
     careerPathway: 'Entrepreneurship',
-    description: 'Individual roleplay event focusing on entrepreneurial decision-making and startup challenges'
+    description: 'Individual roleplay event focusing on entrepreneurial decision-making and startup challenges',
+    prepTime: 10,
+    roleplayDuration: 10
   },
   {
     id: 'PEN',
@@ -168,7 +206,91 @@ export const DECA_EVENTS: DECAEvent[] = [
     category: 'ENTREPRENEUR',
     careerCluster: 'Business Management and Administration',
     careerPathway: 'Entrepreneurship',
-    description: 'Individual roleplay event covering fundamental entrepreneurship principles and concepts'
+    description: 'Individual roleplay event covering fundamental entrepreneurship principles and concepts',
+    prepTime: 10,
+    roleplayDuration: 10
+  },
+
+  // Team Decision Making Events
+  {
+    id: 'BLTDM',
+    name: 'Business Law and Ethics Team Decision Making',
+    category: 'MANAGEMENT',
+    careerCluster: 'Business Management and Administration',
+    careerPathway: 'Business Law',
+    description: 'Team event focusing on legal and ethical decision-making in business scenarios',
+    prepTime: 30,
+    roleplayDuration: 15
+  },
+  {
+    id: 'BTDM',
+    name: 'Buying and Merchandising Team Decision Making',
+    category: 'MARKETING',
+    careerCluster: 'Marketing',
+    careerPathway: 'Merchandising',
+    description: 'Team event focusing on buying decisions and merchandising strategies in retail',
+    prepTime: 30,
+    roleplayDuration: 15
+  },
+  {
+    id: 'ETDM',
+    name: 'Entrepreneurship Team Decision Making',
+    category: 'ENTREPRENEUR',
+    careerCluster: 'Business Management and Administration',
+    careerPathway: 'Entrepreneurship',
+    description: 'Team event focusing on entrepreneurial ventures and startup decision-making',
+    prepTime: 30,
+    roleplayDuration: 15
+  },
+  {
+    id: 'FTDM',
+    name: 'Financial Services Team Decision Making',
+    category: 'FINANCE',
+    careerCluster: 'Finance',
+    careerPathway: 'Financial Services',
+    description: 'Team event focusing on financial services industry decisions and client solutions',
+    prepTime: 30,
+    roleplayDuration: 15
+  },
+  {
+    id: 'HTDM',
+    name: 'Hospitality Services Team Decision Making',
+    category: 'HOSPITALITY',
+    careerCluster: 'Hospitality and Tourism',
+    careerPathway: 'Hospitality Management',
+    description: 'Team event focusing on hospitality service decisions and guest experience management',
+    prepTime: 30,
+    roleplayDuration: 15
+  },
+  {
+    id: 'MTDM',
+    name: 'Marketing Management Team Decision Making',
+    category: 'MARKETING',
+    careerCluster: 'Marketing',
+    careerPathway: 'Marketing Management',
+    description: 'Team event focusing on marketing strategy and management decisions',
+    prepTime: 30,
+    roleplayDuration: 15
+  },
+  {
+    id: 'STDM',
+    name: 'Sports and Entertainment Marketing Team Decision Making',
+    category: 'MARKETING',
+    careerCluster: 'Marketing',
+    careerPathway: 'Marketing Communications',
+    description: 'Team event focusing on sports and entertainment industry marketing decisions',
+    prepTime: 30,
+    roleplayDuration: 15
+  },
+  {
+    id: 'TTDM',
+    name: 'Travel and Tourism Team Decision Making',
+    category: 'HOSPITALITY',
+    careerCluster: 'Hospitality and Tourism',
+    careerPathway: 'Travel and Tourism',
+    description: 'Team event focusing on travel and tourism industry decisions and destination management',
+    prepTime: 30,
+    roleplayDuration: 15
   }
 ]
 

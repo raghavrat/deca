@@ -5,33 +5,58 @@ import { useAuth } from '../context/AuthContext';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
-export default function SignUp() {
-  const [name, setName] = useState('');
+export default function Signup() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [name, setName] = useState('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const { signUp } = useAuth();
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!name.trim()) {
-      setError('Please enter a display name');
+    setError('');
+    setSuccess('');
+
+    if (password !== confirmPassword) {
+      setError('Passwords do not match');
       return;
     }
-    
+
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters');
+      return;
+    }
+
+    setIsLoading(true);
     try {
-      await signUp(email, password, name.trim());
-      setSuccess('Please check your email for verification before logging in');
-      setError('');
-      setTimeout(() => {
-        router.push('/login');
-      }, 3000);
+      const emailSent = await signUp(email, password, name);
+      if (emailSent) {
+        setSuccess('Account created! Please check your email to verify your account.');
+        // Clear form
+        setEmail('');
+        setPassword('');
+        setConfirmPassword('');
+        setName('');
+      }
     } catch (err: any) {
-      setError(err.message || 'Failed to create an account');
-      setSuccess('');
+      console.error('Signup error:', err);
+      if (err.code === 'auth/email-already-in-use') {
+        setError('An account with this email already exists');
+      } else if (err.code === 'auth/invalid-email') {
+        setError('Invalid email address');
+      } else if (err.code === 'auth/weak-password') {
+        setError('Password is too weak');
+      } else if (err.message) {
+        setError(err.message);
+      } else {
+        setError('Failed to create account. Please try again.');
+      }
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -39,18 +64,18 @@ export default function SignUp() {
     <div className="min-h-screen flex items-center justify-center p-4">
       <div className="w-full max-w-md space-y-8">
         <div>
-          <h2 className="text-4xl font-bold mb-12 text-center text-gray-800 dark:text-white">
-            Create an account
+          <h2 className="text-4xl font-light tracking-tight text-center text-black dark:text-white">
+            Create your account
           </h2>
         </div>
         <form className="space-y-6" onSubmit={handleSubmit}>
           {error && (
-            <div className="bg-red-100 dark:bg-red-900/30 border border-red-400 dark:border-red-600 text-red-700 dark:text-red-400 px-4 py-3 rounded-[15px]">
+            <div className="text-sm text-red-600 dark:text-red-400">
               {error}
             </div>
           )}
           {success && (
-            <div className="bg-green-100 dark:bg-green-900/30 border border-green-400 dark:border-green-600 text-green-700 dark:text-green-400 px-4 py-3 rounded-[15px]">
+            <div className="text-sm text-green-600 dark:text-green-400">
               {success}
             </div>
           )}
@@ -58,15 +83,15 @@ export default function SignUp() {
             <input
               type="text"
               required
-              className="w-full px-6 py-4 rounded-[15px] border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-[#0066cc] dark:focus:ring-[#4d94ff] focus:border-transparent"
-              placeholder="Display Name"
+              className="input-minimal"
+              placeholder="Full name"
               value={name}
               onChange={(e) => setName(e.target.value)}
             />
             <input
               type="email"
               required
-              className="w-full px-6 py-4 rounded-[15px] border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-[#0066cc] dark:focus:ring-[#4d94ff] focus:border-transparent"
+              className="input-minimal"
               placeholder="Email address"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -74,24 +99,33 @@ export default function SignUp() {
             <input
               type="password"
               required
-              className="w-full px-6 py-4 rounded-[15px] border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-[#0066cc] dark:focus:ring-[#4d94ff] focus:border-transparent"
+              className="input-minimal"
               placeholder="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+            />
+            <input
+              type="password"
+              required
+              className="input-minimal"
+              placeholder="Confirm password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
             />
           </div>
 
           <button
             type="submit"
-            className="btn btn-primary w-full"
+            disabled={isLoading || success !== ''}
+            className="w-full py-3 text-sm font-medium border border-gray-300 dark:border-gray-700 hover:border-black dark:hover:border-white transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Sign up
+            {isLoading ? 'Creating account...' : 'Sign up'}
           </button>
         </form>
         <div className="text-center">
           <Link 
             href="/login" 
-            className="text-[#0066cc] dark:text-[#4d94ff] hover:text-[#0052a3] dark:hover:text-[#6ba3ff] font-semibold transition-colors duration-300"
+            className="text-sm text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors duration-200"
           >
             Already have an account? Sign in
           </Link>
@@ -99,4 +133,4 @@ export default function SignUp() {
       </div>
     </div>
   );
-} 
+}

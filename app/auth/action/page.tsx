@@ -151,13 +151,13 @@ function AuthActionContent() {
     return (
       <div className="min-h-screen flex items-center justify-center p-4">
         <div className="w-full max-w-md space-y-6 text-center">
-          <h2 className="text-3xl font-bold text-gray-800 dark:text-white">Email Verified!</h2>
-          <div className="bg-green-100 dark:bg-green-900/30 border border-green-400 dark:border-green-600 text-green-700 dark:text-green-400 px-4 py-3 rounded-[15px]">
+          <h2 className="text-4xl font-light text-gray-800 dark:text-white">Email Verified!</h2>
+          <div className="text-sm text-green-600 dark:text-green-400 my-4">
             {success}
           </div>
           <Link 
             href="/login" 
-            className="inline-block text-[#0066cc] dark:text-[#4d94ff] hover:text-[#0052a3] dark:hover:text-[#6ba3ff] font-semibold transition-colors duration-300"
+            className="inline-block text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors duration-300"
           >
             Go to Login
           </Link>
@@ -172,7 +172,7 @@ function AuthActionContent() {
       <div className="min-h-screen flex items-center justify-center p-4">
         <div className="w-full max-w-md space-y-8">
           <div>
-            <h2 className="text-4xl font-bold mb-4 text-center text-gray-800 dark:text-white">
+            <h2 className="text-4xl font-light mb-4 text-center text-gray-800 dark:text-white">
               Set new password
             </h2>
             {userEmail && (
@@ -183,7 +183,7 @@ function AuthActionContent() {
           </div>
           <form className="space-y-6" onSubmit={handlePasswordReset}>
             {error && (
-              <div className="bg-red-100 dark:bg-red-900/30 border border-red-400 dark:border-red-600 text-red-700 dark:text-red-400 px-4 py-3 rounded-[15px]">
+              <div className="text-sm text-red-600 dark:text-red-400 mb-4">
                 {error}
               </div>
             )}
@@ -196,7 +196,7 @@ function AuthActionContent() {
               <input
                 type="password"
                 required
-                className="w-full px-6 py-4 rounded-[15px] border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-[#0066cc] dark:focus:ring-[#4d94ff] focus:border-transparent"
+                className="input-minimal"
                 placeholder="New password"
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
@@ -206,7 +206,7 @@ function AuthActionContent() {
               <input
                 type="password"
                 required
-                className="w-full px-6 py-4 rounded-[15px] border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-[#0066cc] dark:focus:ring-[#4d94ff] focus:border-transparent"
+                className="input-minimal"
                 placeholder="Confirm new password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
@@ -218,7 +218,7 @@ function AuthActionContent() {
             <button
               type="submit"
               disabled={isLoading || !!success}
-              className="btn btn-primary w-full disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full py-3 text-sm font-medium border border-gray-300 dark:border-gray-700 hover:border-black dark:hover:border-white transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isLoading ? 'Resetting...' : 'Reset password'}
             </button>
@@ -227,7 +227,7 @@ function AuthActionContent() {
             <div className="text-center">
               <Link 
                 href="/login" 
-                className="text-[#0066cc] dark:text-[#4d94ff] hover:text-[#0052a3] dark:hover:text-[#6ba3ff] font-semibold transition-colors duration-300"
+                className="text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors duration-300"
               >
                 Back to sign in
               </Link>
@@ -242,14 +242,14 @@ function AuthActionContent() {
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
       <div className="w-full max-w-md space-y-6 text-center">
-        <h2 className="text-3xl font-bold text-gray-800 dark:text-white">Action Required</h2>
+        <h2 className="text-4xl font-light text-gray-800 dark:text-white">Action Required</h2>
         {error && (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-[15px]">
+          <div className="text-sm text-red-600 dark:text-red-400 mb-4">
             {error}
           </div>
         )}
         {success && (
-          <div className="bg-green-100 dark:bg-green-900/30 border border-green-400 dark:border-green-600 text-green-700 dark:text-green-400 px-4 py-3 rounded-[15px]">
+          <div className="text-sm text-green-600 dark:text-green-400 my-4">
             {success}
           </div>
         )}
@@ -264,7 +264,7 @@ function AuthActionContent() {
           )}
           <Link 
             href="/login" 
-            className="block text-[#0066cc] hover:text-[#0052a3] font-semibold transition-colors duration-300"
+            className="block text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors duration-300"
           >
             Go to Login
           </Link>

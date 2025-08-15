@@ -1,10 +1,14 @@
 import './globals.css'
-import { Inter } from 'next/font/google'
+import { Manrope } from 'next/font/google'
 import Header from './components/Header'
 import { AuthContextProvider } from './context/AuthContext'
 import { ThemeProvider } from './context/ThemeContext'
 
-const inter = Inter({ subsets: ['latin'] })
+const manrope = Manrope({ 
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700'],
+  variable: '--font-manrope'
+})
 
 export const metadata = {
   title: 'Deca Pal',
@@ -18,12 +22,12 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={inter.className}>
+      <body className={`${manrope.variable} font-sans`}>
         <ThemeProvider>
           <AuthContextProvider>
-            <div className="min-h-screen bg-gray-100 dark:bg-gray-900 flex flex-col transition-colors">
+            <div className="min-h-screen bg-white dark:bg-black flex flex-col transition-colors">
               <Header />
-              <main className="flex-grow pt-4 md:pt-16">
+              <main className="flex-grow pt-24">
                 {children}
               </main>
             </div>

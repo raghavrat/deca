@@ -3,8 +3,10 @@ import { NextResponse } from 'next/server'
 import { adminAuth } from '../../../firebase/admin'
 
 export async function POST(request: Request) {
+  console.log('Session POST endpoint called');
   try {
     const { idToken } = await request.json()
+    console.log('Received ID token:', idToken ? 'Yes' : 'No');
     
     if (!idToken) {
       console.log('No ID token provided');
@@ -13,9 +15,10 @@ export async function POST(request: Request) {
 
     // Check if adminAuth is properly initialized
     if (!adminAuth) {
-      console.error('Firebase Admin SDK not initialized');
+      console.error('Firebase Admin SDK not initialized - adminAuth is null');
       return NextResponse.json({ error: 'Server configuration error' }, { status: 500 })
     }
+    console.log('Firebase Admin SDK is available');
 
     try {
       const decodedToken = await adminAuth.verifyIdToken(idToken)

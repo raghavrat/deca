@@ -3,43 +3,100 @@
 @tailwind utilities;
 
 :root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
+  --font-manrope: 'Manrope', sans-serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
-  }
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 body {
-  @apply bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors;
+  font-family: var(--font-manrope);
+  @apply bg-white dark:bg-black text-black dark:text-white antialiased;
+}
+
+@layer base {
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-medium tracking-tight;
+  }
+  
+  a {
+    @apply transition-all duration-200;
+  }
 }
 
 @layer components {
-  .btn {
-    @apply font-semibold py-4 px-6 rounded-[15px] shadow-md text-center transition-all duration-300 ease-in-out transform focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0066cc];
+  /* Minimalist button style */
+  .btn-minimal {
+    @apply relative py-2 text-sm font-medium tracking-wide transition-all duration-200;
+    @apply after:absolute after:bottom-0 after:left-0 after:h-[1px] after:w-0 after:bg-current after:transition-all after:duration-200;
+    @apply hover:after:w-full;
   }
-
+  
+  /* Underline navigation link */
+  .nav-link {
+    @apply relative text-sm font-medium tracking-wide text-gray-600 dark:text-gray-400 transition-colors duration-200;
+    @apply hover:text-black dark:hover:text-white;
+    @apply after:absolute after:bottom-[-2px] after:left-0 after:h-[1px] after:w-0 after:bg-black dark:after:bg-white after:transition-all after:duration-200;
+    @apply hover:after:w-full;
+  }
+  
+  .nav-link-active {
+    @apply text-black dark:text-white;
+    @apply after:w-full;
+  }
+  
+  /* Primary button - minimal style */
   .btn-primary {
-    @apply bg-[#0066cc] hover:bg-[#0052a3] text-white;
-  }
-
-  .btn-secondary {
-    @apply bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 text-[#0066cc] dark:text-[#4d94ff] border border-gray-200 dark:border-gray-700;
-  }
-  
-  /* Click animation class - easy to add/remove */
-  .click-animation {
-    @apply transition-transform duration-75;
+    @apply inline-flex items-center justify-center px-6 py-3 text-sm font-medium;
+    @apply bg-black dark:bg-white text-white dark:text-black;
+    @apply border border-black dark:border-white;
+    @apply hover:bg-transparent dark:hover:bg-transparent hover:text-black dark:hover:text-white;
+    @apply transition-all duration-200;
   }
   
-  .click-animation:active {
-    @apply scale-[0.98];
+  /* Ghost button */
+  .btn-ghost {
+    @apply inline-flex items-center justify-center px-6 py-3 text-sm font-medium;
+    @apply bg-transparent text-black dark:text-white;
+    @apply border border-gray-300 dark:border-gray-700;
+    @apply hover:border-black dark:hover:border-white;
+    @apply transition-all duration-200;
+  }
+  
+  /* Text button with underline */
+  .btn-text {
+    @apply relative inline-flex items-center text-sm font-medium;
+    @apply text-black dark:text-white;
+    @apply after:absolute after:bottom-0 after:left-0 after:h-[1px] after:w-full after:bg-current;
+    @apply hover:opacity-70 transition-opacity duration-200;
+  }
+  
+  /* Card style - minimal */
+  .card-minimal {
+    @apply bg-white dark:bg-black;
+    @apply border border-gray-200 dark:border-gray-800;
+    @apply transition-all duration-200;
+  }
+  
+  /* Input field - minimal */
+  .input-minimal {
+    @apply w-full px-0 py-2 text-sm;
+    @apply bg-transparent border-0 border-b border-gray-300 dark:border-gray-700;
+    @apply focus:border-black dark:focus:border-white focus:outline-none;
+    @apply placeholder-gray-500 dark:placeholder-gray-500;
+    @apply transition-colors duration-200;
+  }
+  
+  /* Subtle animation */
+  .fade-in {
+    animation: fadeIn 0.3s ease-in-out;
+  }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
   }
 }
-

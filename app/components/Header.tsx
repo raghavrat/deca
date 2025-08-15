@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import { UserCircle, Menu, X, LogOut, Moon, Sun } from 'lucide-react'
 import { useState, useEffect, useRef } from 'react'
 import { useAuth } from '../context/AuthContext'
@@ -12,6 +13,7 @@ export default function Header() {
   const { user, logout } = useAuth()
   const { darkMode, toggleDarkMode } = useTheme()
   const dropdownRef = useRef<HTMLDivElement>(null)
+  const pathname = usePathname()
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -35,177 +37,165 @@ export default function Header() {
     }
   }
 
+  const isActive = (path: string) => pathname.startsWith(path)
+
   return (
-    <header className="fixed top-4 left-4 right-4 z-10">
-      <div className="bg-white dark:bg-gray-800 shadow-lg rounded-[20px] transition-colors max-w-7xl mx-auto">
-        <div className="px-4 sm:px-6 lg:px-8">
+    <header className="fixed top-4 left-1/2 transform -translate-x-1/2 w-full max-w-6xl z-50 bg-white dark:bg-black backdrop-blur-md border border-gray-300 dark:border-gray-700 shadow-lg">
+      <div className="w-full">
+        <div className="px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
-          {/* Logo */}
-          <div className="flex-1 flex items-center">
-            <Link href="/" className="text-2xl font-bold text-gray-800 dark:text-white hover:text-[#0066cc] dark:hover:text-[#4d94ff] transition-colors duration-300">
-              Deca Pal
-            </Link>
-          </div>
-
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex flex-1 items-center justify-center space-x-6">
-            <Link href="/performance" className="text-gray-600 dark:text-gray-300 hover:text-[#0066cc] dark:hover:text-[#4d94ff] transition-colors duration-300 whitespace-nowrap">
-              Performance Indicators
-            </Link>
-            <Link href="/test" className="text-gray-600 dark:text-gray-300 hover:text-[#0066cc] dark:hover:text-[#4d94ff] transition-colors duration-300">
-              Tests
-            </Link>
-            <Link href="/roleplay" className="text-gray-600 dark:text-gray-300 hover:text-[#0066cc] dark:hover:text-[#4d94ff] transition-colors duration-300">
-              Roleplays
-            </Link>
-            <Link href="/leaderboard" className="text-gray-600 dark:text-gray-300 hover:text-[#0066cc] dark:hover:text-[#4d94ff] transition-colors duration-300">
-              Leaderboard
-            </Link>
-          </nav>
-
-          {/* User Icon and Dark Mode Toggle - Desktop */}
-          <div className="hidden md:flex flex-1 items-center justify-end space-x-4 relative">
-            <button 
-              onClick={toggleDarkMode}
-              className="text-gray-600 dark:text-gray-300 hover:text-[#0066cc] dark:hover:text-[#4d94ff] transition-colors duration-200 click-animation"
-              aria-label="Toggle dark mode"
-            >
-              {darkMode ? <Sun size={24} /> : <Moon size={24} />}
-            </button>
-            <div ref={dropdownRef} className="relative">
-              <button 
-                onClick={() => setIsProfileOpen(!isProfileOpen)}
-                className="text-gray-600 dark:text-gray-300 hover:text-[#0066cc] dark:hover:text-[#4d94ff] transition-colors duration-200 click-animation"
-              >
-                <UserCircle size={32} />
-              </button>
-
-              {/* Profile Dropdown */}
-              {isProfileOpen && (
-                <div className="absolute right-0 top-12 w-72 py-2 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-100 dark:border-gray-700">
-                  {user ? (
-                    <>
-                      <div className="px-4 py-2 text-sm text-gray-700 dark:text-gray-300 border-b border-gray-100 dark:border-gray-700 break-words">
-                        {user.email}
-                      </div>
-                      <Link
-                        href="/account"
-                        onClick={() => setIsProfileOpen(false)}
-                        className="flex items-center w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 click-animation"
-                      >
-                        <UserCircle size={16} className="mr-2 flex-shrink-0" />
-                        Account
-                      </Link>
-                      <button
-                        onClick={handleLogout}
-                        className="flex items-center w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 click-animation"
-                      >
-                        <LogOut size={16} className="mr-2 flex-shrink-0" />
-                        Logout
-                      </button>
-                    </>
-                  ) : (
-                    <Link
-                      href="/login"
-                      className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 click-animation"
-                    >
-                      Login
-                    </Link>
-                  )}
-                </div>
-              )}
+            {/* Logo */}
+            <div className="flex items-center">
+              <Link href="/" className="text-lg font-semibold tracking-tight text-black dark:text-white hover:opacity-70 transition-opacity">
+                Deca Pal
+              </Link>
             </div>
-          </div>
 
-          {/* Mobile Menu Button */}
-          <div className="md:hidden">
-            <button 
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="text-gray-600 hover:text-[#0066cc] transition-colors duration-200 click-animation"
-            >
-              {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
-            </button>
-          </div>
-        </div>
-
-        {/* Mobile Navigation */}
-        {isMenuOpen && (
-          <div className="md:hidden">
-            <div className="px-2 pt-2 pb-3 space-y-1 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
+            {/* Desktop Navigation */}
+            <nav className="hidden md:flex items-center space-x-8">
               <Link 
                 href="/performance" 
-                className="block px-3 py-2 text-gray-600 dark:text-white hover:text-[#0066cc] dark:hover:text-[#4d94ff] transition-colors duration-300"
-                onClick={() => setIsMenuOpen(false)}
+                className={`nav-link ${isActive('/performance') ? 'nav-link-active' : ''}`}
               >
-                PIs
+                Performance Indicators
               </Link>
               <Link 
                 href="/test" 
-                className="block px-3 py-2 text-gray-600 dark:text-white hover:text-[#0066cc] dark:hover:text-[#4d94ff] transition-colors duration-300"
-                onClick={() => setIsMenuOpen(false)}
+                className={`nav-link ${isActive('/test') ? 'nav-link-active' : ''}`}
               >
                 Tests
               </Link>
               <Link 
                 href="/roleplay" 
-                className="block px-3 py-2 text-gray-600 dark:text-white hover:text-[#0066cc] dark:hover:text-[#4d94ff] transition-colors duration-300"
-                onClick={() => setIsMenuOpen(false)}
+                className={`nav-link ${isActive('/roleplay') ? 'nav-link-active' : ''}`}
               >
                 Roleplays
               </Link>
-              <Link 
-                href="/leaderboard" 
-                className="block px-3 py-2 text-gray-600 dark:text-white hover:text-[#0066cc] dark:hover:text-[#4d94ff] transition-colors duration-300"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Leaderboard
-              </Link>
-              
-              {/* Dark Mode Toggle - Mobile */}
-              <button
+            </nav>
+
+            {/* Right side - Theme toggle and User */}
+            <div className="hidden md:flex items-center space-x-6">
+              <button 
                 onClick={toggleDarkMode}
-                className="flex items-center w-full px-3 py-2 text-gray-600 dark:text-white hover:text-[#0066cc] dark:hover:text-[#4d94ff] transition-colors duration-300"
+                className="text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors"
+                aria-label="Toggle dark mode"
               >
-                {darkMode ? <Sun size={20} className="mr-2" /> : <Moon size={20} className="mr-2" />}
-                <span className="text-gray-600 dark:text-white">{darkMode ? 'Light Mode' : 'Dark Mode'}</span>
+                {darkMode ? <Sun size={20} /> : <Moon size={20} />}
               </button>
               
-              {user ? (
-                <>
-                  <div className="px-3 py-2 text-sm text-gray-700 dark:text-white border-t border-gray-100 dark:border-gray-700 break-words">
-                    {user.email}
-                  </div>
-                  <Link 
-                    href="/account"
-                    className="flex items-center w-full px-3 py-2 text-gray-600 dark:text-white hover:text-[#0066cc] dark:hover:text-[#4d94ff] transition-colors duration-200 click-animation"
-                    onClick={() => setIsMenuOpen(false)}
+              <div ref={dropdownRef} className="relative">
+                {user ? (
+                  <>
+                    <button 
+                      onClick={() => setIsProfileOpen(!isProfileOpen)}
+                      className="text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors"
+                    >
+                      {user.email?.split('@')[0]}
+                    </button>
+
+                    {/* Profile Dropdown */}
+                    {isProfileOpen && (
+                      <div className="absolute right-0 top-8 w-48 py-2 bg-white dark:bg-black border border-gray-200 dark:border-gray-800 fade-in">
+                        <Link
+                          href="/account"
+                          onClick={() => setIsProfileOpen(false)}
+                          className="block px-4 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors"
+                        >
+                          Account
+                        </Link>
+                        <button
+                          onClick={handleLogout}
+                          className="w-full text-left px-4 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors"
+                        >
+                          Sign Out
+                        </button>
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <Link
+                    href="/login"
+                    className="btn-text"
                   >
-                    <UserCircle size={20} className="mr-2 flex-shrink-0" />
-                    Account
+                    Sign In
                   </Link>
-                  <button 
-                    className="flex items-center w-full px-3 py-2 text-gray-600 dark:text-white hover:text-[#0066cc] dark:hover:text-[#4d94ff] transition-colors duration-200 click-animation"
-                    onClick={handleLogout}
-                  >
-                    <LogOut size={20} className="mr-2 flex-shrink-0" />
-                    Logout
-                  </button>
-                </>
-              ) : (
-                <Link 
-                  href="/login"
-                  className="block px-3 py-2 text-gray-600 dark:text-white hover:text-[#0066cc] dark:hover:text-[#4d94ff] transition-colors duration-300"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  Login
-                </Link>
-              )}
+                )}
+              </div>
+            </div>
+
+            {/* Mobile Menu Button */}
+            <div className="md:hidden">
+              <button 
+                onClick={() => setIsMenuOpen(!isMenuOpen)}
+                className="text-black dark:text-white"
+              >
+                {isMenuOpen ? <X size={20} /> : <Menu size={20} />}
+              </button>
             </div>
           </div>
-        )}
+
+          {/* Mobile Navigation */}
+          {isMenuOpen && (
+            <div className="md:hidden pb-4 fade-in">
+              <div className="flex flex-col space-y-4 pt-4 border-t border-gray-200 dark:border-gray-800">
+                <Link 
+                  href="/performance" 
+                  className={`nav-link ${isActive('/performance') ? 'nav-link-active' : ''}`}
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Performance Indicators
+                </Link>
+                <Link 
+                  href="/test" 
+                  className={`nav-link ${isActive('/test') ? 'nav-link-active' : ''}`}
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Tests
+                </Link>
+                <Link 
+                  href="/roleplay" 
+                  className={`nav-link ${isActive('/roleplay') ? 'nav-link-active' : ''}`}
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Roleplays
+                </Link>
+                
+                <div className="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-gray-800">
+                  <button
+                    onClick={toggleDarkMode}
+                    className="flex items-center text-sm font-medium text-gray-600 dark:text-gray-400"
+                  >
+                    {darkMode ? <Sun size={16} className="mr-2" /> : <Moon size={16} className="mr-2" />}
+                    {darkMode ? 'Light' : 'Dark'}
+                  </button>
+                  
+                  {user ? (
+                    <div className="flex items-center space-x-4">
+                      <span className="text-sm text-gray-600 dark:text-gray-400">
+                        {user.email?.split('@')[0]}
+                      </span>
+                      <button 
+                        className="text-sm font-medium text-gray-600 dark:text-gray-400"
+                        onClick={handleLogout}
+                      >
+                        Sign Out
+                      </button>
+                    </div>
+                  ) : (
+                    <Link 
+                      href="/login"
+                      className="text-sm font-medium text-black dark:text-white"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      Sign In
+                    </Link>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </header>
   )
 }
-

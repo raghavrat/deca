@@ -44,13 +44,13 @@ export default function Login() {
     <div className="min-h-screen flex items-center justify-center p-4">
       <div className="w-full max-w-md space-y-8">
         <div>
-          <h2 className="text-4xl font-bold mb-12 text-center text-gray-800 dark:text-white">
+          <h2 className="text-4xl font-light tracking-tight text-center text-black dark:text-white">
             Sign in to your account
           </h2>
         </div>
         <form className="space-y-6" onSubmit={handleSubmit}>
           {error && (
-            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-[15px]">
+            <div className="text-sm text-red-600 dark:text-red-400">
               {error}
             </div>
           )}
@@ -58,7 +58,7 @@ export default function Login() {
             <input
               type="email"
               required
-              className="w-full px-6 py-4 rounded-[15px] border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-[#0066cc] dark:focus:ring-[#4d94ff] focus:border-transparent"
+              className="input-minimal"
               placeholder="Email address"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -66,7 +66,7 @@ export default function Login() {
             <input
               type="password"
               required
-              className="w-full px-6 py-4 rounded-[15px] border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-[#0066cc] dark:focus:ring-[#4d94ff] focus:border-transparent"
+              className="input-minimal"
               placeholder="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -76,7 +76,7 @@ export default function Login() {
           <button
             type="submit"
             disabled={isLoading}
-            className="btn btn-primary w-full disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full py-3 text-sm font-medium border border-gray-300 dark:border-gray-700 hover:border-black dark:hover:border-white transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isLoading ? 'Signing in...' : 'Sign in'}
           </button>
@@ -84,13 +84,13 @@ export default function Login() {
         <div className="text-center space-y-2">
           <Link 
             href="/forgot-password" 
-            className="text-[#0066cc] hover:text-[#0052a3] font-semibold transition-colors duration-300 block"
+            className="text-sm text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors duration-200 block"
           >
             Forgot your password?
           </Link>
           <Link 
             href="/signup" 
-            className="text-[#0066cc] hover:text-[#0052a3] font-semibold transition-colors duration-300 block"
+            className="text-sm text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors duration-200 block"
           >
             Don't have an account? Sign up
           </Link>
@@ -98,4 +98,4 @@ export default function Login() {
       </div>
     </div>
   );
-} 
+}

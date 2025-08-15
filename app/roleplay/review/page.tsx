@@ -111,9 +111,9 @@ function RoleplayReviewContent() {
 
   if (!sessionData) {
     return (
-      <div className="min-h-screen bg-gray-100 dark:bg-gray-900 flex items-center justify-center">
+      <div className="min-h-screen bg-white dark:bg-black flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <div className="animate-spin h-12 w-12 border-b-2 border-black dark:border-white mx-auto mb-4"></div>
           <p className="text-gray-600 dark:text-gray-400">Loading results...</p>
         </div>
       </div>
@@ -137,20 +137,20 @@ function RoleplayReviewContent() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-4">
+    <div className="min-h-screen bg-white dark:bg-black p-4">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center">
             <Link
               href="/roleplay"
-              className="flex items-center text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors mr-4"
+              className="flex items-center text-black dark:text-white hover:text-gray-600 dark:hover:text-gray-400 transition-colors mr-4"
             >
               <ArrowLeft className="h-5 w-5 mr-1" />
               Back to Roleplay
             </Link>
             <div>
-              <h1 className="text-3xl font-bold text-gray-800 dark:text-white">AI Performance Review</h1>
+              <h1 className="text-3xl font-light text-black dark:text-white">AI Performance Review</h1>
               <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
                 {sessionData.category} • {Math.floor(sessionData.duration / 60)}:{(sessionData.duration % 60).toString().padStart(2, '0')} duration
               </p>
@@ -158,35 +158,35 @@ function RoleplayReviewContent() {
           </div>
           <Link
             href={`/roleplay/${sessionData.category.toLowerCase()}`}
-            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-md transition-colors"
+            className="px-4 py-2 border border-gray-300 dark:border-gray-700 hover:border-black dark:hover:border-white text-black dark:text-white text-sm font-medium bg-white dark:bg-black transition-colors"
           >
             Practice Another
           </Link>
         </div>
 
         {/* Score Overview */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-6">
+        <div className="bg-white dark:bg-black border border-gray-300 dark:border-gray-700 p-6 mb-6">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-2xl font-bold text-gray-800 dark:text-white">Overall Score</h2>
+            <h2 className="text-2xl font-light text-black dark:text-white">Overall Score</h2>
             <Trophy className="w-8 h-8 text-yellow-500" />
           </div>
           
           <div className="text-center mb-6">
-            <div className={`text-5xl font-bold ${getScoreColor(sessionData.scores?.total || 0, 100)}`}>
+            <div className={`text-5xl font-light text-black dark:text-white`}>
               {sessionData.scores?.total || 0}/100
             </div>
-            <p className={`text-lg mt-2 ${getScoreColor(sessionData.scores?.total || 0, 100)}`}>
+            <p className={`text-lg mt-2 text-black dark:text-white`}>
               {getScoreLabel(sessionData.scores?.total || 0, 100)}
             </p>
           </div>
 
-          <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-4 mb-6">
+          <div className="w-full border border-gray-300 dark:border-gray-700 h-4 mb-6">
             <div
-              className={`h-4 rounded-full transition-all duration-500 ${
-                (sessionData.scores?.total || 0) >= 85 ? 'bg-green-500' :
-                (sessionData.scores?.total || 0) >= 70 ? 'bg-blue-500' :
-                (sessionData.scores?.total || 0) >= 50 ? 'bg-yellow-500' :
-                'bg-red-500'
+              className={`h-4 transition-all duration-500 ${
+                (sessionData.scores?.total || 0) >= 85 ? 'bg-black dark:bg-white' :
+                (sessionData.scores?.total || 0) >= 70 ? 'bg-black dark:bg-white' :
+                (sessionData.scores?.total || 0) >= 50 ? 'bg-black dark:bg-white' :
+                'bg-black dark:bg-white'
               }`}
               style={{ width: `${sessionData.scores?.total || 0}%` }}
             ></div>
@@ -195,21 +195,21 @@ function RoleplayReviewContent() {
           {/* Quick Stats */}
           <div className="grid grid-cols-3 gap-4">
             <div className="text-center">
-              <div className="text-2xl font-bold text-gray-800 dark:text-white">
+              <div className="text-2xl font-light text-black dark:text-white">
                 {sessionData.scores?.performanceIndicators?.reduce((sum, pi) => sum + (pi.score || 0), 0) || 0}/
                 {(sessionData.scenario?.performanceIndicators?.length || 0) * 14}
               </div>
               <p className="text-sm text-gray-600 dark:text-gray-400">Performance Indicators</p>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-gray-800 dark:text-white">
+              <div className="text-2xl font-light text-black dark:text-white">
                 {sessionData.scores?.centurySkills?.reduce((sum, skill) => sum + (skill.score || 0), 0) || 0}/
                 {(sessionData.scores?.centurySkills?.length || 0) * 6}
               </div>
               <p className="text-sm text-gray-600 dark:text-gray-400">21st Century Skills</p>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-gray-800 dark:text-white">
+              <div className="text-2xl font-light text-black dark:text-white">
                 {sessionData.scores?.overallImpression?.score || 0}/6
               </div>
               <p className="text-sm text-gray-600 dark:text-gray-400">Overall Impression</p>
@@ -218,15 +218,15 @@ function RoleplayReviewContent() {
         </div>
 
         {/* Tab Navigation */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg mb-6">
+        <div className="bg-white dark:bg-black border border-gray-300 dark:border-gray-700 mb-6">
           <div className="border-b border-gray-200 dark:border-gray-700">
             <div className="flex">
               <button
                 onClick={() => setActiveTab('scores')}
-                className={`px-6 py-3 font-medium transition-colors ${
+                className={`px-6 py-3 text-sm font-medium transition-colors ${
                   activeTab === 'scores'
-                    ? 'text-blue-600 dark:text-blue-400 border-b-2 border-blue-600 dark:border-blue-400'
-                    : 'text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200'
+                    ? 'text-black dark:text-white border-b-2 border-black dark:border-white'
+                    : 'text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white'
                 }`}
               >
                 <Target className="w-4 h-4 inline mr-2" />
@@ -234,10 +234,10 @@ function RoleplayReviewContent() {
               </button>
               <button
                 onClick={() => setActiveTab('transcript')}
-                className={`px-6 py-3 font-medium transition-colors ${
+                className={`px-6 py-3 text-sm font-medium transition-colors ${
                   activeTab === 'transcript'
-                    ? 'text-blue-600 dark:text-blue-400 border-b-2 border-blue-600 dark:border-blue-400'
-                    : 'text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200'
+                    ? 'text-black dark:text-white border-b-2 border-black dark:border-white'
+                    : 'text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white'
                 }`}
               >
                 <MessageSquare className="w-4 h-4 inline mr-2" />
@@ -245,10 +245,10 @@ function RoleplayReviewContent() {
               </button>
               <button
                 onClick={() => setActiveTab('feedback')}
-                className={`px-6 py-3 font-medium transition-colors ${
+                className={`px-6 py-3 text-sm font-medium transition-colors ${
                   activeTab === 'feedback'
-                    ? 'text-blue-600 dark:text-blue-400 border-b-2 border-blue-600 dark:border-blue-400'
-                    : 'text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200'
+                    ? 'text-black dark:text-white border-b-2 border-black dark:border-white'
+                    : 'text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white'
                 }`}
               >
                 <TrendingUp className="w-4 h-4 inline mr-2" />
@@ -256,10 +256,10 @@ function RoleplayReviewContent() {
               </button>
               <button
                 onClick={() => setActiveTab('scenario')}
-                className={`px-6 py-3 font-medium transition-colors ${
+                className={`px-6 py-3 text-sm font-medium transition-colors ${
                   activeTab === 'scenario'
-                    ? 'text-blue-600 dark:text-blue-400 border-b-2 border-blue-600 dark:border-blue-400'
-                    : 'text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200'
+                    ? 'text-black dark:text-white border-b-2 border-black dark:border-white'
+                    : 'text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white'
                 }`}
               >
                 <FileText className="w-4 h-4 inline mr-2" />
@@ -273,7 +273,7 @@ function RoleplayReviewContent() {
             {activeTab === 'scores' && (
               <div className="space-y-6">
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">Performance Indicators</h3>
+                  <h3 className="text-lg font-light text-black dark:text-white mb-4">Performance Indicators</h3>
                   <div className="space-y-3">
                     {sessionData.scenario?.performanceIndicators ? (
                       sessionData.scenario.performanceIndicators.map((piName: string, index: number) => {
@@ -281,10 +281,10 @@ function RoleplayReviewContent() {
                           (pi: any) => pi.indicator === piName
                         )
                         return (
-                          <div key={index} className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                          <div key={index} className="border border-gray-200 dark:border-gray-700  p-4">
                             <div className="flex justify-between items-start mb-2">
-                              <p className="font-medium text-gray-800 dark:text-white flex-1">{piName}</p>
-                              <span className={`font-bold ml-4 ${getScoreColor(piScore?.score || 0, 14)}`}>
+                              <p className="font-light text-black dark:text-white flex-1">{piName}</p>
+                              <span className={`font-light ml-4 text-black dark:text-white`}>
                                 {piScore?.score || 0}/14
                               </span>
                             </div>
@@ -301,7 +301,7 @@ function RoleplayReviewContent() {
                 </div>
 
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">21st Century Skills</h3>
+                  <h3 className="text-lg font-light text-black dark:text-white mb-4">21st Century Skills</h3>
                   <div className="space-y-3">
                     {sessionData.scenario?.centurySkills ? (
                       sessionData.scenario.centurySkills.map((skillName: string, index: number) => {
@@ -309,10 +309,10 @@ function RoleplayReviewContent() {
                           (skill: any) => skill.skill === skillName
                         )
                         return (
-                          <div key={index} className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                          <div key={index} className="border border-gray-200 dark:border-gray-700  p-4">
                             <div className="flex justify-between items-start mb-2">
-                              <p className="font-medium text-gray-800 dark:text-white flex-1">{skillName}</p>
-                              <span className={`font-bold ml-4 ${getScoreColor(skillScore?.score || 0, 6)}`}>
+                              <p className="font-light text-black dark:text-white flex-1">{skillName}</p>
+                              <span className={`font-light ml-4 text-black dark:text-white`}>
                                 {skillScore?.score || 0}/6
                               </span>
                             </div>
@@ -329,11 +329,11 @@ function RoleplayReviewContent() {
                 </div>
 
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">Overall Impression</h3>
-                  <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                  <h3 className="text-lg font-light text-black dark:text-white mb-4">Overall Impression</h3>
+                  <div className="border border-gray-200 dark:border-gray-700  p-4">
                     <div className="flex justify-between items-start mb-2">
-                      <p className="font-medium text-gray-800 dark:text-white">Judge's Overall Assessment</p>
-                      <span className={`font-bold ${getScoreColor(sessionData.scores?.overallImpression?.score || 0, 6)}`}>
+                      <p className="font-light text-black dark:text-white">Judge's Overall Assessment</p>
+                      <span className={`font-light text-black dark:text-white`}>
                         {sessionData.scores?.overallImpression?.score || 0}/6
                       </span>
                     </div>
@@ -346,7 +346,7 @@ function RoleplayReviewContent() {
             {/* Transcript Tab */}
             {activeTab === 'transcript' && (
               <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">Performance Transcript</h3>
+                <h3 className="text-lg font-light text-black dark:text-white mb-4">Performance Transcript</h3>
                 
                 {/* Actions/Gestures */}
                 {sessionData.actions && sessionData.actions.length > 0 && (
@@ -355,7 +355,7 @@ function RoleplayReviewContent() {
                     <div className="space-y-2">
                       {(sessionData.actions || []).map((action, index) => (
                         <div key={index} className="flex items-start space-x-3 text-sm">
-                          <span className="text-blue-600 dark:text-blue-400 font-mono">{action.timestamp}</span>
+                          <span className="text-black dark:text-white font-mono">{action.timestamp}</span>
                           <span className="text-gray-600 dark:text-gray-400 italic">{action.action}</span>
                         </div>
                       ))}
@@ -367,7 +367,7 @@ function RoleplayReviewContent() {
                 <div className="space-y-2">
                   {(sessionData.transcript || []).map((entry, index) => (
                     <div key={index} className="flex items-start space-x-3">
-                      <span className="text-blue-600 dark:text-blue-400 font-mono text-sm">{entry.timestamp}</span>
+                      <span className="text-black dark:text-white font-mono text-sm">{entry.timestamp}</span>
                       <p className="text-gray-700 dark:text-gray-300 flex-1">{entry.text}</p>
                     </div>
                   ))}
@@ -380,7 +380,7 @@ function RoleplayReviewContent() {
               <div className="space-y-6">
                 {/* Strengths */}
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4 flex items-center">
+                  <h3 className="text-lg font-light text-black dark:text-white mb-4 flex items-center">
                     <Star className="w-5 h-5 mr-2 text-green-500" />
                     Strengths
                   </h3>
@@ -396,7 +396,7 @@ function RoleplayReviewContent() {
 
                 {/* Areas for Improvement */}
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4 flex items-center">
+                  <h3 className="text-lg font-light text-black dark:text-white mb-4 flex items-center">
                     <TrendingUp className="w-5 h-5 mr-2 text-yellow-500" />
                     Areas for Improvement
                   </h3>
@@ -413,7 +413,7 @@ function RoleplayReviewContent() {
                 {/* Timestamped Feedback */}
                 {sessionData.timestampedFeedback && sessionData.timestampedFeedback.length > 0 && (
                   <div>
-                    <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4 flex items-center">
+                    <h3 className="text-lg font-light text-black dark:text-white mb-4 flex items-center">
                       <Clock className="w-5 h-5 mr-2 text-blue-500" />
                       Moment-by-Moment Feedback
                     </h3>
@@ -423,18 +423,18 @@ function RoleplayReviewContent() {
                           key={index}
                           className={`border-l-4 pl-4 py-2 ${
                             feedback.type === 'positive'
-                              ? 'border-green-500 bg-green-50 dark:bg-green-900/20'
-                              : 'border-yellow-500 bg-yellow-50 dark:bg-yellow-900/20'
+                              ? 'border-green-500'
+                              : 'border-yellow-500'
                           }`}
                         >
                           <div className="flex items-center space-x-2 mb-1">
-                            <span className="text-sm font-mono text-blue-600 dark:text-blue-400">
+                            <span className="text-sm font-mono text-black dark:text-white">
                               {feedback.timestamp}
                             </span>
-                            <span className={`text-xs px-2 py-1 rounded-full ${
+                            <span className={`text-xs px-2 py-1 border border-gray-300 dark:border-gray-700 ${
                               feedback.type === 'positive'
-                                ? 'bg-green-200 dark:bg-green-800 text-green-800 dark:text-green-200'
-                                : 'bg-yellow-200 dark:bg-yellow-800 text-yellow-800 dark:text-yellow-200'
+                                ? 'text-green-600 dark:text-green-400'
+                                : 'text-yellow-600 dark:text-yellow-400'
                             }`}>
                               {feedback.type === 'positive' ? 'Strength' : 'Suggestion'}
                             </span>
@@ -452,8 +452,8 @@ function RoleplayReviewContent() {
             {activeTab === 'scenario' && sessionData.scenario && (
               <div className="space-y-6">
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">Event Information</h3>
-                  <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 space-y-2">
+                  <h3 className="text-lg font-light text-black dark:text-white mb-4">Event Information</h3>
+                  <div className="border border-gray-300 dark:border-gray-700 p-4 space-y-2">
                     <p><strong>Event Code:</strong> {sessionData.scenario.eventCode}</p>
                     <p><strong>Career Cluster:</strong> {sessionData.scenario.careerCluster}</p>
                     <p><strong>Career Pathway:</strong> {sessionData.scenario.careerPathway || 'N/A'}</p>
@@ -462,7 +462,7 @@ function RoleplayReviewContent() {
 
                 {sessionData.scenario.eventSituation && (
                   <div>
-                    <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">Event Situation</h3>
+                    <h3 className="text-lg font-light text-black dark:text-white mb-4">Event Situation</h3>
                     <div className="space-y-4">
                       <div>
                         <h4 className="font-medium text-gray-700 dark:text-gray-300 mb-2">Your Role</h4>
@@ -502,7 +502,7 @@ function RoleplayReviewContent() {
 
                 {sessionData.scenario.performanceIndicators && (
                   <div>
-                    <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">Performance Indicators</h3>
+                    <h3 className="text-lg font-light text-black dark:text-white mb-4">Performance Indicators</h3>
                     <ol className="list-decimal list-inside space-y-2 text-gray-600 dark:text-gray-400">
                       {sessionData.scenario.performanceIndicators.map((pi: string, index: number) => (
                         <li key={index}>{pi}</li>
@@ -513,7 +513,7 @@ function RoleplayReviewContent() {
 
                 {sessionData.scenario.centurySkills && (
                   <div>
-                    <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">21st Century Skills</h3>
+                    <h3 className="text-lg font-light text-black dark:text-white mb-4">21st Century Skills</h3>
                     <ol className="list-decimal list-inside space-y-2 text-gray-600 dark:text-gray-400">
                       {sessionData.scenario.centurySkills.map((skill: string, index: number) => (
                         <li key={index}>{skill}</li>
@@ -524,7 +524,7 @@ function RoleplayReviewContent() {
 
                 {sessionData.scenario.judgeInstructions && (
                   <div>
-                    <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">Judge Information</h3>
+                    <h3 className="text-lg font-light text-black dark:text-white mb-4">Judge Information</h3>
                     <div className="space-y-4">
                       {sessionData.scenario.judgeInstructions.roleCharacterization && (
                         <div>
@@ -549,7 +549,7 @@ function RoleplayReviewContent() {
 
                 {sessionData.scenario.participantInstructions && (
                   <div>
-                    <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">Participant Instructions</h3>
+                    <h3 className="text-lg font-light text-black dark:text-white mb-4">Participant Instructions</h3>
                     <ol className="list-decimal list-inside space-y-2 text-gray-600 dark:text-gray-400">
                       {sessionData.scenario.participantInstructions.map((instruction: string, index: number) => (
                         <li key={index}>{instruction}</li>
@@ -569,9 +569,9 @@ function RoleplayReviewContent() {
 export default function RoleplayReviewPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-gray-100 dark:bg-gray-900 flex items-center justify-center">
+      <div className="min-h-screen bg-white dark:bg-black flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <div className="animate-spin h-12 w-12 border-b-2 border-black dark:border-white mx-auto mb-4"></div>
           <p className="text-gray-600 dark:text-gray-400">Loading...</p>
         </div>
       </div>

@@ -93,12 +93,12 @@ export function AuthContextProvider({ children }: { children: React.ReactNode })
       console.log('Session creation response:', sessionData);
   
       if (!sessionResponse.ok) {
-        throw new Error('Failed to create session');
+        console.error('Session creation failed:', sessionData);
+        throw new Error(sessionData.error || 'Failed to create session');
       }
   
-      // Force a page reload to ensure the session cookie is properly recognized
-      // This prevents race conditions between client auth and server session
-      window.location.href = '/';
+      // Use router.push instead of window.location.href to avoid the query string issue
+      router.push('/');
     } catch (error) {
       console.error('Sign in error:', error);
       throw error;

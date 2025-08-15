@@ -58,21 +58,21 @@ export default function ForgotPassword() {
     <div className="min-h-screen flex items-center justify-center p-4">
       <div className="w-full max-w-md space-y-8">
         <div>
-          <h2 className="text-4xl font-bold mb-4 text-center text-gray-800 dark:text-white">
+          <h2 className="text-4xl font-light mb-4 text-center text-gray-800 dark:text-white">
             Reset your password
           </h2>
-          <p className="text-center text-gray-600 dark:text-gray-400">
+          <p className="text-sm text-center text-gray-600 dark:text-gray-400">
             Enter your email address and we'll send you a link to reset your password.
           </p>
         </div>
         <form className="space-y-6" onSubmit={handleSubmit}>
           {error && (
-            <div className="bg-red-100 dark:bg-red-900/30 border border-red-400 dark:border-red-600 text-red-700 dark:text-red-400 px-4 py-3 rounded-[15px]">
+            <div className="text-sm text-red-500 mb-4">
               {error}
             </div>
           )}
           {success && (
-            <div className="bg-green-100 dark:bg-green-900/30 border border-green-400 dark:border-green-600 text-green-700 dark:text-green-400 px-4 py-3 rounded-[15px]">
+            <div className="text-sm text-green-600 dark:text-green-400 mb-4">
               {success}
             </div>
           )}
@@ -80,7 +80,7 @@ export default function ForgotPassword() {
             <input
               type="email"
               required
-              className="w-full px-6 py-4 rounded-[15px] border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-[#0066cc] dark:focus:ring-[#4d94ff] focus:border-transparent"
+              className="input-minimal"
               placeholder="Email address"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -92,7 +92,7 @@ export default function ForgotPassword() {
             <button
               type="submit"
               disabled={isLoading}
-              className="btn btn-primary w-full disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full py-3 text-sm font-medium border border-gray-300 dark:border-gray-700 hover:border-black dark:hover:border-white transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isLoading ? 'Sending...' : 'Send reset email'}
             </button>
@@ -102,7 +102,7 @@ export default function ForgotPassword() {
                 type="button"
                 onClick={handleResend}
                 disabled={isLoading}
-                className="btn btn-primary w-full disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full py-3 text-sm font-medium border border-gray-300 dark:border-gray-700 hover:border-black dark:hover:border-white transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isLoading ? 'Resending...' : 'Resend email'}
               </button>
@@ -115,7 +115,7 @@ export default function ForgotPassword() {
         <div className="text-center">
           <Link 
             href="/login" 
-            className="text-[#0066cc] dark:text-[#4d94ff] hover:text-[#0052a3] dark:hover:text-[#6ba3ff] font-semibold transition-colors duration-300"
+            className="text-sm text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors duration-200"
           >
             Back to sign in
           </Link>

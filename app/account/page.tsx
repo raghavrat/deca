@@ -93,26 +93,26 @@ export default function AccountPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 mb-6">
-          <h1 className="text-3xl font-bold text-gray-800 dark:text-white mb-2">Account Dashboard</h1>
-          <p className="text-gray-600 dark:text-gray-400">{user.email}</p>
+        <div className="p-6 mb-6">
+          <h1 className="text-4xl font-light text-black dark:text-white mb-2">Account Dashboard</h1>
+          <p className="text-sm text-gray-600 dark:text-gray-400">{user.email}</p>
         </div>
 
         {/* Name Section */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 mb-6">
-          <h2 className="text-xl font-bold text-gray-800 dark:text-white mb-4">Display Name</h2>
+        <div className="p-6 mb-6 border-b border-gray-300 dark:border-gray-700">
+          <h2 className="text-xl font-light text-black dark:text-white mb-4">Display Name</h2>
           {!isEditingName ? (
             <div className="flex items-center justify-between">
               <div className="flex items-center">
                 <UserIcon className="h-6 w-6 text-gray-500 dark:text-gray-400 mr-3" />
-                <span className="text-lg text-gray-800 dark:text-white">{name || 'No name set'}</span>
+                <span className="text-lg text-black dark:text-white">{name || 'No name set'}</span>
               </div>
               <button 
                 onClick={() => setIsEditingName(true)} 
-                className="text-sm text-blue-600 dark:text-blue-400 hover:underline"
+                className="text-sm text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors duration-200"
               >
                 Edit
               </button>
@@ -124,50 +124,50 @@ export default function AccountPage() {
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 w-full text-gray-800 dark:text-white bg-white dark:bg-gray-700"
+                  className="input-minimal"
                   placeholder="Enter your display name"
                 />
-                <button type="submit" className="ml-3 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+                <button type="submit" className="ml-3 px-4 py-2 border border-gray-300 dark:border-gray-700 hover:border-black dark:hover:border-white transition-colors duration-200">
                   <Save className="h-5 w-5" />
                 </button>
-                <button onClick={() => setIsEditingName(false)} className="ml-2 px-4 py-2 text-gray-600 dark:text-gray-400">
+                <button onClick={() => setIsEditingName(false)} className="ml-2 px-4 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors duration-200">
                   Cancel
                 </button>
               </div>
             </form>
           )}
-          {feedback && <p className="text-sm text-green-600 mt-2">{feedback}</p>}
+          {feedback && <p className="text-sm text-green-600 dark:text-green-400 mt-2">{feedback}</p>}
         </div>
 
         {/* Stats Overview */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
+          <div className="p-6 border border-gray-300 dark:border-gray-700">
             <div className="flex items-center justify-between mb-4">
-              <div className="p-3 bg-blue-100 rounded-lg">
-                <Target className="h-6 w-6 text-blue-600" />
+              <div className="p-3">
+                <Target className="h-6 w-6 text-gray-600 dark:text-gray-400" />
               </div>
             </div>
-            <h3 className="text-2xl font-bold text-gray-800 dark:text-white">{stats.totalQuestions}</h3>
+            <h3 className="text-2xl font-light text-black dark:text-white">{stats.totalQuestions}</h3>
             <p className="text-gray-600 dark:text-gray-400 text-sm">Total Questions Attempted</p>
           </div>
 
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
+          <div className="p-6 border border-gray-300 dark:border-gray-700">
             <div className="flex items-center justify-between mb-4">
-              <div className="p-3 bg-green-100 rounded-lg">
-                <TrendingUp className="h-6 w-6 text-green-600" />
+              <div className="p-3">
+                <TrendingUp className="h-6 w-6 text-gray-600 dark:text-gray-400" />
               </div>
             </div>
-            <h3 className="text-2xl font-bold text-gray-800 dark:text-white">{stats.streak || 0}</h3>
+            <h3 className="text-2xl font-light text-black dark:text-white">{stats.streak || 0}</h3>
             <p className="text-gray-600 dark:text-gray-400 text-sm">Day Streak</p>
           </div>
 
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
+          <div className="p-6 border border-gray-300 dark:border-gray-700">
             <div className="flex items-center justify-between mb-4">
-              <div className="p-3 bg-purple-100 rounded-lg">
-                <Clock className="h-6 w-6 text-purple-600" />
+              <div className="p-3">
+                <Clock className="h-6 w-6 text-gray-600 dark:text-gray-400" />
               </div>
             </div>
-            <h3 className="text-lg font-semibold text-gray-800 dark:text-white">
+            <h3 className="text-lg font-light text-black dark:text-white">
               {stats.lastAttempt ? new Date(stats.lastAttempt).toLocaleDateString() : 'No attempts yet'}
             </h3>
             <p className="text-gray-600 dark:text-gray-400 text-sm">Last Activity</p>

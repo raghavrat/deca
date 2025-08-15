@@ -136,9 +136,9 @@ export default function TestPage({ params, searchParams }: PageProps) {
 
  if (filteredQuestions.length === 0) {
    return (
-     <div className="min-h-screen bg-gray-100 dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8">
+     <div className="min-h-screen bg-white dark:bg-black py-12 px-4 sm:px-6 lg:px-8">
        <div className="max-w-3xl mx-auto">
-         <h1 className="text-3xl font-bold mb-8 text-center text-gray-800 dark:text-white">No questions found</h1>
+         <h1 className="text-3xl font-light mb-8 text-center text-black dark:text-white">No questions found</h1>
          <p className="text-center text-gray-600 dark:text-gray-400">Category: {category}</p>
        </div>
      </div>
@@ -146,12 +146,12 @@ export default function TestPage({ params, searchParams }: PageProps) {
  }
 
  return (
-   <div className="min-h-screen bg-gray-100 dark:bg-gray-900 flex items-center justify-center pt-8 pb-12">
+   <div className="min-h-screen bg-white dark:bg-black flex items-center justify-center pt-8 pb-12">
      <div className="w-full max-w-2xl mx-auto px-4">
-       <h1 className="text-3xl font-bold mb-8 text-center text-gray-800 dark:text-white">{currentQuestion.category} Practice Test</h1>
+       <h1 className="text-3xl font-light mb-8 text-center text-black dark:text-white">{currentQuestion.category} Practice Test</h1>
        
-       <div className={`bg-white dark:bg-gray-800 shadow-lg rounded-[15px] p-6 mb-8 transition-opacity duration-300 ease-in-out ${isTransitioning ? 'opacity-0' : 'opacity-100'}`}>
-         <h2 className="text-xl font-semibold mb-4 text-gray-700 dark:text-gray-300">{currentQuestion.text}</h2>
+       <div className={`bg-white dark:bg-black border border-gray-300 dark:border-gray-700 p-6 mb-8 transition-opacity duration-300 ease-in-out ${isTransitioning ? 'opacity-0' : 'opacity-100'}`}>
+         <h2 className="text-xl font-light mb-4 text-black dark:text-white">{currentQuestion.text}</h2>
          
          <div className={`overflow-hidden transition-all duration-300 ease-in-out ${showResults ? 'max-h-[1000px] opacity-100 mb-6' : 'max-h-0 opacity-0'}`}>
            <p className="text-gray-600 dark:text-gray-400">{currentQuestion.explanation}</p>
@@ -162,16 +162,16 @@ export default function TestPage({ params, searchParams }: PageProps) {
              <button
                key={index}
                onClick={() => !showResults && setSelectedAnswer(index)} 
-               className={`w-full text-left p-4 rounded-[15px] transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0066cc] dark:focus:ring-[#4d94ff] click-animation ${
+               className={`w-full text-left p-4 border border-gray-300 dark:border-gray-700 transition-colors duration-200 focus:outline-none ${
                  selectedAnswer === index && !showResults
-                   ? 'bg-blue-500 text-white shadow-md'
+                   ? 'bg-black dark:bg-white text-white dark:text-black border-black dark:border-white'
                    : showResults
                    ? currentQuestion.answerType === index
-                     ? 'bg-green-500 text-white shadow-md'
+                     ? 'bg-green-500 text-white border-green-500'
                      : selectedAnswer === index
-                     ? 'bg-red-500 text-white shadow-md'
-                     : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
-                   : 'bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600'
+                     ? 'bg-red-500 text-white border-red-500'
+                     : 'bg-white dark:bg-black text-black dark:text-white'
+                   : 'bg-white dark:bg-black text-black dark:text-white hover:border-black dark:hover:border-white'
                }`}
                disabled={showResults}
              >
@@ -184,7 +184,7 @@ export default function TestPage({ params, searchParams }: PageProps) {
        {!showResults ? (
          <button
            onClick={handleSubmit}
-           className="w-full bg-[#0066cc] hover:bg-[#0052a3] text-white font-semibold py-4 px-6 rounded-[15px] shadow-md text-center transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0066cc] dark:focus:ring-[#4d94ff] click-animation"
+           className="w-full bg-black dark:bg-white text-white dark:text-black border border-black dark:border-white font-medium py-4 px-6 text-center transition-colors duration-200 focus:outline-none hover:bg-transparent dark:hover:bg-transparent hover:text-black dark:hover:text-white disabled:opacity-50 disabled:cursor-not-allowed text-sm"
            disabled={selectedAnswer === null}
          >
            Submit Answer
@@ -192,7 +192,7 @@ export default function TestPage({ params, searchParams }: PageProps) {
        ) : (
          <button
            onClick={getNextQuestion}
-           className="w-full bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 text-[#0066cc] dark:text-[#4d94ff] font-semibold py-4 px-6 rounded-[15px] shadow-md text-center transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0066cc] dark:focus:ring-[#4d94ff] click-animation"
+           className="w-full bg-white dark:bg-black text-black dark:text-white border border-gray-300 dark:border-gray-700 hover:border-black dark:hover:border-white font-medium py-4 px-6 text-center transition-colors duration-200 focus:outline-none text-sm"
          >
            Next Question
          </button>

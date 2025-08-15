@@ -1,6 +1,0 @@
-{
-  "/api/roleplay/process/route": "app/api/roleplay/process/route.js",
-  "/api/roleplay/get/route": "app/api/roleplay/get/route.js",
-  "/roleplay/[category]/page": "app/roleplay/[category]/page.js",
-  "/roleplay/review/page": "app/roleplay/review/page.js"
-}

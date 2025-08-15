@@ -10,7 +10,7 @@ import dynamic from 'next/dynamic'
 const InstructionalArea = dynamic(
   () => import('../../../components/InstructionalArea'),
   {
-    loading: () => <div className="animate-pulse bg-gray-200 h-96 rounded-lg"></div>,
+    loading: () => <div className="animate-pulse bg-gray-200 dark:bg-gray-800 h-96"></div>,
     ssr: false
   }
 )
@@ -73,14 +73,14 @@ export default function IAPage({ params: paramsPromise, searchParams: searchPara
 
   return (
     <div className="py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-      <Link href="/performance" className="mb-6 inline-flex items-center text-[#0066cc] dark:text-[#4d94ff] hover:text-[#0052a3] dark:hover:text-[#6ba3ff] transition-colors duration-200">
+      <Link href="/performance" className="mb-6 inline-flex items-center nav-link">
         <ChevronLeft className="mr-1" />
         Back to Clusters
       </Link>
-      <h2 className="text-3xl font-bold mb-6 text-gray-800 dark:text-white">{category} - {ia}</h2>
-      <Suspense fallback={<div className="animate-pulse bg-gray-200 h-96 rounded-lg"></div>}>
+      <h2 className="text-3xl font-light mb-6 text-black dark:text-white">{category} - {ia}</h2>
+      <Suspense fallback={<div className="animate-pulse bg-gray-200 dark:bg-gray-800 h-96"></div>}>
         {isLoading ? (
-          <div className="animate-pulse bg-gray-200 h-96 rounded-lg"></div>
+          <div className="animate-pulse bg-gray-200 dark:bg-gray-800 h-96"></div>
         ) : filteredData.length > 0 ? (
           <InstructionalArea area={ia} indicators={filteredData} />
         ) : (
