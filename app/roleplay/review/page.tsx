@@ -161,12 +161,11 @@ function RoleplayReviewContent() {
     )
   }
 
-  const getScoreColor = (score: number, max: number) => {
+  const getScoreBg = (score: number, max: number) => {
     const percentage = (score / max) * 100
-    if (percentage >= 85) return 'text-green-600 dark:text-green-400'
-    if (percentage >= 70) return 'text-blue-600 dark:text-blue-400'
-    if (percentage >= 50) return 'text-yellow-600 dark:text-yellow-400'
-    return 'text-red-600 dark:text-red-400'
+    if (percentage >= 80) return 'bg-green-600 dark:bg-green-400'
+    if (percentage >= 65) return 'bg-yellow-600 dark:bg-yellow-400'
+    return 'bg-red-600 dark:bg-red-400'
   }
 
   const getScoreLabel = (score: number, max: number) => {
@@ -224,10 +223,7 @@ function RoleplayReviewContent() {
           <div className="w-full border border-gray-300 dark:border-gray-700 h-4 mb-6">
             <div
               className={`h-4 transition-all duration-500 ${
-                (sessionData.scores?.total || 0) >= 85 ? 'bg-black dark:bg-white' :
-                (sessionData.scores?.total || 0) >= 70 ? 'bg-black dark:bg-white' :
-                (sessionData.scores?.total || 0) >= 50 ? 'bg-black dark:bg-white' :
-                'bg-black dark:bg-white'
+                getScoreBg((sessionData.scores?.total || 0), 100)
               }`}
               style={{ width: `${sessionData.scores?.total || 0}%` }}
             ></div>
