@@ -584,7 +584,7 @@ export default function CategoryRoleplayPage() {
 
               {/* Judge Instructions */}
               <div className="mb-8">
-                <h3 className="text-lg font-light text-black dark:text-white mb-4">JUDGE'S INSTRUCTIONS</h3>
+                <h3 className="text-lg font-light text-black dark:text-white mb-4">JUDGE&apos;S INSTRUCTIONS</h3>
 
                 <div className="mb-6">
                   <h4 className="font-light text-black dark:text-white mb-2">JUDGE ROLE-PLAY CHARACTERIZATION</h4>
@@ -697,7 +697,7 @@ export default function CategoryRoleplayPage() {
                 <div className="space-y-6">
                   {/* Judge's Questions Section */}
                   <div className="bg-white dark:bg-black border border-gray-300 dark:border-gray-700 p-6">
-                    <h3 className="text-lg font-light text-black dark:text-white mb-4">JUDGE'S QUESTIONS</h3>
+                    <h3 className="text-lg font-light text-black dark:text-white mb-4">JUDGE&apos;S QUESTIONS</h3>
                     <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
                       The judge may ask you the following questions during or after your presentation:
                     </p>
@@ -1196,7 +1196,7 @@ export default function CategoryRoleplayPage() {
                       <div className="mb-6">
                         <h4 className="font-light text-black dark:text-white mb-3">Overall Impression (0-6 points)</h4>
                         <div className="border border-gray-300 dark:border-gray-700 p-4">
-                          <p className="font-light text-black dark:text-white mb-2">10. Overall impression and responses to the judge's questions</p>
+                          <p className="font-light text-black dark:text-white mb-2">10. Overall impression and responses to the judge&apos;s questions</p>
                           <div className="flex items-center space-x-4">
                             <input
                               type="number"

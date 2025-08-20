@@ -116,7 +116,7 @@ export default function RoleplayPage() {
           <div className="mb-8 bg-white dark:bg-black border border-gray-300 dark:border-gray-700 p-6">
             <p className="text-gray-600 dark:text-gray-400 mb-4">{selectedCategoryData?.description}</p>
             <p className="text-sm text-gray-500 dark:text-gray-400">
-              Choose a specific DECA event below for a more targeted roleplay experience, or select "General Category Practice" for broader scenarios.
+              Choose a specific DECA event below for a more targeted roleplay experience, or select &quot;General Category Practice&quot; for broader scenarios.
             </p>
           </div>
 
