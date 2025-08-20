@@ -395,7 +395,7 @@ function RoleplayReviewContent() {
                   <h3 className="text-lg font-light text-black dark:text-white mb-4">Overall Impression</h3>
                   <div className="border border-gray-200 dark:border-gray-700  p-4">
                     <div className="flex justify-between items-start mb-2">
-                      <p className="font-light text-black dark:text-white">Judge's Overall Assessment</p>
+                      <p className="font-light text-black dark:text-white">Judge&apos;s Overall Assessment</p>
                       <span className={`font-light text-black dark:text-white`}>
                         {sessionData.scores?.overallImpression?.score || 0}/6
                       </span>
@@ -591,7 +591,7 @@ function RoleplayReviewContent() {
                     <div className="space-y-4">
                       {sessionData.scenario.judgeInstructions.roleCharacterization && (
                         <div>
-                          <h4 className="font-medium text-gray-700 dark:text-gray-300 mb-2">Judge's Role</h4>
+                          <h4 className="font-medium text-gray-700 dark:text-gray-300 mb-2">Judge&apos;s Role</h4>
                           <p className="text-gray-600 dark:text-gray-400">{sessionData.scenario.judgeInstructions.roleCharacterization}</p>
                         </div>
                       )}

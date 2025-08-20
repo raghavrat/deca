@@ -7,7 +7,8 @@ import { ThemeProvider } from './context/ThemeContext'
 const manrope = Manrope({ 
   subsets: ['latin'],
   weight: ['400', '500', '600', '700'],
-  variable: '--font-manrope'
+  variable: '--font-manrope',
+  fallback: ['system-ui', 'Arial', 'sans-serif']
 })
 
 export const metadata = {
