@@ -26,7 +26,7 @@ export default function LandingPage() {
             href="/signup" 
             className="group inline-flex items-center justify-center px-8 py-4 bg-black dark:bg-white text-white dark:text-black hover:bg-gray-800 dark:hover:bg-gray-200 transition-all duration-200 text-lg font-medium"
           >
-            Start Free Trial
+            Get Started
             <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
           </Link>
           <Link 
@@ -99,13 +99,13 @@ export default function LandingPage() {
             Ready to start winning?
           </h2>
           <p className="text-xl text-gray-600 dark:text-gray-400 mb-8">
-            No credit card required. Start your free trial today.
+            Join thousands of DECA students preparing for competition success.
           </p>
           <Link 
             href="/signup" 
             className="group inline-flex items-center justify-center px-8 py-4 bg-black dark:bg-white text-white dark:text-black hover:bg-gray-800 dark:hover:bg-gray-200 transition-all duration-200 text-lg font-medium"
           >
-            Get Started Free
+            Get Started
             <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
           </Link>
         </div>
