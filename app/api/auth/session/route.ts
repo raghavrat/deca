@@ -5,6 +5,57 @@ import { isEmailAllowed } from '../../../config/allowedEmails'
 import { getErrorMessage, getErrorCode } from '../../../utils/errorHandling'
 import { logger } from '../../../utils/logger'
 
+export async function GET() {
+  logger.log('Session GET endpoint called');
+  try {
+    const cookieStore = await cookies()
+    const sessionCookie = cookieStore.get('session')
+
+    if (!sessionCookie?.value) {
+      logger.log('No session cookie found');
+      return NextResponse.json({ error: 'No session cookie' }, { status: 401 })
+    }
+
+    if (!adminAuth) {
+      logger.errorProduction('Firebase Admin SDK not initialized - adminAuth is null');
+      return NextResponse.json({ error: 'Server configuration error' }, { status: 500 })
+    }
+
+    try {
+      const decodedClaims = await adminAuth.verifySessionCookie(sessionCookie.value, true)
+      
+      // Validate email against whitelist
+      if (!decodedClaims.email || !isEmailAllowed(decodedClaims.email)) {
+        logger.log('Email not in whitelist:', decodedClaims.email);
+        return NextResponse.json({ error: 'This email domain is not allowed to access the system' }, { status: 403 })
+      }
+
+      logger.log('Session validated successfully for user:', decodedClaims.email);
+      return NextResponse.json({ 
+        status: 'success',
+        user: {
+          uid: decodedClaims.uid,
+          email: decodedClaims.email,
+          email_verified: decodedClaims.email_verified
+        }
+      })
+    } catch (verifyError: unknown) {
+      logger.error('Session verification error:', verifyError)
+      const errorCode = getErrorCode(verifyError)
+      
+      if (errorCode === 'auth/session-cookie-expired') {
+        return NextResponse.json({ error: 'Session expired' }, { status: 401 })
+      }
+      
+      return NextResponse.json({ error: 'Invalid session' }, { status: 401 })
+    }
+  } catch (error: unknown) {
+    logger.errorProduction('Session validation error:', error)
+    const errorMessage = getErrorMessage(error)
+    return NextResponse.json({ error: errorMessage || 'Internal server error' }, { status: 500 })
+  }
+}
+
 export async function POST(request: Request) {
   logger.log('Session POST endpoint called');
   try {

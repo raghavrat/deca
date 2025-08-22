@@ -33,18 +33,63 @@ export function AuthContextProvider({ children }: { children: React.ReactNode })
   const router = useRouter();
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        // Only create session if user just signed in (not on every auth state change)
-        // The signIn method already handles session creation
-        setUser(user);
-      } else {
-        setUser(null);
-      }
-      setLoading(false);
-    });
+    let unsubscribe: (() => void) | undefined;
 
-    return () => unsubscribe();
+    const initializeAuth = async () => {
+      // First check if we have a valid session
+      let hasValidSession = false;
+      try {
+        const sessionResponse = await fetch('/api/auth/session', {
+          method: 'GET',
+          credentials: 'include'
+        });
+        
+        if (sessionResponse.ok) {
+          const sessionData = await sessionResponse.json();
+          if (sessionData.user) {
+            hasValidSession = true;
+            console.log('Valid session found for:', sessionData.user.email);
+          }
+        }
+      } catch (error) {
+        console.log('No existing session:', error);
+      }
+      
+      // Set up Firebase auth state listener
+      unsubscribe = onAuthStateChanged(auth, async (user) => {
+        if (user) {
+          setUser(user);
+        } else if (hasValidSession) {
+          // Session exists but Firebase auth state is null
+          // This can happen on page refresh - Firebase auth needs time to restore state
+          console.log('Session exists but Firebase auth is null, waiting for auth state...');
+          
+          // Give Firebase a moment to restore auth state
+          setTimeout(async () => {
+            await auth.authStateReady();
+            if (auth.currentUser) {
+              setUser(auth.currentUser);
+            } else {
+              // If still no user after waiting, the session might be stale
+              setUser(null);
+            }
+            setLoading(false);
+          }, 1000);
+          return; // Don't set loading to false yet
+        } else {
+          setUser(null);
+        }
+        setLoading(false);
+      });
+    };
+
+    initializeAuth();
+
+    return () => {
+      if (unsubscribe) {
+        unsubscribe();
+      }
+    };
   }, []);
 
   const signUp = async (email: string, password: string, name: string) => {
