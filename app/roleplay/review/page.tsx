@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowLeft, Trophy, TrendingUp, AlertCircle, CheckCircle, Clock, MessageSquare, Star, Target, FileText, ChevronDown } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
+import { logger } from '../../utils/logger'
 
 interface SessionData {
   userId: string
@@ -56,29 +57,29 @@ function RoleplayReviewContent() {
       // Get session ID from URL parameters
       const sessionId = searchParams.get('id')
       
-      console.log('Review page loaded with session ID:', sessionId)
+      logger.log('Review page loaded with session ID:', sessionId)
       
       if (!sessionId) {
-        console.error('No session ID found in URL')
+        logger.error('No session ID found in URL')
         router.push('/roleplay')
         return
       }
       
       if (!user) {
-        console.error('No user logged in')
+        logger.error('No user logged in')
         router.push('/login')
         return
       }
 
       try {
-        console.log('Fetching session data via API for user:', user.email)
+        logger.log('Fetching session data via API for user:', user.email)
         
         // Fetch the roleplay data through the API endpoint
         const response = await fetch(`/api/roleplay/get?id=${sessionId}&email=${encodeURIComponent(user.email!)}`)
         
         if (!response.ok) {
           const error = await response.json()
-          console.error('API error:', error)
+          logger.error('API error:', error)
           alert(`Failed to load session: ${error.error}`)
           router.push('/roleplay')
           return
@@ -86,7 +87,7 @@ function RoleplayReviewContent() {
         
         const { data: sessionData } = await response.json()
         
-        console.log('Session data retrieved:', {
+        logger.log('Session data retrieved:', {
           hasScores: !!sessionData.scores,
           hasTranscript: !!sessionData.transcript,
           totalScore: sessionData.scores?.total
@@ -99,9 +100,9 @@ function RoleplayReviewContent() {
         } as SessionData
         
         setSessionData(completeSessionData)
-        console.log('Session data set successfully')
+        logger.log('Session data set successfully')
       } catch (error) {
-        console.error('Error fetching session data:', error)
+        logger.error('Error fetching session data:', error)
         alert('Failed to load review data. Redirecting back to roleplay page.')
         router.push('/roleplay')
       }

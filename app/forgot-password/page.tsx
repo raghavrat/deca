@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { getErrorMessage, getErrorCode } from '../utils/errorHandling';
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState('');

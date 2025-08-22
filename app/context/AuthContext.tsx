@@ -74,6 +74,11 @@ export function AuthContextProvider({ children }: { children: React.ReactNode })
   };
 
   const signIn = async (email: string, password: string) => {
+    // Check if email is allowed before attempting to sign in
+    if (!isEmailAllowed(email)) {
+      throw new Error('This email domain is not allowed to access the system');
+    }
+    
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       console.log('User signed in:', userCredential.user.uid);

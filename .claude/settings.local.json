@@ -8,5 +8,6 @@
       "WebSearch"
     ],
     "deny": []
-  }
+  },
+  "outputStyle": "default"
 }

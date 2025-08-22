@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { getErrorMessage, getErrorCode } from '../utils/errorHandling';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -22,15 +23,18 @@ export default function Login() {
     try {
       await signIn(email, password);
       // Navigation is handled in the signIn method
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Login error:', err);
-      if (err.code === 'auth/wrong-password') {
+      const errorCode = getErrorCode(err);
+      const errorMessage = getErrorMessage(err);
+      
+      if (errorCode === 'auth/wrong-password') {
         setError('Incorrect password');
-      } else if (err.code === 'auth/user-not-found') {
+      } else if (errorCode === 'auth/user-not-found') {
         setError('No account found with this email');
-      } else if (err.code === 'auth/invalid-email') {
+      } else if (errorCode === 'auth/invalid-email') {
         setError('Invalid email address');
-      } else if (err.message && err.message.includes('Email not verified')) {
+      } else if (errorMessage.includes('Email not verified')) {
         setError('Please verify your email before signing in');
       } else {
         setError('Failed to sign in. Please try again.');

@@ -79,7 +79,7 @@ npm run lint         # Run Next.js linting
    - Performance indicators stored in `/app/performanceIndicators.tsx`
    - Quiz questions in `/app/questions.tsx`
    - Categories: MANAGEMENT, MARKETING, FINANCE, HOSPITALITY, ENTREPRENEURSHIP
-   - Note: There's a typo in types.ts - "MANAGMENT" should be "MANAGEMENT"
+   - Note: MANAGMENT mappings exist for backward compatibility in utility files
 
 3. **Routing Structure**
    - Dynamic routes: `/performance/[category]/[ia]/page.tsx`

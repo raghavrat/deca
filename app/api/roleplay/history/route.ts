@@ -12,6 +12,12 @@ export async function GET(request: NextRequest) {
     
     console.log('Fetching roleplay history for:', email)
     
+    // Check if Firebase Admin is properly initialized
+    if (!adminDb) {
+      console.error('Firebase Admin SDK not initialized - adminDb is null')
+      return NextResponse.json({ error: 'Server configuration error' }, { status: 500 })
+    }
+    
     // Fetch all roleplays for this user
     const docRef = adminDb.collection('roleplays').doc(email)
     const docSnap = await docRef.get()

@@ -22,6 +22,26 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  var theme = localStorage.getItem('theme');
+                  var systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                  var shouldBeDark = theme === 'dark' || (!theme && systemPrefersDark);
+                  
+                  document.documentElement.classList.toggle('dark', shouldBeDark);
+                } catch (e) {
+                  // Fallback to light mode if localStorage is not available
+                  document.documentElement.classList.remove('dark');
+                }
+              })();
+            `,
+          }}
+        />
+      </head>
       <body className={`${manrope.variable} font-sans`}>
         <ThemeProvider>
           <AuthContextProvider>

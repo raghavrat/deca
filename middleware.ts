@@ -1,23 +1,27 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const session = request.cookies.get('session')
   const currentPath = request.nextUrl.pathname
 
   // Paths that don't require authentication
-  const publicPaths = ['/login', '/signup', '/forgot-password', '/auth/action', '/api/auth/session']
+  const publicPaths = ['/', '/login', '/signup', '/pricing', '/about', '/forgot-password', '/auth/action', '/api/auth/session']
   
   // Allow public paths and API routes
   if (publicPaths.includes(currentPath) || currentPath.startsWith('/api/')) {
     return NextResponse.next()
   }
 
-  // Redirect to login if no session exists
+  // For protected routes, only check if session cookie exists
+  // Detailed session validation will be done by individual pages using Firebase Admin SDK
   if (!session?.value) {
+    console.log('No session cookie found, redirecting to login')
     return NextResponse.redirect(new URL('/login', request.url))
   }
 
+  // If session cookie exists, allow access
+  // The actual session validation will happen in API routes or server components
   return NextResponse.next()
 }
 
@@ -30,7 +34,9 @@ export const config = {
      * - _next/static (static files)
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
+     * - images/ (public images directory)
+     * - screenshots/ (public screenshots directory)
      */
-    '/((?!api/auth|_next/static|_next/image|favicon.ico).*)',
+    '/((?!api/auth|_next/static|_next/image|favicon.ico|images/|screenshots/).*)',
   ],
 } 

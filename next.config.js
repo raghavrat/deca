@@ -7,6 +7,30 @@ const nextConfig = {
     optimizePackageImports: ['lucide-react'],
   },
   webpack: (config) => {
+    // Handle node: protocol imports with simple aliases
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      'node:stream': 'stream',
+      'node:crypto': 'crypto',
+      'node:buffer': 'buffer',
+      'node:util': 'util',
+      'node:fs': 'fs',
+      'node:path': 'path',
+      'node:url': 'url',
+      'node:events': 'events',
+      'node:os': 'os',
+      'node:process': 'process',
+      'node:querystring': 'querystring',
+      'node:zlib': 'zlib',
+      'node:http': 'http',
+      'node:https': 'https',
+      'node:assert': 'assert',
+      'node:net': 'net',
+      'node:tls': 'tls',
+      'node:timers': 'timers',
+      'node:string_decoder': 'string_decoder',
+    }
+
     config.optimization = {
       ...config.optimization,
       splitChunks: {

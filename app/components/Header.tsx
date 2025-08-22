@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { UserCircle, Menu, X, LogOut, Moon, Sun } from 'lucide-react'
+import { Menu, X, Moon, Sun } from 'lucide-react'
 import { useState, useEffect, useRef } from 'react'
 import { useAuth } from '../context/AuthContext'
 import { useTheme } from '../context/ThemeContext'
@@ -10,8 +10,8 @@ import { useTheme } from '../context/ThemeContext'
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isProfileOpen, setIsProfileOpen] = useState(false)
-  const { user, logout } = useAuth()
-  const { darkMode, toggleDarkMode } = useTheme()
+  const { user, logout, loading } = useAuth()
+  const { darkMode, toggleDarkMode, isHydrated } = useTheme()
   const dropdownRef = useRef<HTMLDivElement>(null)
   const pathname = usePathname()
 
@@ -53,24 +53,50 @@ export default function Header() {
 
             {/* Desktop Navigation */}
             <nav className="hidden md:flex items-center space-x-8">
-              <Link 
-                href="/performance" 
-                className={`nav-link ${isActive('/performance') ? 'nav-link-active' : ''}`}
-              >
-                Performance Indicators
-              </Link>
-              <Link 
-                href="/test" 
-                className={`nav-link ${isActive('/test') ? 'nav-link-active' : ''}`}
-              >
-                Tests
-              </Link>
-              <Link 
-                href="/roleplay" 
-                className={`nav-link ${isActive('/roleplay') ? 'nav-link-active' : ''}`}
-              >
-                Roleplays
-              </Link>
+              {loading ? (
+                /* Loading placeholder - maintain layout */
+                <div className="flex items-center space-x-8">
+                  <div className="w-24 h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                  <div className="w-16 h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                  <div className="w-20 h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                </div>
+              ) : user ? (
+                <>
+                  <Link 
+                    href="/performance" 
+                    className={`nav-link ${isActive('/performance') ? 'nav-link-active' : ''}`}
+                  >
+                    Performance Indicators
+                  </Link>
+                  <Link 
+                    href="/test" 
+                    className={`nav-link ${isActive('/test') ? 'nav-link-active' : ''}`}
+                  >
+                    Tests
+                  </Link>
+                  <Link 
+                    href="/roleplay" 
+                    className={`nav-link ${isActive('/roleplay') ? 'nav-link-active' : ''}`}
+                  >
+                    Roleplays
+                  </Link>
+                </>
+              ) : (
+                <>
+                  <Link 
+                    href="/pricing" 
+                    className={`nav-link ${isActive('/pricing') ? 'nav-link-active' : ''}`}
+                  >
+                    Pricing
+                  </Link>
+                  <Link 
+                    href="/about" 
+                    className={`nav-link ${isActive('/about') ? 'nav-link-active' : ''}`}
+                  >
+                    About
+                  </Link>
+                </>
+              )}
             </nav>
 
             {/* Right side - Theme toggle and User */}
@@ -80,11 +106,22 @@ export default function Header() {
                 className="text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors"
                 aria-label="Toggle dark mode"
               >
-                {darkMode ? <Sun size={20} /> : <Moon size={20} />}
+                {/* Prevent hydration mismatch by checking DOM state during hydration */}
+                {isHydrated ? (
+                  darkMode ? <Sun size={20} /> : <Moon size={20} />
+                ) : (
+                  // During hydration, check DOM state to show correct icon
+                  typeof window !== 'undefined' && document.documentElement.classList.contains('dark') 
+                    ? <Sun size={20} /> 
+                    : <Moon size={20} />
+                )}
               </button>
               
               <div ref={dropdownRef} className="relative">
-                {user ? (
+                {loading ? (
+                  /* Loading placeholder for user area */
+                  <div className="w-16 h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                ) : user ? (
                   <>
                     <button 
                       onClick={() => setIsProfileOpen(!isProfileOpen)}
@@ -138,38 +175,87 @@ export default function Header() {
           {isMenuOpen && (
             <div className="md:hidden pb-4 fade-in">
               <div className="flex flex-col space-y-4 pt-4 border-t border-gray-200 dark:border-gray-800">
-                <Link 
-                  href="/performance" 
-                  className={`nav-link ${isActive('/performance') ? 'nav-link-active' : ''}`}
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  Performance Indicators
-                </Link>
-                <Link 
-                  href="/test" 
-                  className={`nav-link ${isActive('/test') ? 'nav-link-active' : ''}`}
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  Tests
-                </Link>
-                <Link 
-                  href="/roleplay" 
-                  className={`nav-link ${isActive('/roleplay') ? 'nav-link-active' : ''}`}
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  Roleplays
-                </Link>
+                {loading ? (
+                  /* Loading placeholder for mobile nav */
+                  <div className="flex flex-col space-y-4">
+                    <div className="w-32 h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                    <div className="w-24 h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                    <div className="w-28 h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                  </div>
+                ) : user ? (
+                  <>
+                    <Link 
+                      href="/performance" 
+                      className={`nav-link ${isActive('/performance') ? 'nav-link-active' : ''}`}
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      Performance Indicators
+                    </Link>
+                    <Link 
+                      href="/test" 
+                      className={`nav-link ${isActive('/test') ? 'nav-link-active' : ''}`}
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      Tests
+                    </Link>
+                    <Link 
+                      href="/roleplay" 
+                      className={`nav-link ${isActive('/roleplay') ? 'nav-link-active' : ''}`}
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      Roleplays
+                    </Link>
+                  </>
+                ) : (
+                  <>
+                    <Link 
+                      href="/pricing" 
+                      className={`nav-link ${isActive('/pricing') ? 'nav-link-active' : ''}`}
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      Pricing
+                    </Link>
+                    <Link 
+                      href="/about" 
+                      className={`nav-link ${isActive('/about') ? 'nav-link-active' : ''}`}
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      About
+                    </Link>
+                  </>
+                )}
                 
                 <div className="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-gray-800">
                   <button
                     onClick={toggleDarkMode}
                     className="flex items-center text-sm font-medium text-gray-600 dark:text-gray-400"
                   >
-                    {darkMode ? <Sun size={16} className="mr-2" /> : <Moon size={16} className="mr-2" />}
-                    {darkMode ? 'Light' : 'Dark'}
+                    {/* Prevent hydration mismatch by checking DOM state during hydration */}
+                    {isHydrated ? (
+                      <>
+                        {darkMode ? <Sun size={16} className="mr-2" /> : <Moon size={16} className="mr-2" />}
+                        {darkMode ? 'Light' : 'Dark'}
+                      </>
+                    ) : (
+                      // During hydration, check DOM state to show correct icon and text
+                      typeof window !== 'undefined' && document.documentElement.classList.contains('dark') ? (
+                        <>
+                          <Sun size={16} className="mr-2" />
+                          Light
+                        </>
+                      ) : (
+                        <>
+                          <Moon size={16} className="mr-2" />
+                          Dark
+                        </>
+                      )
+                    )}
                   </button>
                   
-                  {user ? (
+                  {loading ? (
+                    /* Loading placeholder for mobile user area */
+                    <div className="w-16 h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                  ) : user ? (
                     <div className="flex items-center space-x-4">
                       <span className="text-sm text-gray-600 dark:text-gray-400">
                         {user.email?.split('@')[0]}

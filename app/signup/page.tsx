@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { getErrorMessage, getErrorCode } from '../utils/errorHandling';
 
 export default function Signup() {
   const [email, setEmail] = useState('');
@@ -42,18 +43,19 @@ export default function Signup() {
         setConfirmPassword('');
         setName('');
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Signup error:', err);
-      if (err.code === 'auth/email-already-in-use') {
+      const errorCode = getErrorCode(err);
+      const errorMessage = getErrorMessage(err);
+      
+      if (errorCode === 'auth/email-already-in-use') {
         setError('An account with this email already exists');
-      } else if (err.code === 'auth/invalid-email') {
+      } else if (errorCode === 'auth/invalid-email') {
         setError('Invalid email address');
-      } else if (err.code === 'auth/weak-password') {
+      } else if (errorCode === 'auth/weak-password') {
         setError('Password is too weak');
-      } else if (err.message) {
-        setError(err.message);
       } else {
-        setError('Failed to create account. Please try again.');
+        setError(errorMessage || 'Failed to create account. Please try again.');
       }
     } finally {
       setIsLoading(false);

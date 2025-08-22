@@ -5,22 +5,42 @@ import { createContext, useContext, useEffect, useState } from 'react';
 interface ThemeContextType {
   darkMode: boolean;
   toggleDarkMode: () => void;
+  isHydrated: boolean;
 }
 
 const ThemeContext = createContext<ThemeContextType>({} as ThemeContextType);
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [darkMode, setDarkMode] = useState(false);
+  const [isHydrated, setIsHydrated] = useState(false);
 
   useEffect(() => {
-    // Check localStorage and system preference on mount
-    const savedTheme = localStorage.getItem('theme');
-    const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    // Set hydration flag and sync with DOM state
+    setIsHydrated(true);
+    const isDark = document.documentElement.classList.contains('dark');
+    const theme = localStorage.getItem('theme');
     
-    if (savedTheme === 'dark' || (!savedTheme && systemPrefersDark)) {
-      setDarkMode(true);
-      document.documentElement.classList.add('dark');
-    }
+    setDarkMode(isDark);
+
+    // Listen for system theme changes
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const handleSystemThemeChange = (e: MediaQueryListEvent) => {
+      // Only apply system preference if user hasn't explicitly set a theme
+      const savedTheme = localStorage.getItem('theme');
+      if (!savedTheme) {
+        const shouldBeDark = e.matches;
+        setDarkMode(shouldBeDark);
+        
+        if (shouldBeDark) {
+          document.documentElement.classList.add('dark');
+        } else {
+          document.documentElement.classList.remove('dark');
+        }
+      }
+    };
+
+    mediaQuery.addEventListener('change', handleSystemThemeChange);
+    return () => mediaQuery.removeEventListener('change', handleSystemThemeChange);
   }, []);
 
   const toggleDarkMode = () => {
@@ -37,7 +57,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <ThemeContext.Provider value={{ darkMode, toggleDarkMode }}>
+    <ThemeContext.Provider value={{ darkMode, toggleDarkMode, isHydrated }}>
       {children}
     </ThemeContext.Provider>
   );

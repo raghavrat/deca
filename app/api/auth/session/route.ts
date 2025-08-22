@@ -1,32 +1,41 @@
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
 import { adminAuth } from '../../../firebase/admin'
+import { isEmailAllowed } from '../../../config/allowedEmails'
+import { getErrorMessage, getErrorCode } from '../../../utils/errorHandling'
+import { logger } from '../../../utils/logger'
 
 export async function POST(request: Request) {
-  console.log('Session POST endpoint called');
+  logger.log('Session POST endpoint called');
   try {
     const { idToken } = await request.json()
-    console.log('Received ID token:', idToken ? 'Yes' : 'No');
+    logger.log('Received ID token:', idToken ? 'Yes' : 'No');
     
     if (!idToken) {
-      console.log('No ID token provided');
+      logger.log('No ID token provided');
       return NextResponse.json({ error: 'No ID token provided' }, { status: 400 })
     }
 
     // Check if adminAuth is properly initialized
     if (!adminAuth) {
-      console.error('Firebase Admin SDK not initialized - adminAuth is null');
+      logger.errorProduction('Firebase Admin SDK not initialized - adminAuth is null');
       return NextResponse.json({ error: 'Server configuration error' }, { status: 500 })
     }
-    console.log('Firebase Admin SDK is available');
+    logger.log('Firebase Admin SDK is available');
 
     try {
       const decodedToken = await adminAuth.verifyIdToken(idToken)
       
       // Only allow verified emails
       if (!decodedToken.email_verified) {
-        console.log('Email not verified');
+        logger.log('Email not verified');
         return NextResponse.json({ error: 'Email not verified' }, { status: 401 })
+      }
+
+      // Validate email against whitelist
+      if (!decodedToken.email || !isEmailAllowed(decodedToken.email)) {
+        logger.log('Email not in whitelist:', decodedToken.email);
+        return NextResponse.json({ error: 'This email domain is not allowed to access the system' }, { status: 403 })
       }
 
       // Create session cookie
@@ -36,30 +45,38 @@ export async function POST(request: Request) {
       // Get cookies instance
       const cookieStore = await cookies()
       
+      // Enhanced security configuration for session cookies
+      const isProduction = process.env.NODE_ENV === 'production'
+      
       cookieStore.set('session', sessionCookie, {
         maxAge: expiresIn / 1000, // maxAge is in seconds, not milliseconds
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
-        path: '/',
+        httpOnly: true, // Prevents client-side JavaScript access (XSS protection)
+        secure: isProduction, // HTTPS only in production (man-in-the-middle protection)
+        sameSite: 'strict', // Maximum CSRF protection - prevents all cross-site requests
+        path: '/', // Cookie available for entire domain
+        // Note: 'strict' sameSite provides the highest security by blocking all cross-site requests
+        // This prevents CSRF attacks but may break some legitimate cross-site navigation
+        // In development, browsers accept secure cookies over HTTP for localhost
       })
 
-      console.log('Session cookie set successfully');
+      logger.log('Session cookie set successfully');
       return NextResponse.json({ status: 'success' })
-    } catch (verifyError: any) {
-      console.error('Token verification error:', verifyError)
+    } catch (verifyError: unknown) {
+      logger.error('Token verification error:', verifyError)
+      const errorCode = getErrorCode(verifyError)
       
       // More specific error messages
-      if (verifyError.code === 'auth/id-token-expired') {
+      if (errorCode === 'auth/id-token-expired') {
         return NextResponse.json({ error: 'Token expired' }, { status: 401 })
-      } else if (verifyError.code === 'auth/argument-error') {
+      } else if (errorCode === 'auth/argument-error') {
         return NextResponse.json({ error: 'Invalid token format' }, { status: 400 })
       }
       
       return NextResponse.json({ error: 'Invalid token' }, { status: 401 })
     }
-  } catch (error: any) {
-    console.error('Session creation error:', error)
-    return NextResponse.json({ error: error.message || 'Internal server error' }, { status: 500 })
+  } catch (error: unknown) {
+    logger.errorProduction('Session creation error:', error)
+    const errorMessage = getErrorMessage(error)
+    return NextResponse.json({ error: errorMessage || 'Internal server error' }, { status: 500 })
   }
 } 

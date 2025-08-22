@@ -27,6 +27,6 @@ if (!getApps().length) {
   app = getApp();
 }
 
-export const adminAuth = app ? getAuth(app) : null as any;
-export const adminDb = app ? getFirestore(app) : null as any;
+export const adminAuth = app ? getAuth(app) : null;
+export const adminDb = app ? getFirestore(app) : null;
 

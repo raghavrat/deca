@@ -99,4 +99,17 @@ body {
     from { opacity: 0; transform: translateY(4px); }
     to { opacity: 1; transform: translateY(0); }
   }
+  
+  /* Landing page specific styles */
+  .hero-gradient {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  }
+  
+  .feature-card {
+    @apply p-8 rounded-xl bg-white dark:bg-gray-900 shadow-sm border border-gray-100 dark:border-gray-800 transition-all duration-300 hover:shadow-md;
+  }
+  
+  .section-padding {
+    @apply py-20 px-4;
+  }
 }

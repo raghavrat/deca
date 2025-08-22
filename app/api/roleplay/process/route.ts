@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { adminAuth, adminDb } from '../../../firebase/admin'
+import { logger } from '../../../utils/logger'
 
 export async function POST(request: NextRequest) {
   try {
@@ -425,6 +426,12 @@ ${scenario.centurySkills.map((skill: string) => `      {"skill": "${skill}", "sc
       hasJudgeInstructions: !!roleplayData.scenario?.judgeInstructions,
       hasParticipantInstructions: !!roleplayData.scenario?.participantInstructions
     })
+    
+    // Check if Firebase Admin is properly initialized
+    if (!adminDb) {
+      logger.errorProduction('Firebase Admin SDK not initialized - adminDb is null')
+      return NextResponse.json({ error: 'Server configuration error' }, { status: 500 })
+    }
     
     // Save to Firebase under user's email document
     await adminDb

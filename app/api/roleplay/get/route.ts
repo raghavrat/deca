@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { adminAuth, adminDb } from '../../../firebase/admin'
+import { logger } from '../../../utils/logger'
 
 export async function GET(request: NextRequest) {
   try {
@@ -11,14 +12,20 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Missing session ID or email' }, { status: 400 })
     }
     
-    console.log('Fetching roleplay session:', { sessionId, email })
+    logger.log('Fetching roleplay session:', { sessionId, email })
+    
+    // Check if Firebase Admin is properly initialized
+    if (!adminDb) {
+      logger.errorProduction('Firebase Admin SDK not initialized - adminDb is null')
+      return NextResponse.json({ error: 'Server configuration error' }, { status: 500 })
+    }
     
     // Fetch the roleplay data from Firebase
     const docRef = adminDb.collection('roleplays').doc(email)
     const docSnap = await docRef.get()
     
     if (!docSnap.exists) {
-      console.error('No roleplay document found for email:', email)
+      logger.error('No roleplay document found for email:', email)
       return NextResponse.json({ error: 'Session not found' }, { status: 404 })
     }
     
@@ -26,18 +33,18 @@ export async function GET(request: NextRequest) {
     const sessionData = data?.[sessionId]
     
     if (!sessionData) {
-      console.error('Session not found:', sessionId)
+      logger.error('Session not found:', sessionId)
       return NextResponse.json({ error: 'Session not found' }, { status: 404 })
     }
     
-    console.log('Session data retrieved successfully')
+    logger.log('Session data retrieved successfully')
     
     return NextResponse.json({ 
       success: true,
       data: sessionData
     })
   } catch (error) {
-    console.error('Error fetching roleplay session:', error)
+    logger.errorProduction('Error fetching roleplay session:', error)
     return NextResponse.json(
       { error: 'Failed to fetch session', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
