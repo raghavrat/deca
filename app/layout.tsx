@@ -45,7 +45,7 @@ export default function RootLayout({
       <body className={`${manrope.variable} font-sans`}>
         <ThemeProvider>
           <AuthContextProvider>
-            <div className="min-h-screen bg-white dark:bg-black flex flex-col transition-colors">
+            <div className="min-h-screen flex flex-col transition-colors">
               <Header />
               <main className="flex-grow pt-24">
                 {children}

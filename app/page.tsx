@@ -187,14 +187,6 @@ export default function Home() {
   // Show dashboard for logged-in users
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-4 relative bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-950">
-      {/* Background Pattern */}
-      <div 
-        className="absolute inset-0 opacity-10 dark:opacity-5"
-        style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23000000' fill-opacity='0.3'%3E%3Cpath d='M20 20c0-5.5-4.5-10-10-10s-10 4.5-10 10 4.5 10 10 10 10-4.5 10-10zm10 0c0-5.5-4.5-10-10-10s-10 4.5-10 10 4.5 10 10 10 10-4.5 10-4.5z'/%3E%3C/g%3E%3C/svg%3E")`,
-          backgroundSize: '40px 40px'
-        }}
-      />
       <h1 className="text-5xl font-light tracking-tight mb-12 text-center text-black dark:text-white relative z-10">Welcome Back</h1>
       <div className="w-full max-w-md space-y-6 relative z-10">
         <Link 
