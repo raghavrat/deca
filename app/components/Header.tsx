@@ -106,14 +106,12 @@ export default function Header() {
                 className="text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors"
                 aria-label="Toggle dark mode"
               >
-                {/* Prevent hydration mismatch by checking DOM state during hydration */}
+                {/* Use isHydrated to prevent hydration mismatch */}
                 {isHydrated ? (
                   darkMode ? <Sun size={20} /> : <Moon size={20} />
                 ) : (
-                  // During hydration, check DOM state to show correct icon
-                  typeof window !== 'undefined' && document.documentElement.classList.contains('dark') 
-                    ? <Sun size={20} /> 
-                    : <Moon size={20} />
+                  // Show Sun icon as default during hydration since we're defaulting to dark mode
+                  <Sun size={20} />
                 )}
               </button>
               

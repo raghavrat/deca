@@ -12,7 +12,7 @@ export async function POST() {
     maxAge: 0, // Immediately expire the cookie
     httpOnly: true, // Must match the security attributes from session creation
     secure: isProduction, // Must match the secure flag setting
-    sameSite: 'strict', // Must match the sameSite setting for proper deletion
+    sameSite: 'lax', // Must match the sameSite setting for proper deletion
     path: '/', // Must match the path setting
   })
   

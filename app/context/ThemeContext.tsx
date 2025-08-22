@@ -11,63 +11,70 @@ interface ThemeContextType {
 const ThemeContext = createContext<ThemeContextType>({} as ThemeContextType);
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [darkMode, setDarkMode] = useState(false);
+  // Default to dark mode, but we'll check user preferences in useEffect
+  const [darkMode, setDarkMode] = useState(true);
   const [isHydrated, setIsHydrated] = useState(false);
 
   useEffect(() => {
-    // Set hydration flag and initialize theme from localStorage
+    // Set hydration flag
     setIsHydrated(true);
+    
+    // Check user's theme preference
     const savedTheme = localStorage.getItem('theme');
     
     // Determine the correct theme state
-    let shouldBeDark = false;
+    let shouldBeDark = true; // Default to dark mode
     if (savedTheme) {
       // User has explicitly set a theme preference
       shouldBeDark = savedTheme === 'dark';
-    } else {
-      // No saved preference, use system preference
+    } else if (typeof window !== 'undefined') {
+      // No saved preference, check system preference
       shouldBeDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      // If system prefers light, we'll still default to dark as per your request
     }
     
     // Apply the theme to DOM and state
     setDarkMode(shouldBeDark);
-    if (shouldBeDark) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
+    if (typeof window !== 'undefined') {
+      if (shouldBeDark) {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
     }
 
     // Listen for system theme changes
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    const handleSystemThemeChange = (e: MediaQueryListEvent) => {
-      // Only apply system preference if user hasn't explicitly set a theme
-      const currentSavedTheme = localStorage.getItem('theme');
-      if (!currentSavedTheme) {
-        const systemDark = e.matches;
-        setDarkMode(systemDark);
-        
-        if (systemDark) {
+    if (typeof window !== 'undefined') {
+      const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+      const handleSystemThemeChange = (e: MediaQueryListEvent) => {
+        // Only apply system preference if user hasn't explicitly set a theme
+        const currentSavedTheme = localStorage.getItem('theme');
+        if (!currentSavedTheme) {
+          // Still default to dark even if system prefers light
+          const systemDark = e.matches;
+          // We'll keep dark mode as default, but update state for UI consistency
+          setDarkMode(true);
           document.documentElement.classList.add('dark');
-        } else {
-          document.documentElement.classList.remove('dark');
         }
-      }
-    };
+      };
 
-    mediaQuery.addEventListener('change', handleSystemThemeChange);
-    return () => mediaQuery.removeEventListener('change', handleSystemThemeChange);
+      mediaQuery.addEventListener('change', handleSystemThemeChange);
+      return () => mediaQuery.removeEventListener('change', handleSystemThemeChange);
+    }
   }, []);
 
   const toggleDarkMode = () => {
     const newMode = !darkMode;
     setDarkMode(newMode);
     
-    if (newMode) {
-      document.documentElement.classList.add('dark');
-      localStorage.setItem('theme', 'dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-      localStorage.setItem('theme', 'light');
+    if (typeof window !== 'undefined') {
+      if (newMode) {
+        document.documentElement.classList.add('dark');
+        localStorage.setItem('theme', 'dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+        localStorage.setItem('theme', 'light');
+      }
     }
   };
 

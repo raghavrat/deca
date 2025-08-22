@@ -103,14 +103,20 @@ export async function POST(request: Request) {
         maxAge: expiresIn / 1000, // maxAge is in seconds, not milliseconds
         httpOnly: true, // Prevents client-side JavaScript access (XSS protection)
         secure: isProduction, // HTTPS only in production (man-in-the-middle protection)
-        sameSite: 'strict', // Maximum CSRF protection - prevents all cross-site requests
+        sameSite: 'lax', // Allows cookie to be sent on navigation from external sites (needed for redirects)
         path: '/', // Cookie available for entire domain
-        // Note: 'strict' sameSite provides the highest security by blocking all cross-site requests
-        // This prevents CSRF attacks but may break some legitimate cross-site navigation
-        // In development, browsers accept secure cookies over HTTP for localhost
       })
 
       logger.log('Session cookie set successfully');
+      // Also log the cookie for debugging (remove in production)
+      console.log('Setting session cookie:', {
+        value: sessionCookie.substring(0, 20) + '...', // Log first 20 chars for security
+        maxAge: expiresIn / 1000,
+        httpOnly: true,
+        secure: isProduction,
+        sameSite: 'lax',
+        path: '/'
+      });
       return NextResponse.json({ status: 'success' })
     } catch (verifyError: unknown) {
       logger.error('Token verification error:', verifyError)

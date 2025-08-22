@@ -5,11 +5,15 @@ export async function middleware(request: NextRequest) {
   const session = request.cookies.get('session')
   const currentPath = request.nextUrl.pathname
 
+  console.log('Middleware check for path:', currentPath);
+  console.log('Session cookie:', session);
+
   // Paths that don't require authentication
   const publicPaths = ['/', '/login', '/signup', '/pricing', '/about', '/forgot-password', '/auth/action', '/api/auth/session']
   
   // Allow public paths and API routes
   if (publicPaths.includes(currentPath) || currentPath.startsWith('/api/')) {
+    console.log('Allowing public path or API route');
     return NextResponse.next()
   }
 
@@ -20,6 +24,7 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/login', request.url))
   }
 
+  console.log('Session cookie found, allowing access');
   // If session cookie exists, allow access
   // The actual session validation will happen in API routes or server components
   return NextResponse.next()

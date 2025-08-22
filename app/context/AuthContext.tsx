@@ -147,8 +147,8 @@ export function AuthContextProvider({ children }: { children: React.ReactNode })
         throw new Error(sessionData.error || 'Failed to create session');
       }
   
-      // Use router.push instead of window.location.href to avoid the query string issue
-      router.push('/');
+      // Use window.location.href to ensure full page reload and proper cookie handling
+      window.location.href = '/';
     } catch (error) {
       console.error('Sign in error:', error);
       throw error;
