@@ -1,203 +1,256 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { questions, Question } from '../../questions'
+import { useEffect, useState } from 'react'
+import Link from 'next/link'
+import { ArrowLeft, RefreshCw, ShieldCheck } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
-import { doc, getDoc, setDoc, increment } from 'firebase/firestore'
-import { db } from '../../firebase/config'
 
+interface PracticeQuestion {
+  id: string
+  text: string
+  answers: Array<{ text: string }>
+  explanation: string
+  answerType: number
+  category: string
+  learningObjective: string
+  difficulty: 'foundational' | 'intermediate' | 'advanced'
+  questionToken: string
+  provenance: {
+    kind: 'first-party-authored'
+    bankVersion: string
+    blueprintId: string
+  }
+}
 type PageProps = {
- params: Promise<{
-   category: string
- }>
- searchParams: Promise<{ [key: string]: string | string[] | undefined }>
+  params: Promise<{ category: string }>
 }
 
-export default function TestPage({ params, searchParams }: PageProps) {
- const { user } = useAuth()
- const [category, setCategory] = useState('')
- const [filteredQuestions, setFilteredQuestions] = useState<Question[]>([])
- const [remainingQuestions, setRemainingQuestions] = useState<Question[]>([])
- const [currentQuestion, setCurrentQuestion] = useState<Question | null>(null)
- const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null)
- const [showResults, setShowResults] = useState(false)
- const [isTransitioning, setIsTransitioning] = useState(false)
+export default function TestPage({ params }: PageProps) {
+  const { user, loading: authLoading } = useAuth()
+  const [category, setCategory] = useState('')
+  const [questions, setQuestions] = useState<PracticeQuestion[]>([])
+  const [currentIndex, setCurrentIndex] = useState(0)
+  const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null)
+  const [showResults, setShowResults] = useState(false)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
- useEffect(() => {
-   const initParams = async () => {
-     const resolvedParams = await params
-     setCategory(resolvedParams.category)
-     const filtered = questions.filter(q => 
-       q.category.toLowerCase() === resolvedParams.category.toLowerCase()
-     )
-     const shuffled = [...filtered].sort(() => Math.random() - 0.5)
-     setFilteredQuestions(filtered)
-     setRemainingQuestions(shuffled)
-     setCurrentQuestion(shuffled[0])
-   }
-   initParams()
- }, [params])
+  const generateSet = async (requestedCategory: string) => {
+    setLoading(true)
+    setError(null)
+    setQuestions([])
+    setCurrentIndex(0)
+    setSelectedAnswer(null)
+    setShowResults(false)
+    try {
+      const response = await fetch('/api/test/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ category: requestedCategory, count: 8 }),
+      })
+      const data = await response.json()
+      if (!response.ok) throw new Error(data.error || 'Unable to generate a practice set')
+      if (!Array.isArray(data.questions) || data.questions.length === 0) {
+        throw new Error('No original questions were returned')
+      }
+      setQuestions(data.questions)
+    } catch (generationError) {
+      setError(generationError instanceof Error ? generationError.message : 'Unable to generate a practice set')
+    } finally {
+      setLoading(false)
+    }
+  }
 
- const updateQuestionStats = async (isCorrect: boolean) => {
-   if (!user) return
+  useEffect(() => {
+    if (authLoading) return
 
-   const statsKey = `questionStats_${user.uid}`
+    const initialize = async () => {
+      const resolved = await params
+      const requestedCategory = resolved.category.toUpperCase()
+      setCategory(requestedCategory)
+      if (user) {
+        await generateSet(requestedCategory)
+      } else {
+        setLoading(false)
+        setError('Please sign in to start a practice set')
+      }
+    }
+    void initialize()
+  }, [authLoading, params, user])
 
-   // Update Firestore only if the answer is correct
-   if (isCorrect) {
-     const userDocRef = doc(db, 'users', user.uid)
-     try {
-       await setDoc(userDocRef, { problemsCompleted: increment(1) }, { merge: true })
-     } catch (error) {
-       console.error('Error updating problems completed count:', error)
-     }
-   }
-   const existingStats = localStorage.getItem(statsKey)
-   
-   let stats = existingStats ? JSON.parse(existingStats) : {
-     totalQuestions: 0,
-     byCategory: {},
-     lastAttempt: null,
-     streak: 0
-   }
+  const recordAttempt = async (question: PracticeQuestion, selected: number) => {
+    if (!user) return
+    const statsKey = `questionStats_${user.uid}`
+    const existingStats = localStorage.getItem(statsKey)
+    const stats = existingStats ? JSON.parse(existingStats) : {
+      totalQuestions: 0,
+      byCategory: {},
+      lastAttempt: null,
+      streak: 0,
+    }
+    stats.totalQuestions += 1
+    stats.byCategory[category] = typeof stats.byCategory[category] === 'object'
+      ? { ...stats.byCategory[category], total: (stats.byCategory[category].total || 0) + 1 }
+      : (stats.byCategory[category] || 0) + 1
 
-   // Update total questions
-   stats.totalQuestions += 1
+    const today = new Date().toDateString()
+    const lastAttemptDate = stats.lastAttempt ? new Date(stats.lastAttempt).toDateString() : null
+    if (lastAttemptDate !== today) {
+      const yesterday = new Date()
+      yesterday.setDate(yesterday.getDate() - 1)
+      stats.streak = lastAttemptDate === yesterday.toDateString() ? (stats.streak || 0) + 1 : 1
+    }
+    stats.lastAttempt = new Date().toISOString()
+    localStorage.setItem(statsKey, JSON.stringify(stats))
 
-   // Update category count
-   const categoryUpper = category.toUpperCase()
-   
-   // Handle both old format (number) and new format (object)
-   if (typeof stats.byCategory[categoryUpper] === 'object') {
-     // If it's an object from the previous implementation, just increment the total
-     stats.byCategory[categoryUpper].total = (stats.byCategory[categoryUpper].total || 0) + 1
-   } else {
-     // If it's a number or doesn't exist, treat it as a number
-     stats.byCategory[categoryUpper] = (stats.byCategory[categoryUpper] || 0) + 1
-   }
+    if (selected === question.answerType) {
+      try {
+        await fetch('/api/account/progress', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            question: question.text,
+            questionToken: question.questionToken,
+            selectedAnswer: selected,
+          }),
+        })
+      } catch {
+        // The local practice result remains usable if progress sync is temporarily unavailable.
+      }
+    }
+  }
 
-   // Update streak
-   const today = new Date().toDateString()
-   const lastAttemptDate = stats.lastAttempt ? new Date(stats.lastAttempt).toDateString() : null
-   
-   if (lastAttemptDate === today) {
-     // Already attempted today, maintain streak
-   } else if (lastAttemptDate) {
-     const yesterday = new Date()
-     yesterday.setDate(yesterday.getDate() - 1)
-     if (lastAttemptDate === yesterday.toDateString()) {
-       // Attempted yesterday, increment streak
-       stats.streak = (stats.streak || 0) + 1
-     } else {
-       // Missed days, reset streak
-       stats.streak = 1
-     }
-   } else {
-     // First attempt
-     stats.streak = 1
-   }
+  const currentQuestion = questions[currentIndex]
+  const handleSubmit = () => {
+    if (selectedAnswer === null || !currentQuestion) return
+    setShowResults(true)
+    void recordAttempt(currentQuestion, selectedAnswer)
+  }
 
-   // Update last attempt
-   stats.lastAttempt = new Date().toISOString()
+  const nextQuestion = () => {
+    setSelectedAnswer(null)
+    setShowResults(false)
+    setCurrentIndex(index => index + 1)
+  }
 
-   // Save to localStorage
-   localStorage.setItem(statsKey, JSON.stringify(stats))
- }
+  if (loading) {
+    return (
+      <main className="min-h-screen flex items-center justify-center p-6">
+        <div className="text-center" role="status">
+          <RefreshCw className="h-8 w-8 animate-spin mx-auto mb-4" aria-hidden="true" />
+          <p className="text-gray-600 dark:text-gray-400">Creating an original {category.toLowerCase()} practice set…</p>
+        </div>
+      </main>
+    )
+  }
 
- const handleSubmit = () => {
-   if (selectedAnswer !== null && currentQuestion) {
-     const isCorrect = selectedAnswer === currentQuestion.answerType
-     setShowResults(true)
-     updateQuestionStats(isCorrect)
-   }
- }
+  if (error || !currentQuestion) {
+    const completed = questions.length > 0 && currentIndex >= questions.length
+    return (
+      <main className="min-h-screen flex items-center justify-center p-6">
+        <div className="w-full max-w-xl border border-gray-300 dark:border-gray-700 p-8 text-center">
+          <h1 className="text-3xl font-light mb-4">{completed ? 'Practice set complete' : 'Could not create this set'}</h1>
+          <p className="text-gray-600 dark:text-gray-400 mb-6">
+            {completed ? `You completed ${questions.length} original practice questions.` : error}
+          </p>
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <button
+              type="button"
+              onClick={() => void generateSet(category)}
+              className="px-6 py-3 border border-black dark:border-white bg-black dark:bg-white text-white dark:text-black"
+            >
+              Generate another set
+            </button>
+            <Link href="/test" className="px-6 py-3 border border-gray-300 dark:border-gray-700">Choose another category</Link>
+          </div>
+        </div>
+      </main>
+    )
+  }
 
- const getNextQuestion = () => {
-   setIsTransitioning(true)
-   setSelectedAnswer(null)
-   setShowResults(false)
-   
-   setTimeout(() => {
-     if (remainingQuestions.length <= 1) {
-       const shuffled = [...filteredQuestions].sort(() => Math.random() - 0.5)
-       setRemainingQuestions(shuffled)
-       setCurrentQuestion(shuffled[0])
-     } else {
-       const randomIndex = Math.floor(Math.random() * remainingQuestions.length)
-       const nextQuestion = remainingQuestions[randomIndex]
-       setRemainingQuestions(remainingQuestions.filter((_, index) => index !== randomIndex))
-       setCurrentQuestion(nextQuestion)
-     }
-     setIsTransitioning(false)
-   }, 300)
- }
+  return (
+    <main className="min-h-screen flex items-center justify-center py-12 px-4">
+      <div className="w-full max-w-2xl">
+        <Link href="/test" className="inline-flex items-center text-sm mb-6 hover:underline">
+          <ArrowLeft className="h-4 w-4 mr-2" aria-hidden="true" />
+          Practice categories
+        </Link>
+        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3 mb-6">
+          <div>
+            <h1 className="text-3xl font-light text-black dark:text-white">{currentQuestion.category} Practice</h1>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Question {currentIndex + 1} of {questions.length} · {currentQuestion.difficulty}</p>
+          </div>
+          <div className="inline-flex items-center text-xs text-gray-600 dark:text-gray-400">
+            <ShieldCheck className="h-4 w-4 mr-2" aria-hidden="true" />
+            Original first-party question bank
+          </div>
+        </div>
 
- if (!currentQuestion) return null
+        <div className="border border-gray-300 dark:border-gray-700 p-6 mb-6">
+          <p className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400 mb-3">Learning objective</p>
+          <p className="text-sm text-gray-700 dark:text-gray-300 mb-6">{currentQuestion.learningObjective}</p>
+          <h2 className="text-xl font-light mb-6 text-black dark:text-white">{currentQuestion.text}</h2>
 
- if (filteredQuestions.length === 0) {
-   return (
-     <div className="min-h-screen bg-white dark:bg-black py-12 px-4 sm:px-6 lg:px-8">
-       <div className="max-w-3xl mx-auto">
-         <h1 className="text-3xl font-light mb-8 text-center text-black dark:text-white">No questions found</h1>
-         <p className="text-center text-gray-600 dark:text-gray-400">Category: {category}</p>
-       </div>
-     </div>
-   )
- }
+          <div className="space-y-3">
+            {currentQuestion.answers.map((answer, index) => {
+              const isCorrect = showResults && currentQuestion.answerType === index
+              const isIncorrectSelection = showResults && selectedAnswer === index && !isCorrect
+              return (
+                <button
+                  key={`${currentQuestion.id}-${index}`}
+                  type="button"
+                  onClick={() => !showResults && setSelectedAnswer(index)}
+                  disabled={showResults}
+                  aria-pressed={selectedAnswer === index}
+                  className={`w-full text-left p-4 border transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-black dark:focus-visible:ring-white ${
+                    isCorrect
+                      ? 'bg-green-700 text-white border-green-700'
+                      : isIncorrectSelection
+                        ? 'bg-red-700 text-white border-red-700'
+                        : selectedAnswer === index
+                          ? 'bg-black dark:bg-white text-white dark:text-black border-black dark:border-white'
+                          : 'border-gray-300 dark:border-gray-700 hover:border-black dark:hover:border-white'
+                  }`}
+                >
+                  <span className="font-medium mr-2">{String.fromCharCode(65 + index)}.</span> {answer.text}
+                  {isCorrect && <span className="block mt-2 text-sm font-semibold">Correct answer</span>}
+                  {isIncorrectSelection && <span className="block mt-2 text-sm font-semibold">Your answer</span>}
+                </button>
+              )
+            })}
+          </div>
 
- return (
-   <div className="min-h-screen bg-white dark:bg-black flex items-center justify-center pt-8 pb-12">
-     <div className="w-full max-w-2xl mx-auto px-4">
-       <h1 className="text-3xl font-light mb-8 text-center text-black dark:text-white">{currentQuestion.category} Practice Test</h1>
-       
-       <div className={`bg-white dark:bg-black border border-gray-300 dark:border-gray-700 p-6 mb-8 transition-opacity duration-300 ease-in-out ${isTransitioning ? 'opacity-0' : 'opacity-100'}`}>
-         <h2 className="text-xl font-light mb-4 text-black dark:text-white">{currentQuestion.text}</h2>
-         
-         <div className={`overflow-hidden transition-all duration-300 ease-in-out ${showResults ? 'max-h-[1000px] opacity-100 mb-6' : 'max-h-0 opacity-0'}`}>
-           <p className="text-gray-600 dark:text-gray-400">{currentQuestion.explanation}</p>
-         </div>
-         
-         <div className="space-y-4">
-           {currentQuestion.answers.map((answer, index) => (
-             <button
-               key={index}
-               onClick={() => !showResults && setSelectedAnswer(index)} 
-               className={`w-full text-left p-4 border border-gray-300 dark:border-gray-700 transition-colors duration-200 focus:outline-none ${
-                 selectedAnswer === index && !showResults
-                   ? 'bg-black dark:bg-white text-white dark:text-black border-black dark:border-white'
-                   : showResults
-                   ? currentQuestion.answerType === index
-                     ? 'bg-green-500 text-white border-green-500'
-                     : selectedAnswer === index
-                     ? 'bg-red-500 text-white border-red-500'
-                     : 'bg-white dark:bg-black text-black dark:text-white'
-                   : 'bg-white dark:bg-black text-black dark:text-white hover:border-black dark:hover:border-white'
-               }`}
-               disabled={showResults}
-             >
-               {answer.text}
-             </button>
-           ))}
-         </div>
-       </div>
+          {showResults && (
+            <div className="mt-6 border-t border-gray-300 dark:border-gray-700 pt-5" aria-live="polite">
+              <h3 className="font-medium mb-2">Why</h3>
+              <p className="text-gray-700 dark:text-gray-300">{currentQuestion.explanation}</p>
+            </div>
+          )}
+        </div>
 
-       {!showResults ? (
-         <button
-           onClick={handleSubmit}
-           className="w-full bg-black dark:bg-white text-white dark:text-black border border-black dark:border-white font-medium py-4 px-6 text-center transition-colors duration-200 focus:outline-none hover:bg-transparent dark:hover:bg-transparent hover:text-black dark:hover:text-white disabled:opacity-50 disabled:cursor-not-allowed text-sm"
-           disabled={selectedAnswer === null}
-         >
-           Submit Answer
-         </button>
-       ) : (
-         <button
-           onClick={getNextQuestion}
-           className="w-full bg-white dark:bg-black text-black dark:text-white border border-gray-300 dark:border-gray-700 hover:border-black dark:hover:border-white font-medium py-4 px-6 text-center transition-colors duration-200 focus:outline-none text-sm"
-         >
-           Next Question
-         </button>
-       )}
-     </div>
-   </div>
- )
+        {!showResults ? (
+          <button
+            type="button"
+            onClick={handleSubmit}
+            disabled={selectedAnswer === null}
+            className="w-full bg-black dark:bg-white text-white dark:text-black border border-black dark:border-white font-medium py-4 px-6 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Check answer
+          </button>
+        ) : (
+          <button
+            type="button"
+            onClick={nextQuestion}
+            className="w-full border border-gray-300 dark:border-gray-700 hover:border-black dark:hover:border-white font-medium py-4 px-6"
+          >
+            {currentIndex + 1 === questions.length ? 'Finish set' : 'Next question'}
+          </button>
+        )}
+
+        <p className="text-xs text-gray-500 dark:text-gray-400 text-center mt-5">
+          Written from Deca Pal-authored business concept blueprints. Not an official DECA exam and not endorsed by DECA Inc.
+        </p>
+      </div>
+    </main>
+  )
 }

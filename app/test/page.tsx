@@ -10,7 +10,7 @@ export default function TestPage() {
     <div className="min-h-screen flex flex-col items-center justify-center p-4">
       <h1 className="text-4xl font-light tracking-tight mb-8 text-center text-black dark:text-white">Practice Tests</h1>
       <p className="text-sm text-gray-600 dark:text-gray-400 text-center mb-8 max-w-2xl">
-        Choose a category to test your knowledge of DECA performance indicators
+        Choose a category for a randomized set of original, Deca Pal-authored business questions. They are not copied from official DECA exams.
       </p>
       <div className="w-full max-w-md space-y-4">
         {clusters.map((cluster) => (

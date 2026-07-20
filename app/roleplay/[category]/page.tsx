@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useParams, useSearchParams, useRouter } from 'next/navigation'
-import { ArrowLeft, RefreshCw, Trophy, ClipboardList, ChevronUp, ChevronDown, Sparkles, Video, Play, Square, Upload, RotateCcw, Image, X, Mic, Clock } from 'lucide-react'
+import { ArrowLeft, RefreshCw, Trophy, ClipboardList, ChevronUp, ChevronDown, Sparkles, Video, Play, Square, Upload, RotateCcw, Mic, Clock } from 'lucide-react'
 import Link from 'next/link'
 import dynamic from 'next/dynamic'
 
@@ -14,6 +14,7 @@ const ReactMediaRecorder = dynamic(
 import { DECAScenario } from '../../types'
 import { getInstructionalAreasByCategory, InstructionalArea } from '../../utils/instructionalAreas'
 import { getEventById } from '../../data/decaEvents'
+import { PERSONAL_FINANCE_AREAS } from '../../data/personalFinanceIndicators'
 import { useAuth } from '../../context/AuthContext'
 
 const categoryDisplayNames: { [key: string]: string } = {
@@ -47,9 +48,9 @@ export default function CategoryRoleplayPage() {
   const [showAudioRecording, setShowAudioRecording] = useState(false)
   const [recordedAudioBlob, setRecordedAudioBlob] = useState<Blob | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [submitSuccess, setSubmitSuccess] = useState(false)
   const [recordingStartTime, setRecordingStartTime] = useState<Date | null>(null)
   const [recordingDuration, setRecordingDuration] = useState(0)
+  const [hasAiProcessingConsent, setHasAiProcessingConsent] = useState(false)
   
   // Tab states
   const [activeTab, setActiveTab] = useState<'scenario' | 'prep' | 'record'>('scenario')
@@ -58,74 +59,8 @@ export default function CategoryRoleplayPage() {
   const [isPrepTimerRunning, setIsPrepTimerRunning] = useState(false)
   const [roleplayDuration, setRoleplayDuration] = useState(10) // Default 10 minutes
   
-  // Image context states
-  const [contextImages, setContextImages] = useState<Array<{id: string, file: File, preview: string}>>([])
-
   const displayName = categoryDisplayNames[category] || category
   const selectedEvent = eventId ? getEventById(eventId) : null
-
-  // Get time limit based on event settings or default
-  const getTimeLimitMinutes = () => {
-    return selectedEvent?.roleplayDuration || roleplayDuration || 10
-  }
-
-  // Get prep time based on event settings or default
-  const getPrepTimeMinutes = () => {
-    return selectedEvent?.prepTime || prepTime || 10
-  }
-
-  // Format recording duration
-  const formatDuration = (seconds: number) => {
-    const mins = Math.floor(seconds / 60)
-    const secs = seconds % 60
-    return `${mins}:${secs.toString().padStart(2, '0')}`
-  }
-
-  // Submit video for processing
-  const submitVideoForGrading = async (videoBlob: Blob) => {
-    if (!scenario) return
-
-    setIsSubmitting(true)
-    try {
-      const formData = new FormData()
-      formData.append('video', videoBlob, 'roleplay-recording.webm')
-      formData.append('scenarioData', JSON.stringify({
-        id: scenario.id,
-        eventCode: scenario.eventCode,
-        performanceIndicators: scenario.performanceIndicators,
-        centurySkills: scenario.centurySkills,
-        category: category.toUpperCase(),
-        eventId: eventId,
-        selectedInstructionalArea: selectedInstructionalArea
-      }))
-
-      const response = await fetch('/api/roleplay/process', {
-        method: 'POST',
-        body: formData
-      })
-
-      if (!response.ok) {
-        throw new Error(`Failed to submit video: ${response.statusText}`)
-      }
-
-      const result = await response.json()
-      console.log('Video submitted successfully:', result)
-      setSubmitSuccess(true)
-      
-      // Reset recording states after successful submission
-      setTimeout(() => {
-        setShowAudioRecording(false)
-        setRecordedAudioBlob(null)
-        setSubmitSuccess(false)
-      }, 3000)
-
-    } catch (err) {
-      console.error('Error submitting video:', err)
-      setError(err instanceof Error ? err.message : 'Failed to submit video for grading')
-    } finally {
-      setIsSubmitting(false)
-    }
-  }
 
   const generateScenario = async () => {
     if (!selectedInstructionalArea) {
@@ -133,7 +68,6 @@ export default function CategoryRoleplayPage() {
       return
     }
 
-    console.log('generateScenario called - category:', category, 'eventId:', eventId, 'instructionalArea:', selectedInstructionalArea)
     setLoading(true)
     setError(null)
 
@@ -206,12 +140,13 @@ export default function CategoryRoleplayPage() {
   }, [isPrepTimerRunning, prepTimeRemaining])
 
   useEffect(() => {
-    console.log('useEffect triggered - loading events for category:', category)
     try {
       // Load instructional areas for this category
-      const areas = getInstructionalAreasByCategory(category.toUpperCase())
-      console.log('Found instructional areas:', areas.length, areas)
+      const areas = selectedEvent?.id === 'PFL'
+        ? PERSONAL_FINANCE_AREAS
+        : getInstructionalAreasByCategory(category.toUpperCase())
       setInstructionalAreas(areas)
+      setSelectedInstructionalArea('')
       setShowInstructionalAreaSelection(true)
       setScenario(null)
       setError(null)
@@ -220,8 +155,7 @@ export default function CategoryRoleplayPage() {
         setPrepTime(selectedEvent.prepTime || 10)
         setRoleplayDuration(selectedEvent.roleplayDuration || 10)
       }
-    } catch (err) {
-      console.error('Error loading instructional areas:', err)
+    } catch {
       setError('Failed to load instructional areas')
       setShowInstructionalAreaSelection(false)
     }
@@ -321,9 +255,9 @@ export default function CategoryRoleplayPage() {
 
             <div className="space-y-6">
               <div className="relative">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <p id="instructional-area-label" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Instructional Area
-                </label>
+                </p>
                 
                 {/* Selected Area Display */}
                 {selectedInstructionalArea && (
@@ -353,19 +287,19 @@ export default function CategoryRoleplayPage() {
                 {!selectedInstructionalArea && (
                   <button
                     onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                    aria-labelledby="instructional-area-label"
+                    aria-expanded={isDropdownOpen}
+                    aria-controls="instructional-area-options"
                     className="w-full bg-white dark:bg-black border border-gray-300 dark:border-gray-700 hover:border-black dark:hover:border-white text-black dark:text-white text-sm font-medium py-4 px-6 text-center transition-colors duration-200 focus:outline-none flex justify-between items-center click-animation"
                   >
                     <span>Choose an instructional area</span>
-                    {isDropdownOpen ? <ChevronUp className="h-5 w-5 text-gray-400" /> : <ChevronDown className="h-5 w-5 text-gray-400" />}
+                    {isDropdownOpen ? <ChevronUp className="h-5 w-5 text-gray-600 dark:text-gray-400" /> : <ChevronDown className="h-5 w-5 text-gray-600 dark:text-gray-400" />}
                   </button>
                 )}
                 
                 {/* Dropdown Options */}
-                <div className={`mt-2 space-y-2 overflow-hidden transition-all duration-300 ease-in-out ${
-                  isDropdownOpen && !selectedInstructionalArea
-                    ? 'max-h-[500px] opacity-100 transform translate-y-0' 
-                    : 'max-h-0 opacity-0 transform -translate-y-2'
-                }`}>
+                {isDropdownOpen && !selectedInstructionalArea && (
+                <div id="instructional-area-options" className="mt-2 max-h-[500px] space-y-2 overflow-hidden">
                   {/* Random Option */}
                   <button
                     onClick={() => {
@@ -407,6 +341,7 @@ export default function CategoryRoleplayPage() {
                     ))}
                   </div>
                 </div>
+                )}
               </div>
 
               <div className="pt-4">
@@ -502,8 +437,9 @@ export default function CategoryRoleplayPage() {
                 <h4 className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-3">Timer Settings</h4>
                 <div className="space-y-3">
                   <div>
-                    <label className="text-xs text-gray-500 dark:text-gray-500">Prep Time (min)</label>
+                    <label htmlFor="prep-time" className="text-xs text-gray-600 dark:text-gray-400">Prep Time (minutes)</label>
                     <input
+                      id="prep-time"
                       type="number"
                       min="1"
                       max="30"
@@ -513,8 +449,9 @@ export default function CategoryRoleplayPage() {
                     />
                   </div>
                   <div>
-                    <label className="text-xs text-gray-500 dark:text-gray-500">Roleplay Time (min)</label>
+                    <label htmlFor="roleplay-time" className="text-xs text-gray-600 dark:text-gray-400">Roleplay Time (minutes)</label>
                     <input
+                      id="roleplay-time"
                       type="number"
                       min="1"
                       max="30"
@@ -538,6 +475,13 @@ export default function CategoryRoleplayPage() {
                   <p><strong>CAREER CLUSTER:</strong> {scenario.careerCluster}</p>
                   <p><strong>CAREER PATHWAY:</strong> {scenario.careerPathway}</p>
                 </div>
+                {scenario.practiceMetadata && (
+                  <div className="mt-4 flex flex-wrap justify-center gap-2 text-xs text-gray-600 dark:text-gray-400">
+                    <span className="border border-gray-300 dark:border-gray-700 px-2 py-1">{scenario.practiceMetadata.archetypeLabel}</span>
+                    <span className="border border-gray-300 dark:border-gray-700 px-2 py-1">{scenario.practiceMetadata.instructionalArea}</span>
+                    <span className="border border-gray-300 dark:border-gray-700 px-2 py-1">Unofficial practice case</span>
+                  </div>
+                )}
               </div>
 
               {/* Participant Instructions */}
@@ -550,9 +494,9 @@ export default function CategoryRoleplayPage() {
                 </div>
               </div>
 
-              {/* 21st Century Skills */}
+              {/* Career Competencies */}
               <div className="mb-8">
-                <h3 className="text-lg font-light text-black dark:text-white mb-4">21st CENTURY SKILLS</h3>
+                <h3 className="text-lg font-light text-black dark:text-white mb-4">CAREER COMPETENCIES</h3>
                 <div className="space-y-2">
                   {scenario.centurySkills.map((skill, index) => (
                     <p key={index} className="text-gray-700 dark:text-gray-300">• {skill}</p>
@@ -572,7 +516,9 @@ export default function CategoryRoleplayPage() {
 
               {/* Event Situation */}
               <div className="mb-8">
-                <h3 className="text-lg font-light text-black dark:text-white mb-4">EVENT SITUATION</h3>
+                <h3 className="text-lg font-light text-black dark:text-white mb-4">
+                  {scenario.practiceMetadata?.format === 'team-decision' ? 'CASE STUDY SITUATION' : 'EVENT SITUATION'}
+                </h3>
                 <div className="space-y-4 text-gray-700 dark:text-gray-300 leading-relaxed">
                   <p>{scenario.eventSituation.roleDescription}</p>
                   <p>{scenario.eventSituation.companyBackground}</p>
@@ -679,7 +625,9 @@ export default function CategoryRoleplayPage() {
 
                     {/* Event Situation */}
                     <div className="mb-8">
-                      <h3 className="text-lg font-light text-black dark:text-white mb-4">EVENT SITUATION</h3>
+                      <h3 className="text-lg font-light text-black dark:text-white mb-4">
+                        {scenario.practiceMetadata?.format === 'team-decision' ? 'CASE STUDY SITUATION' : 'EVENT SITUATION'}
+                      </h3>
                       <div className="space-y-4 text-gray-700 dark:text-gray-300 leading-relaxed">
                         <p>{scenario.eventSituation.roleDescription}</p>
                         <p>{scenario.eventSituation.companyBackground}</p>
@@ -784,65 +732,11 @@ export default function CategoryRoleplayPage() {
                                     <li>• Time limit: {roleplayDuration} minutes</li>
                                     <li>• Speak clearly and professionally</li>
                                     <li>• Address all performance indicators</li>
-                                    <li>• Upload any diagrams or charts you would draw for the judge</li>
+                                    {scenario.practiceMetadata?.format === 'team-decision' && (
+                                      <li>• Record both team members in one coordinated presentation</li>
+                                    )}
+                                    <li>• Your recording stays in this browser until you submit it</li>
                                   </ul>
-                                </div>
-
-                                {/* Image Upload Section */}
-                                <div className="p-4 border border-gray-300 dark:border-gray-700">
-                                  <h4 className="font-light text-black dark:text-white mb-3 flex items-center">
-                                    <Image className="w-4 h-4 mr-2" />
-                                    Add Context Images (Optional)
-                                  </h4>
-                                  <p className="text-xs text-gray-600 dark:text-gray-400 mb-3">
-                                    Upload diagrams, charts, or visual aids you would show during your presentation
-                                  </p>
-                                  
-                                  {/* Image Preview Grid */}
-                                  {contextImages.length > 0 && (
-                                    <div className="grid grid-cols-3 gap-2 mb-3">
-                                      {contextImages.map((img) => (
-                                        <div key={img.id} className="relative group">
-                                          <img 
-                                            src={img.preview} 
-                                            alt="Context" 
-                                            className="w-full h-24 object-cover"
-                                          />
-                                          <button
-                                            onClick={() => {
-                                              setContextImages(prev => prev.filter(i => i.id !== img.id))
-                                              URL.revokeObjectURL(img.preview)
-                                            }}
-                                            className="absolute top-1 right-1 bg-black dark:bg-white text-white dark:text-black p-1 opacity-0 group-hover:opacity-100 transition-opacity"
-                                          >
-                                            <X className="w-3 h-3" />
-                                          </button>
-                                        </div>
-                                      ))}
-                                    </div>
-                                  )}
-                                  
-                                  <label className="flex items-center justify-center w-full px-4 py-2 bg-white dark:bg-black border border-gray-300 dark:border-gray-600 cursor-pointer hover:border-black dark:hover:border-white transition-colors">
-                                    <Image className="w-5 h-5 mr-2 text-gray-400" />
-                                    <span className="text-sm text-gray-600 dark:text-gray-400">
-                                      {contextImages.length === 0 ? 'Upload Images' : 'Add More Images'}
-                                    </span>
-                                    <input
-                                      type="file"
-                                      accept="image/*"
-                                      multiple
-                                      className="hidden"
-                                      onChange={(e) => {
-                                        const files = Array.from(e.target.files || [])
-                                        const newImages = files.map(file => ({
-                                          id: Math.random().toString(36).substr(2, 9),
-                                          file,
-                                          preview: URL.createObjectURL(file)
-                                        }))
-                                        setContextImages(prev => [...prev, ...newImages].slice(0, 5)) // Max 5 images
-                                      }}
-                                    />
-                                  </label>
                                 </div>
                               </div>
                             )}
@@ -853,8 +747,22 @@ export default function CategoryRoleplayPage() {
                                 <audio
                                   src={mediaBlobUrl}
                                   controls
+                                  aria-label="Review your roleplay recording"
                                   className="w-full"
                                 />
+                                <div className="mt-4 flex items-start gap-3 rounded border border-gray-300 p-4 dark:border-gray-700">
+                                  <input
+                                    id="ai-processing-consent"
+                                    type="checkbox"
+                                    checked={hasAiProcessingConsent}
+                                    onChange={(event) => setHasAiProcessingConsent(event.target.checked)}
+                                    className="mt-1 h-5 w-5"
+                                  />
+                                  <label htmlFor="ai-processing-consent" className="text-sm leading-6 text-gray-700 dark:text-gray-300">
+                                    I agree to send this audio to OpenRouter and its AI model provider for transcription and grading. The audio is not saved by Deca Pal; the transcript and feedback are saved to my account. See the{' '}
+                                    <Link href="/privacy" className="underline underline-offset-2">Privacy Policy</Link>.
+                                  </label>
+                                </div>
                               </div>
                             )}
 
@@ -879,15 +787,11 @@ export default function CategoryRoleplayPage() {
                               {status === 'idle' && !recordedAudioBlob && (
                                 <button
                                   onClick={async () => {
-                                    console.log('Starting recording...')
-                                    
                                     // Request microphone permission explicitly
                                     try {
                                       const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
-                                      console.log('Microphone access granted')
                                       stream.getTracks().forEach(track => track.stop()) // Stop the test stream
-                                    } catch (err) {
-                                      console.error('Microphone access denied:', err)
+                                    } catch {
                                       alert('Please allow microphone access to record audio')
                                       return
                                     }
@@ -895,8 +799,6 @@ export default function CategoryRoleplayPage() {
                                     setRecordingStartTime(new Date())
                                     setRecordingDuration(0)
                                     startRecording()
-                                    console.log('Recording started')
-                                    
                                     // Start timer
                                     const interval = setInterval(() => {
                                       setRecordingDuration(prev => {
@@ -933,6 +835,7 @@ export default function CategoryRoleplayPage() {
                                     onClick={() => {
                                       setRecordedAudioBlob(null)
                                       setRecordingDuration(0)
+                                      setHasAiProcessingConsent(false)
                                     }}
                                     className="flex items-center px-6 py-3 border border-gray-300 dark:border-gray-700 hover:border-black dark:hover:border-white text-black dark:text-white text-sm font-medium bg-white dark:bg-black transition-colors"
                                   >
@@ -942,16 +845,7 @@ export default function CategoryRoleplayPage() {
 
                                   <button
                                     onClick={async () => {
-                                      if (!recordedAudioBlob || !scenario || !user) return
-                                      
-                                      console.log('Starting submission...', {
-                                        hasAudio: !!recordedAudioBlob,
-                                        audioSize: recordedAudioBlob.size,
-                                        audioType: recordedAudioBlob.type,
-                                        hasScenario: !!scenario,
-                                        hasUser: !!user,
-                                        duration: recordingDuration
-                                      })
+                                      if (!recordedAudioBlob || !scenario || !user || !hasAiProcessingConsent) return
                                       
                                       setIsSubmitting(true)
                                       try {
@@ -960,41 +854,19 @@ export default function CategoryRoleplayPage() {
                                         reader.readAsDataURL(recordedAudioBlob)
                                         reader.onloadend = async () => {
                                           const base64Audio = reader.result as string
-                                          console.log('Audio converted to base64, length:', base64Audio.length)
-                                          
-                                          // Convert images to base64
-                                          const base64Images = await Promise.all(
-                                            contextImages.map(async (img) => {
-                                              return new Promise<string>((resolve) => {
-                                                const imgReader = new FileReader()
-                                                imgReader.onloadend = () => resolve(imgReader.result as string)
-                                                imgReader.readAsDataURL(img.file)
-                                              })
-                                            })
-                                          )
-                                          console.log('Images converted:', base64Images.length)
-
-                                          console.log('Sending request to API...')
                                           const response = await fetch('/api/roleplay/process', {
                                             method: 'POST',
                                             headers: { 'Content-Type': 'application/json' },
                                             body: JSON.stringify({
                                               audio: base64Audio,
-                                              images: base64Images,
                                               scenario,
                                               category: displayName,
-                                              duration: recordingDuration,
-                                              userId: user.uid,
-                                              userEmail: user.email
+                                              duration: recordingDuration
                                             })
                                           })
-
-                                          console.log('Response status:', response.status)
                                           
                                           if (!response.ok) {
                                             const errorData = await response.json()
-                                            console.error('API Error response:', errorData)
-                                            
                                             // Check for silent audio error
                                             if (errorData.error === 'silent_audio') {
                                               alert(errorData.message || 'No audio detected in your recording. Please ensure your microphone is working and try again.')
@@ -1016,25 +888,17 @@ export default function CategoryRoleplayPage() {
                                           }
                                           
                                           const responseData = await response.json()
-                                          console.log('Response data received:', {
-                                            success: responseData.success,
-                                            sessionId: responseData.sessionId,
-                                            userEmail: responseData.userEmail
-                                          })
-                                          
-                                          const { sessionId, userEmail } = responseData
+                                          const { sessionId } = responseData
                                           
                                           if (!sessionId) {
                                             throw new Error('No session ID returned from API')
                                           }
                                           
                                           // Navigate to review page with just session ID
-                                          console.log('Navigating to review page with session ID:', sessionId)
                                           router.push(`/roleplay/review?id=${sessionId}`)
                                         }
                                         
-                                        reader.onerror = (error) => {
-                                          console.error('FileReader error:', error)
+                                        reader.onerror = () => {
                                           alert('Failed to read audio file. Please try again.')
                                           setIsSubmitting(false)
                                         }
@@ -1044,7 +908,7 @@ export default function CategoryRoleplayPage() {
                                         setIsSubmitting(false)
                                       }
                                     }}
-                                    disabled={isSubmitting}
+                                    disabled={isSubmitting || !hasAiProcessingConsent}
                                     className="flex items-center px-6 py-3 border border-gray-300 dark:border-gray-700 hover:border-black dark:hover:border-white text-black dark:text-white text-sm font-medium bg-white dark:bg-black transition-colors disabled:opacity-50"
                                   >
                                     <Upload className="w-5 h-5 mr-2" />
@@ -1087,10 +951,10 @@ export default function CategoryRoleplayPage() {
                                       </p>
                                     </div>
                                     
-                                    {/* Fun Facts While Waiting */}
+                                    {/* Prompt While Waiting */}
                                     <div className="border border-gray-300 dark:border-gray-700 p-3 max-w-sm">
                                       <p className="text-xs text-gray-600 dark:text-gray-400 italic">
-                                        💡 Did you know? DECA has over 200,000 members across 3,500 schools!
+                                        Tip: Think of one strength and one improvement area in your presentation.
                                       </p>
                                     </div>
                                   </div>
@@ -1100,13 +964,7 @@ export default function CategoryRoleplayPage() {
                           </div>
                         )}
                         onStop={(blobUrl, blob) => {
-                          console.log('Recording stopped:', {
-                            blobUrl,
-                            blobSize: blob.size,
-                            blobType: blob.type
-                          })
                           if (blob.size === 0) {
-                            console.error('Recording blob is empty!')
                             alert('Recording failed - no audio data captured. Please check your microphone.')
                           }
                           setRecordedAudioBlob(blob)
@@ -1128,30 +986,32 @@ export default function CategoryRoleplayPage() {
 
                       {/* Performance Indicators Scoring */}
                       <div className="mb-6">
-                        <h4 className="font-light text-black dark:text-white mb-3">Performance Indicators (0-14 points each)</h4>
+                        <h4 className="font-light text-black dark:text-white mb-3">Performance Indicators</h4>
                         <div className="space-y-4">
                           {scenario.performanceIndicators.map((indicator, index) => (
                             <div key={index} className="border border-gray-300 dark:border-gray-700 p-4">
                               <p className="font-light text-black dark:text-white mb-2">{index + 1}. {indicator}</p>
                               <div className="flex items-center space-x-4">
                                 <input
+                                  aria-label={`Self score for performance indicator ${index + 1}: ${indicator}`}
                                   type="number"
                                   min="0"
-                                  max="14"
+                                  max={scenario.scoringRubric.performanceIndicators[index]?.maxPoints || 14}
                                   step="1"
                                   value={scores[`indicator-${index}`] || 0}
                                   onChange={(e) => {
-                                    const value = Math.min(14, Math.max(0, parseInt(e.target.value) || 0));
+                                    const maximum = scenario.scoringRubric.performanceIndicators[index]?.maxPoints || 14
+                                    const value = Math.min(maximum, Math.max(0, parseInt(e.target.value) || 0));
                                     setScores(prev => ({ ...prev, [`indicator-${index}`]: value }));
                                   }}
                                   className="w-20 px-3 py-2 border border-gray-300 dark:border-gray-600 focus:outline-none bg-white dark:bg-black text-black dark:text-white"
                                 />
-                                <span className="text-sm text-gray-600 dark:text-gray-400">/ 14 points</span>
+                                <span className="text-sm text-gray-600 dark:text-gray-400">/ {scenario.scoringRubric.performanceIndicators[index]?.maxPoints || 14} points</span>
                                 <div className="flex-1 flex space-x-2 text-xs">
-                                  <span className="px-2 py-1 border border-gray-300 dark:border-gray-700 text-black dark:text-white">0-4: Little/No</span>
-                                  <span className="px-2 py-1 border border-gray-300 dark:border-gray-700 text-black dark:text-white">5-8: Below</span>
-                                  <span className="px-2 py-1 border border-gray-300 dark:border-gray-700 text-black dark:text-white">9-11: Meets</span>
-                                  <span className="px-2 py-1 border border-gray-300 dark:border-gray-700 text-black dark:text-white">12-14: Exceeds</span>
+                                  <span className="px-2 py-1 border border-gray-300 dark:border-gray-700 text-black dark:text-white">{scenario.scoringRubric.performanceIndicators[index]?.levels.little.points}: Little/No</span>
+                                  <span className="px-2 py-1 border border-gray-300 dark:border-gray-700 text-black dark:text-white">{scenario.scoringRubric.performanceIndicators[index]?.levels.below.points}: Below</span>
+                                  <span className="px-2 py-1 border border-gray-300 dark:border-gray-700 text-black dark:text-white">{scenario.scoringRubric.performanceIndicators[index]?.levels.meets.points}: Meets</span>
+                                  <span className="px-2 py-1 border border-gray-300 dark:border-gray-700 text-black dark:text-white">{scenario.scoringRubric.performanceIndicators[index]?.levels.exceeds.points}: Exceeds</span>
                                 </div>
                               </div>
                             </div>
@@ -1159,15 +1019,44 @@ export default function CategoryRoleplayPage() {
                         </div>
                       </div>
 
-                      {/* 21st Century Skills Scoring */}
+                      {/* Solution Scoring */}
                       <div className="mb-6">
-                        <h4 className="font-light text-black dark:text-white mb-3">21st Century Skills (0-6 points each)</h4>
+                        <h4 className="font-light text-black dark:text-white mb-3">Solution</h4>
+                        <div className="space-y-4">
+                          {scenario.scoringRubric.solution.map((criterion, index) => (
+                            <div key={criterion.name} className="border border-gray-300 dark:border-gray-700 p-4">
+                              <p className="font-light text-black dark:text-white mb-2">{criterion.name}</p>
+                              <div className="flex items-center space-x-4">
+                                <input
+                                  aria-label={`Self score for solution criterion ${criterion.name}`}
+                                  type="number"
+                                  min="0"
+                                  max={criterion.maxPoints}
+                                  step="1"
+                                  value={scores[`solution-${index}`] || 0}
+                                  onChange={(e) => {
+                                    const value = Math.min(criterion.maxPoints, Math.max(0, parseInt(e.target.value) || 0))
+                                    setScores(prev => ({ ...prev, [`solution-${index}`]: value }))
+                                  }}
+                                  className="w-20 px-3 py-2 border border-gray-300 dark:border-gray-600 focus:outline-none bg-white dark:bg-black text-black dark:text-white"
+                                />
+                                <span className="text-sm text-gray-600 dark:text-gray-400">/ {criterion.maxPoints} points</span>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Career Competencies Scoring */}
+                      <div className="mb-6">
+                        <h4 className="font-light text-black dark:text-white mb-3">Career Competencies (0-6 points each)</h4>
                         <div className="space-y-4">
                           {scenario.centurySkills.map((skill, index) => (
                             <div key={index} className="border border-gray-300 dark:border-gray-700 p-4">
-                              <p className="font-light text-black dark:text-white mb-2">{index + 6}. {skill}</p>
+                              <p className="font-light text-black dark:text-white mb-2">{skill}</p>
                               <div className="flex items-center space-x-4">
                                 <input
+                                  aria-label={`Self score for career competency ${index + 1}: ${skill}`}
                                   type="number"
                                   min="0"
                                   max="6"
@@ -1194,23 +1083,24 @@ export default function CategoryRoleplayPage() {
 
                       {/* Overall Impression */}
                       <div className="mb-6">
-                        <h4 className="font-light text-black dark:text-white mb-3">Overall Impression (0-6 points)</h4>
+                        <h4 className="font-light text-black dark:text-white mb-3">Overall Impression (0-{scenario.scoringRubric.overallImpression.maxPoints} points)</h4>
                         <div className="border border-gray-300 dark:border-gray-700 p-4">
                           <p className="font-light text-black dark:text-white mb-2">10. Overall impression and responses to the judge's questions</p>
                           <div className="flex items-center space-x-4">
                             <input
+                              aria-label="Self score for overall impression"
                               type="number"
                               min="0"
-                              max="6"
+                              max={scenario.scoringRubric.overallImpression.maxPoints}
                               step="1"
                               value={scores['overall'] || 0}
                               onChange={(e) => {
-                                const value = Math.min(6, Math.max(0, parseInt(e.target.value) || 0));
+                                const value = Math.min(scenario.scoringRubric.overallImpression.maxPoints, Math.max(0, parseInt(e.target.value) || 0));
                                 setScores(prev => ({ ...prev, overall: value }));
                               }}
                               className="w-20 px-3 py-2 border border-gray-300 dark:border-gray-600 focus:outline-none bg-white dark:bg-black text-black dark:text-white"
                             />
-                            <span className="text-sm text-gray-600">/ 6 points</span>
+                            <span className="text-sm text-gray-600">/ {scenario.scoringRubric.overallImpression.maxPoints} points</span>
                             <div className="flex-1 flex space-x-2 text-xs">
                               <span className="px-2 py-1 border border-gray-300 dark:border-gray-700 text-black dark:text-white">0-1: Little/No</span>
                               <span className="px-2 py-1 border border-gray-300 dark:border-gray-700 text-black dark:text-white">2-3: Below</span>

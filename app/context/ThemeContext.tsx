@@ -46,12 +46,11 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     // Listen for system theme changes
     if (typeof window !== 'undefined') {
       const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-      const handleSystemThemeChange = (e: MediaQueryListEvent) => {
+      const handleSystemThemeChange = () => {
         // Only apply system preference if user hasn't explicitly set a theme
         const currentSavedTheme = localStorage.getItem('theme');
         if (!currentSavedTheme) {
           // Still default to dark even if system prefers light
-          const systemDark = e.matches;
           // We'll keep dark mode as default, but update state for UI consistency
           setDarkMode(true);
           document.documentElement.classList.add('dark');

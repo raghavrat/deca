@@ -2,9 +2,7 @@
 
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { getErrorMessage, getErrorCode } from '../utils/errorHandling';
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState('');
@@ -13,7 +11,6 @@ export default function ForgotPassword() {
   const [isLoading, setIsLoading] = useState(false);
   const [emailSent, setEmailSent] = useState(false);
   const { resetPassword } = useAuth();
-  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -23,17 +20,12 @@ export default function ForgotPassword() {
     
     try {
       await resetPassword(email);
-      setSuccess('Password reset email sent! Check your inbox.');
+      setSuccess('If an account exists for that address, a reset email has been sent.');
       setEmailSent(true);
-    } catch (err: any) {
-      console.error('Password reset error:', err);
-      if (err.code === 'auth/user-not-found') {
-        setError('No account found with this email');
-      } else if (err.code === 'auth/invalid-email') {
-        setError('Invalid email address');
-      } else {
-        setError('Failed to send reset email. Please try again.');
-      }
+    } catch {
+      // Use the same response whether or not the account exists.
+      setSuccess('If an account exists for that address, a reset email has been sent.');
+      setEmailSent(true);
     } finally {
       setIsLoading(false);
     }
@@ -46,10 +38,9 @@ export default function ForgotPassword() {
     
     try {
       await resetPassword(email);
-      setSuccess('Password reset email resent! Check your inbox.');
-    } catch (err: any) {
-      console.error('Password reset error:', err);
-      setError('Failed to resend email. Please try again.');
+      setSuccess('If an account exists for that address, a reset email has been sent.');
+    } catch {
+      setSuccess('If an account exists for that address, a reset email has been sent.');
     } finally {
       setIsLoading(false);
     }
@@ -59,30 +50,33 @@ export default function ForgotPassword() {
     <div className="min-h-screen flex items-center justify-center p-4">
       <div className="w-full max-w-md space-y-8">
         <div>
-          <h2 className="text-4xl font-light mb-4 text-center text-gray-800 dark:text-white">
+          <h1 className="text-4xl font-light mb-4 text-center text-gray-800 dark:text-white">
             Reset your password
-          </h2>
+          </h1>
           <p className="text-sm text-center text-gray-600 dark:text-gray-400">
             Enter your email address and we'll send you a link to reset your password.
           </p>
         </div>
         <form className="space-y-6" onSubmit={handleSubmit}>
           {error && (
-            <div className="text-sm text-red-500 mb-4">
+            <div role="alert" className="text-sm text-red-700 dark:text-red-400 mb-4">
               {error}
             </div>
           )}
           {success && (
-            <div className="text-sm text-green-600 dark:text-green-400 mb-4">
+            <div role="status" className="text-sm text-green-700 dark:text-green-400 mb-4">
               {success}
             </div>
           )}
           <div>
+            <label htmlFor="reset-email" className="mb-1 block text-sm font-medium">Email address</label>
             <input
+              id="reset-email"
               type="email"
               required
+              autoComplete="email"
+              maxLength={254}
               className="input-minimal"
-              placeholder="Email address"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               disabled={isLoading || emailSent}

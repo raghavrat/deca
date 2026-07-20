@@ -2,7 +2,6 @@
 
 import { useState, useEffect, Suspense } from 'react'
 import { Datashape, performanceIndicators } from '../../../performanceIndicators'
-import { getIndicatorAnchorId } from '../../../utils/piSlug'
 import Link from 'next/link'
 import { ChevronLeft } from 'lucide-react'
 import dynamic from 'next/dynamic'

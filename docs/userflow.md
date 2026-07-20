@@ -1,15 +1,12 @@
 # DECA Pal User Flow Documentation
 
+> **Document status:** UX plan. Personas, percentages, conversion figures, retention figures, and outcome claims are hypotheses or targets unless linked to dated analytics. They must not be presented as measured facts.
+
 ## Executive Summary
 
 DECA Pal's user experience is meticulously designed to convert curious students into engaged daily users through a frictionless onboarding process and compelling engagement loops. Our user flows are optimized for conversion, retention, and viral growth, with clear paths from discovery to advocacy. This document outlines every user touchpoint and decision point, enabling marketing and finance teams to optimize conversion funnels and maximize customer lifetime value.
 
-**Key Metrics:**
-- **Onboarding Completion Rate**: 85% (industry average: 60%)
-- **Time to First Value**: <3 minutes
-- **Daily Active Users**: 40% of registered users
-- **Viral Coefficient**: 1.3 (each user brings 1.3 new users)
-- **30-Day Retention**: 65% (target: 70%)
+**Proposed metrics to measure:** onboarding completion, time to first useful action, daily/monthly active users, referrals, and 30-day retention. No baseline is asserted here.
 
 ## User Personas
 
@@ -323,7 +320,7 @@ Free User → Value Realization → Upgrade Prompt → Payment → Premium Featu
 ## Accessibility & Inclusion
 
 ### Design Standards
-- **WCAG 2.1 AA**: Full compliance
+- **WCAG 2.2 AA**: Design and testing target; do not claim conformance until manual keyboard, screen-reader, zoom/reflow, and contrast testing is documented
 - **Screen Readers**: Proper ARIA labels
 - **Keyboard Navigation**: Full functionality
 - **Color Contrast**: 4.5:1 minimum

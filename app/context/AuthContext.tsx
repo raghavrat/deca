@@ -14,12 +14,11 @@ import {
 import { auth, db } from '../firebase/config';
 import { doc, setDoc } from 'firebase/firestore';
 import { useRouter } from 'next/navigation';
-import { isEmailAllowed } from '../config/allowedEmails';
 
 interface AuthContextType {
   user: User | null;
   loading: boolean;
-  signUp: (email: string, password: string, name: string) => Promise<boolean>;
+  signUp: (email: string, password: string, name: string, ageConfirmed: boolean, termsAccepted: boolean) => Promise<boolean>;
   signIn: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
   resetPassword: (email: string) => Promise<void>;
@@ -48,11 +47,10 @@ export function AuthContextProvider({ children }: { children: React.ReactNode })
           const sessionData = await sessionResponse.json();
           if (sessionData.user) {
             hasValidSession = true;
-            console.log('Valid session found for:', sessionData.user.email);
           }
         }
-      } catch (error) {
-        console.log('No existing session:', error);
+      } catch {
+        // A missing session is expected for signed-out visitors.
       }
       
       // Set up Firebase auth state listener
@@ -62,7 +60,6 @@ export function AuthContextProvider({ children }: { children: React.ReactNode })
         } else if (hasValidSession) {
           // Session exists but Firebase auth state is null
           // This can happen on page refresh - Firebase auth needs time to restore state
-          console.log('Session exists but Firebase auth is null, waiting for auth state...');
           
           // Give Firebase a moment to restore auth state
           setTimeout(async () => {
@@ -92,9 +89,17 @@ export function AuthContextProvider({ children }: { children: React.ReactNode })
     };
   }, []);
 
-  const signUp = async (email: string, password: string, name: string) => {
-    if (!isEmailAllowed(email)) {
-      throw new Error('This email domain is not allowed to register');
+  const signUp = async (email: string, password: string, name: string, ageConfirmed: boolean, termsAccepted: boolean) => {
+    if (!ageConfirmed || !termsAccepted) {
+      throw new Error('Age and policy confirmations are required')
+    }
+    const eligibilityResponse = await fetch('/api/auth/eligibility', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email }),
+    })
+    if (!eligibilityResponse.ok) {
+      throw new Error('This email is not eligible to register')
     }
     
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
@@ -111,6 +116,10 @@ export function AuthContextProvider({ children }: { children: React.ReactNode })
       name: name,
       displayName: name, // Store both for compatibility
       problemsCompleted: 0,
+      leaderboardVisible: false,
+      age13Confirmed: true,
+      termsAcceptedAt: new Date(),
+      privacyPolicyVersion: '2026-07-20',
       createdAt: new Date(),
     });
 
@@ -119,17 +128,9 @@ export function AuthContextProvider({ children }: { children: React.ReactNode })
   };
 
   const signIn = async (email: string, password: string) => {
-    // Check if email is allowed before attempting to sign in
-    if (!isEmailAllowed(email)) {
-      throw new Error('This email domain is not allowed to access the system');
-    }
-    
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      console.log('User signed in:', userCredential.user.uid);
-  
       const idToken = await userCredential.user.getIdToken();
-      console.log('ID token obtained');
   
       const sessionResponse = await fetch('/api/auth/session', {
         method: 'POST',
@@ -140,10 +141,7 @@ export function AuthContextProvider({ children }: { children: React.ReactNode })
       });
       
       const sessionData = await sessionResponse.json();
-      console.log('Session creation response:', sessionData);
-  
       if (!sessionResponse.ok) {
-        console.error('Session creation failed:', sessionData);
         throw new Error(sessionData.error || 'Failed to create session');
       }
   
@@ -173,4 +171,4 @@ export function AuthContextProvider({ children }: { children: React.ReactNode })
   );
 }
 
-export const useAuth = () => useContext(AuthContext); 
+export const useAuth = () => useContext(AuthContext);

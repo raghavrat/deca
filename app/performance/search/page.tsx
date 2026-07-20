@@ -112,18 +112,22 @@ function SearchContent() {
       <div className="mb-4 flex items-center justify-between w-full">
         <div className="flex-grow relative mr-4">
           <input
-            type="text"
+            id="performance-search-results"
+            type="search"
+            aria-label="Search performance indicators"
             placeholder="Search performance indicators..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            onKeyPress={handleKeyPress}
+            onKeyDown={handleKeyPress}
             className="input-minimal w-full px-4 py-3 pl-12 text-black dark:text-white bg-transparent border-0 border-b border-gray-300 dark:border-gray-700 focus:outline-none focus:border-black dark:focus:border-white placeholder-gray-500 dark:placeholder-gray-400 transition-colors duration-200"
           />
           <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 h-5 w-5" />
         </div>
         <button 
+          type="button"
           onClick={handleSearch}
-          className="p-3 border border-gray-300 dark:border-gray-700 hover:border-black dark:hover:border-white text-gray-400 dark:text-gray-500 hover:text-black dark:hover:text-white transition-colors duration-200"
+          aria-label="Search performance indicators"
+          className="min-h-11 min-w-11 p-3 border border-gray-300 dark:border-gray-700 hover:border-black dark:hover:border-white text-gray-700 dark:text-gray-300 hover:text-black dark:hover:text-white transition-colors duration-200"
         >
           <Search className="h-5 w-5" />
         </button>
@@ -285,4 +289,4 @@ export default function SearchPage() {
       <SearchContent />
     </Suspense>
   )
-} 
+}

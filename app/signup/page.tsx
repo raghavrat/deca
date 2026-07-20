@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { getErrorMessage, getErrorCode } from '../utils/errorHandling';
 
@@ -14,8 +13,9 @@ export default function Signup() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [ageConfirmed, setAgeConfirmed] = useState(false);
+  const [termsAccepted, setTermsAccepted] = useState(false);
   const { signUp } = useAuth();
-  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -27,14 +27,19 @@ export default function Signup() {
       return;
     }
 
-    if (password.length < 6) {
-      setError('Password must be at least 6 characters');
+    if (password.length < 12) {
+      setError('Password must be at least 12 characters');
+      return;
+    }
+
+    if (!ageConfirmed || !termsAccepted) {
+      setError('Confirm your age and accept the Terms and Privacy Policy to continue.');
       return;
     }
 
     setIsLoading(true);
     try {
-      const emailSent = await signUp(email, password, name);
+      const emailSent = await signUp(email, password, name, ageConfirmed, termsAccepted);
       if (emailSent) {
         setSuccess('Account created! Please check your email to verify your account.');
         // Clear form
@@ -42,6 +47,8 @@ export default function Signup() {
         setPassword('');
         setConfirmPassword('');
         setName('');
+        setAgeConfirmed(false);
+        setTermsAccepted(false);
       }
     } catch (err: unknown) {
       console.error('Signup error:', err);
@@ -66,59 +73,36 @@ export default function Signup() {
     <div className="min-h-screen flex items-center justify-center p-4">
       <div className="w-full max-w-md space-y-8">
         <div>
-          <h2 className="text-4xl font-light tracking-tight text-center text-black dark:text-white">
+          <h1 className="text-4xl font-light tracking-tight text-center text-black dark:text-white">
             Create your account
-          </h2>
+          </h1>
         </div>
         <form className="space-y-6" onSubmit={handleSubmit}>
           {error && (
-            <div className="text-sm text-red-600 dark:text-red-400">
+            <div id="signup-error" role="alert" className="text-sm text-red-700 dark:text-red-400">
               {error}
             </div>
           )}
           {success && (
-            <div className="text-sm text-green-600 dark:text-green-400">
+            <div role="status" className="text-sm text-green-700 dark:text-green-400">
               {success}
             </div>
           )}
           <div className="space-y-4">
-            <input
-              type="text"
-              required
-              className="input-minimal"
-              placeholder="Full name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-            />
-            <input
-              type="email"
-              required
-              className="input-minimal"
-              placeholder="Email address"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-            <input
-              type="password"
-              required
-              className="input-minimal"
-              placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-            <input
-              type="password"
-              required
-              className="input-minimal"
-              placeholder="Confirm password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-            />
+            <div><label htmlFor="signup-name" className="mb-1 block text-sm font-medium">Display name</label><input id="signup-name" type="text" required autoComplete="name" maxLength={80} className="input-minimal" value={name} onChange={(e) => setName(e.target.value)} /></div>
+            <div><label htmlFor="signup-email" className="mb-1 block text-sm font-medium">Email address</label><input id="signup-email" type="email" required autoComplete="email" maxLength={254} className="input-minimal" value={email} onChange={(e) => setEmail(e.target.value)} /></div>
+            <div><label htmlFor="signup-password" className="mb-1 block text-sm font-medium">Password</label><input id="signup-password" type="password" required autoComplete="new-password" minLength={12} aria-describedby="password-help" className="input-minimal" value={password} onChange={(e) => setPassword(e.target.value)} /><p id="password-help" className="mt-2 text-xs text-gray-600 dark:text-gray-400">Use at least 12 characters. Password managers and paste are supported.</p></div>
+            <div><label htmlFor="signup-confirm-password" className="mb-1 block text-sm font-medium">Confirm password</label><input id="signup-confirm-password" type="password" required autoComplete="new-password" minLength={12} className="input-minimal" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} /></div>
+          </div>
+
+          <div className="space-y-4">
+            <div className="flex items-start gap-3"><input id="age-confirmation" type="checkbox" checked={ageConfirmed} onChange={(e) => setAgeConfirmed(e.target.checked)} required className="mt-1 h-5 w-5" /><label htmlFor="age-confirmation" className="text-sm leading-6">I am at least 13 years old. If I am under the age of legal majority, my parent or guardian has permitted me to use Deca Pal.</label></div>
+            <div className="flex items-start gap-3"><input id="terms-confirmation" type="checkbox" checked={termsAccepted} onChange={(e) => setTermsAccepted(e.target.checked)} required className="mt-1 h-5 w-5" /><label htmlFor="terms-confirmation" className="text-sm leading-6">I agree to the <Link href="/terms" className="underline underline-offset-2">Terms of Use</Link> and acknowledge the <Link href="/privacy" className="underline underline-offset-2">Privacy Policy</Link>.</label></div>
           </div>
 
           <button
             type="submit"
-            disabled={isLoading || success !== ''}
+            disabled={isLoading || success !== '' || !ageConfirmed || !termsAccepted}
             className="w-full py-3 text-sm font-medium border border-gray-300 dark:border-gray-700 hover:border-black dark:hover:border-white transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isLoading ? 'Creating account...' : 'Sign up'}

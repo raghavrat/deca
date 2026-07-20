@@ -27,6 +27,17 @@ export default function Header() {
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
 
+  useEffect(() => {
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setIsMenuOpen(false)
+        setIsProfileOpen(false)
+      }
+    }
+    document.addEventListener('keydown', handleEscape)
+    return () => document.removeEventListener('keydown', handleEscape)
+  }, [])
+
   const handleLogout = async () => {
     try {
       await logout()
@@ -52,7 +63,7 @@ export default function Header() {
             </div>
 
             {/* Desktop Navigation */}
-            <nav className="hidden md:flex items-center space-x-8">
+            <nav aria-label="Primary" className="hidden md:flex items-center space-x-8">
               {loading ? (
                 /* Loading placeholder - maintain layout */
                 <div className="flex items-center space-x-8">
@@ -65,18 +76,21 @@ export default function Header() {
                   <Link 
                     href="/performance" 
                     className={`nav-link ${isActive('/performance') ? 'nav-link-active' : ''}`}
+                    aria-current={isActive('/performance') ? 'page' : undefined}
                   >
                     Performance Indicators
                   </Link>
                   <Link 
                     href="/test" 
                     className={`nav-link ${isActive('/test') ? 'nav-link-active' : ''}`}
+                    aria-current={isActive('/test') ? 'page' : undefined}
                   >
                     Tests
                   </Link>
                   <Link 
                     href="/roleplay" 
                     className={`nav-link ${isActive('/roleplay') ? 'nav-link-active' : ''}`}
+                    aria-current={isActive('/roleplay') ? 'page' : undefined}
                   >
                     Roleplays
                   </Link>
@@ -86,12 +100,14 @@ export default function Header() {
                   <Link 
                     href="/pricing" 
                     className={`nav-link ${isActive('/pricing') ? 'nav-link-active' : ''}`}
+                    aria-current={isActive('/pricing') ? 'page' : undefined}
                   >
                     Pricing
                   </Link>
                   <Link 
                     href="/about" 
                     className={`nav-link ${isActive('/about') ? 'nav-link-active' : ''}`}
+                    aria-current={isActive('/about') ? 'page' : undefined}
                   >
                     About
                   </Link>
@@ -103,8 +119,8 @@ export default function Header() {
             <div className="hidden md:flex items-center space-x-6">
               <button 
                 onClick={toggleDarkMode}
-                className="text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors"
-                aria-label="Toggle dark mode"
+                className="inline-flex min-h-11 min-w-11 items-center justify-center text-gray-700 dark:text-gray-300 hover:text-black dark:hover:text-white transition-colors"
+                aria-label={darkMode ? 'Switch to light mode' : 'Switch to dark mode'}
               >
                 {/* Use isHydrated to prevent hydration mismatch */}
                 {isHydrated ? (
@@ -123,14 +139,17 @@ export default function Header() {
                   <>
                     <button 
                       onClick={() => setIsProfileOpen(!isProfileOpen)}
-                      className="text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors"
+                      className="min-h-11 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-black dark:hover:text-white transition-colors"
+                      aria-expanded={isProfileOpen}
+                      aria-controls="profile-menu"
+                      aria-haspopup="true"
                     >
                       {user.email?.split('@')[0]}
                     </button>
 
                     {/* Profile Dropdown */}
                     {isProfileOpen && (
-                      <div className="absolute right-0 top-8 w-48 py-2 bg-white dark:bg-black border border-gray-200 dark:border-gray-800 fade-in">
+                      <div id="profile-menu" className="absolute right-0 top-11 w-48 py-2 bg-white dark:bg-black border border-gray-200 dark:border-gray-800 fade-in">
                         <Link
                           href="/account"
                           onClick={() => setIsProfileOpen(false)}
@@ -162,7 +181,10 @@ export default function Header() {
             <div className="md:hidden">
               <button 
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
-                className="text-black dark:text-white"
+                className="inline-flex min-h-11 min-w-11 items-center justify-center text-black dark:text-white"
+                aria-label={isMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
+                aria-expanded={isMenuOpen}
+                aria-controls="mobile-navigation"
               >
                 {isMenuOpen ? <X size={20} /> : <Menu size={20} />}
               </button>
@@ -171,7 +193,7 @@ export default function Header() {
 
           {/* Mobile Navigation */}
           {isMenuOpen && (
-            <div className="md:hidden pb-4 fade-in">
+            <nav id="mobile-navigation" aria-label="Mobile primary" className="md:hidden pb-4 fade-in">
               <div className="flex flex-col space-y-4 pt-4 border-t border-gray-200 dark:border-gray-800">
                 {loading ? (
                   /* Loading placeholder for mobile nav */
@@ -184,22 +206,25 @@ export default function Header() {
                   <>
                     <Link 
                       href="/performance" 
-                      className={`nav-link ${isActive('/performance') ? 'nav-link-active' : ''}`}
-                      onClick={() => setIsMenuOpen(false)}
+                    className={`nav-link ${isActive('/performance') ? 'nav-link-active' : ''}`}
+                    onClick={() => setIsMenuOpen(false)}
+                    aria-current={isActive('/performance') ? 'page' : undefined}
                     >
                       Performance Indicators
                     </Link>
                     <Link 
                       href="/test" 
                       className={`nav-link ${isActive('/test') ? 'nav-link-active' : ''}`}
-                      onClick={() => setIsMenuOpen(false)}
+                    onClick={() => setIsMenuOpen(false)}
+                    aria-current={isActive('/test') ? 'page' : undefined}
                     >
                       Tests
                     </Link>
                     <Link 
                       href="/roleplay" 
                       className={`nav-link ${isActive('/roleplay') ? 'nav-link-active' : ''}`}
-                      onClick={() => setIsMenuOpen(false)}
+                    onClick={() => setIsMenuOpen(false)}
+                    aria-current={isActive('/roleplay') ? 'page' : undefined}
                     >
                       Roleplays
                     </Link>
@@ -210,6 +235,7 @@ export default function Header() {
                       href="/pricing" 
                       className={`nav-link ${isActive('/pricing') ? 'nav-link-active' : ''}`}
                       onClick={() => setIsMenuOpen(false)}
+                      aria-current={isActive('/pricing') ? 'page' : undefined}
                     >
                       Pricing
                     </Link>
@@ -217,6 +243,7 @@ export default function Header() {
                       href="/about" 
                       className={`nav-link ${isActive('/about') ? 'nav-link-active' : ''}`}
                       onClick={() => setIsMenuOpen(false)}
+                      aria-current={isActive('/about') ? 'page' : undefined}
                     >
                       About
                     </Link>
@@ -226,7 +253,7 @@ export default function Header() {
                 <div className="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-gray-800">
                   <button
                     onClick={toggleDarkMode}
-                    className="flex items-center text-sm font-medium text-gray-600 dark:text-gray-400"
+                    className="flex min-h-11 items-center text-sm font-medium text-gray-700 dark:text-gray-300"
                   >
                     {/* Prevent hydration mismatch by checking DOM state during hydration */}
                     {isHydrated ? (
@@ -276,7 +303,7 @@ export default function Header() {
                   )}
                 </div>
               </div>
-            </div>
+            </nav>
           )}
         </div>
       </div>

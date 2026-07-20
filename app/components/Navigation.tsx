@@ -79,6 +79,7 @@ export default function Navigation() {
           <li key={cluster}>
             <button
               onClick={() => toggleCluster(cluster)}
+              aria-expanded={openCluster === cluster}
               className={`w-full text-left px-4 py-2 rounded-md flex items-center justify-between ${
                 pathname.startsWith(`/${cluster.toLowerCase()}`)
                   ? 'bg-blue-600'
@@ -113,4 +114,3 @@ export default function Navigation() {
     </nav>
   )
 }
-

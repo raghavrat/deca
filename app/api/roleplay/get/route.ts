@@ -1,52 +1,33 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { adminAuth, adminDb } from '../../../firebase/admin'
-import { logger } from '../../../utils/logger'
+import { RequestError, requireSession } from '../../../utils/serverAuth'
+import { getRoleplayForUser } from '../../../utils/roleplayStore'
 
 export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams
     const sessionId = searchParams.get('id')
-    const email = searchParams.get('email')
+    const user = await requireSession()
     
-    if (!sessionId || !email) {
-      return NextResponse.json({ error: 'Missing session ID or email' }, { status: 400 })
+    if (!sessionId || !/^roleplay_[a-zA-Z0-9_-]{8,100}$/.test(sessionId)) {
+      return NextResponse.json({ error: 'Invalid session ID' }, { status: 400 })
     }
     
-    logger.log('Fetching roleplay session:', { sessionId, email })
-    
-    // Check if Firebase Admin is properly initialized
-    if (!adminDb) {
-      logger.errorProduction('Firebase Admin SDK not initialized - adminDb is null')
-      return NextResponse.json({ error: 'Server configuration error' }, { status: 500 })
-    }
-    
-    // Fetch the roleplay data from Firebase
-    const docRef = adminDb.collection('roleplays').doc(email)
-    const docSnap = await docRef.get()
-    
-    if (!docSnap.exists) {
-      logger.error('No roleplay document found for email:', email)
-      return NextResponse.json({ error: 'Session not found' }, { status: 404 })
-    }
-    
-    const data = docSnap.data()
-    const sessionData = data?.[sessionId]
+    const sessionData = await getRoleplayForUser(user, sessionId)
     
     if (!sessionData) {
-      logger.error('Session not found:', sessionId)
       return NextResponse.json({ error: 'Session not found' }, { status: 404 })
     }
-    
-    logger.log('Session data retrieved successfully')
     
     return NextResponse.json({ 
       success: true,
       data: sessionData
-    })
+    }, { headers: { 'Cache-Control': 'no-store' } })
   } catch (error) {
-    logger.errorProduction('Error fetching roleplay session:', error)
+    if (error instanceof RequestError) {
+      return NextResponse.json({ error: error.message }, { status: error.status })
+    }
     return NextResponse.json(
-      { error: 'Failed to fetch session', details: error instanceof Error ? error.message : 'Unknown error' },
+      { error: 'Failed to fetch session' },
       { status: 500 }
     )
   }

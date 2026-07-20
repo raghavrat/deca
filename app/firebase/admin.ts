@@ -1,13 +1,13 @@
 import { initializeApp, getApps, cert, getApp } from 'firebase-admin/app';
+import type { App } from 'firebase-admin/app';
 import { getAuth } from 'firebase-admin/auth';
 import { getFirestore } from 'firebase-admin/firestore';
 
-let app;
+let app: App | null = null;
 
 if (!getApps().length) {
   try {
     if (!process.env.FIREBASE_SERVICE_ACCOUNT_BASE64) {
-      console.error('FIREBASE_SERVICE_ACCOUNT_BASE64 environment variable is not set');
       throw new Error('Missing Firebase service account configuration');
     }
     
@@ -18,10 +18,10 @@ if (!getApps().length) {
     app = initializeApp({
       credential: cert(serviceAccountJson)
     });
-    console.log('Firebase Admin SDK initialized successfully');
-  } catch (error) {
-    console.error('Firebase admin initialization error:', error);
-    throw error; // Re-throw to make the error more visible
+  } catch {
+    // Routes return a controlled configuration error when credentials are absent.
+    // Keeping module initialization non-fatal allows static pages to build.
+    app = null;
   }
 } else {
   app = getApp();
@@ -29,4 +29,3 @@ if (!getApps().length) {
 
 export const adminAuth = app ? getAuth(app) : null;
 export const adminDb = app ? getFirestore(app) : null;
-

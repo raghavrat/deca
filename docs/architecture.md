@@ -1,15 +1,17 @@
 # DECA Pal System Architecture
 
+> **Document status:** Technical design record, not a certification, service-level agreement, penetration-test report, or legal-compliance claim. Provider certifications do not automatically certify DECA Pal's own configuration or operations.
+
 ## Executive Summary
 
-DECA Pal is built on a modern, scalable architecture designed for rapid growth and enterprise deployment. The platform leverages serverless technologies and cloud-native services to minimize operational overhead while maximizing performance and reliability. This architecture supports our projected growth from hundreds to hundreds of thousands of concurrent users without significant infrastructure changes.
+DECA Pal uses a serverless web architecture intended to reduce infrastructure operations. Capacity, reliability, recovery, and latency have not been load-tested or independently validated.
 
 **Key Technical Highlights:**
-- **Zero Infrastructure Management**: Fully serverless architecture
-- **Infinite Scalability**: Auto-scaling from 1 to 1M+ users
-- **99.9% Uptime**: Enterprise-grade reliability with Firebase
-- **Sub-second Response Times**: Optimized for mobile networks
-- **SOC 2 Compliant Infrastructure**: Enterprise security standards
+- **Managed infrastructure**: Next.js hosting plus Firebase services
+- **Elasticity**: Provider-managed scaling, subject to quotas, cost, and application bottlenecks
+- **Reliability**: Must be measured with production monitoring and an explicit service objective
+- **Performance**: Must be verified with representative devices, networks, and data volumes
+- **Assurance**: Review provider reports, contracts, and the application's own configuration separately
 
 ## System Architecture Overview
 
@@ -19,7 +21,7 @@ DECA Pal is built on a modern, scalable architecture designed for rapid growth a
 ┌─────────────────────────────────────────────────────────┐
 │                    Frontend (Client)                     │
 ├─────────────────────────────────────────────────────────┤
-│  Next.js 15.3.5  │  React 19.1.0  │  TypeScript 5.7.2  │
+│  Next.js 15.5.x  │  React 19.2.x  │  TypeScript 5.7.x  │
 │  Tailwind CSS    │  Lucide Icons  │  PWA Ready         │
 └─────────────────────────────────────────────────────────┘
                             │
@@ -123,9 +125,9 @@ User Login → Firebase Auth → ID Token → Server Verification
 #### Security Measures
 1. **Email Whitelist**: Restricted access control
 2. **Session Management**: HTTP-only secure cookies
-3. **HTTPS Everywhere**: TLS 1.3 encryption
+3. **HTTPS**: Require HTTPS and verify the production host's protocol configuration
 4. **Input Validation**: XSS and injection prevention
-5. **Rate Limiting**: DDoS protection (planned)
+5. **Rate Limiting**: Per-account application limits; provider-level abuse protection is still required
 6. **Content Security Policy**: XSS mitigation
 
 ### Performance Optimizations
@@ -247,31 +249,30 @@ User Login → Firebase Auth → ID Token → Server Verification
 
 ### Disaster Recovery
 
-#### Backup Strategy
-- **Code**: Git with multiple remotes
-- **Database**: Daily Firestore exports
-- **Assets**: Version-controlled in repo
-- **Secrets**: Secure vault storage
+#### Required Backup Controls
+- **Code**: Protected remote repository and tested restore access
+- **Database**: Configure and verify scheduled Firestore exports or another tested recovery method
+- **Assets**: Version controlled where licensing and sensitivity permit
+- **Secrets**: Store in the deployment platform's secret manager and rotate on suspected exposure
 
-#### Recovery Procedures
-1. **RTO (Recovery Time Objective)**: 1 hour
-2. **RPO (Recovery Point Objective)**: 24 hours
-3. **Failover**: Automatic via Vercel
-4. **Data Recovery**: Firebase point-in-time recovery
+#### Recovery Targets (not tested commitments)
+1. Define RTO and RPO based on actual business needs
+2. Document provider-specific failover behavior
+3. Run and record a restore exercise before promising recovery times
 
 ### Compliance & Standards
 
-#### Current Compliance
-- **COPPA**: Age verification for users
-- **FERPA**: Educational records protection
-- **GDPR**: Data privacy (planned)
-- **CCPA**: California privacy (planned)
+#### Current Privacy Posture
+- Account creation requires a 13-or-older attestation and acceptance of the current policies
+- Users can export and delete account data, and leaderboard visibility is opt-in
+- A privacy notice documents the implemented data flow
+- Applicability of COPPA, FERPA, state student-privacy laws, CCPA/CPRA, GDPR, and other laws requires counsel and operational controls; none is certified by this repository
 
 #### Security Standards
-- **OWASP Top 10**: Security best practices
-- **SOC 2**: Infrastructure compliance (via providers)
-- **SSL/TLS**: A+ rating on SSL Labs
-- **PCI DSS**: Payment processing ready
+- **OWASP Top 10**: Development checklist, not an assessment result
+- **Provider assurance**: Obtain and review relevant reports and contractual terms
+- **SSL/TLS**: Test the deployed host before publishing a rating
+- **Payments**: Not represented as PCI DSS ready; use a qualified payment provider and scope review before adding payments
 
 ## Architecture Decision Records (ADRs)
 
@@ -297,7 +298,7 @@ User Login → Firebase Auth → ID Token → Server Verification
 
 ## Conclusion
 
-DECA Pal's architecture is designed for growth, reliability, and developer productivity. The serverless approach minimizes operational overhead while providing enterprise-grade scalability. With planned improvements in testing, monitoring, and automation, the platform is well-positioned to become the leading DECA preparation tool in the market.
+The architecture is suitable for continued validation, but production capacity, reliability, security assurance, and regulatory readiness remain operational work rather than established facts.
 
 **Next Steps for Technical Leadership:**
 1. Implement comprehensive testing suite

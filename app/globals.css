@@ -17,6 +17,14 @@ body {
   @apply bg-white dark:bg-black text-black dark:text-white antialiased;
 }
 
+.skip-link {
+  @apply fixed left-4 top-4 z-[100] -translate-y-24 bg-white px-4 py-3 font-medium text-black shadow-lg transition-transform dark:bg-black dark:text-white;
+}
+
+.skip-link:focus {
+  @apply translate-y-0;
+}
+
 @layer base {
   h1, h2, h3, h4, h5, h6 {
     @apply font-medium tracking-tight;
@@ -24,6 +32,19 @@ body {
   
   a {
     @apply transition-all duration-200;
+  }
+
+  :focus-visible {
+    outline: 2px solid #1d4ed8 !important;
+    outline-offset: 3px !important;
+  }
+
+  .dark :focus-visible {
+    outline-color: #93c5fd !important;
+  }
+
+  button, [role='button'], input, select, textarea {
+    scroll-margin-top: 7rem;
   }
 }
 
@@ -111,5 +132,34 @@ body {
   
   .section-padding {
     @apply py-20 px-4;
+  }
+
+  .legal-copy h2 {
+    @apply mb-3 text-2xl font-medium text-black dark:text-white;
+  }
+
+  .legal-copy p {
+    @apply leading-7;
+  }
+
+  .legal-copy p + p {
+    @apply mt-4;
+  }
+
+  .legal-copy ul {
+    @apply list-disc space-y-2 pl-6 leading-7;
+  }
+
+  .legal-copy a {
+    @apply underline decoration-1 underline-offset-4;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }

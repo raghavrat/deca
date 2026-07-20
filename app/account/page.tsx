@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { doc, getDoc, setDoc } from 'firebase/firestore'
 import { db } from '../firebase/config'
-import { BarChart3, Target, Clock, TrendingUp, User as UserIcon, Save } from 'lucide-react'
+import { Target, Clock, TrendingUp, User as UserIcon, Save, Download, Trash2 } from 'lucide-react'
 
 interface QuestionStats {
   totalQuestions: number
@@ -17,7 +17,7 @@ interface QuestionStats {
 }
 
 export default function AccountPage() {
-  const { user, loading } = useAuth()
+  const { user, loading, logout } = useAuth()
   const router = useRouter()
   const [stats, setStats] = useState<QuestionStats>({
     totalQuestions: 0,
@@ -26,6 +26,12 @@ export default function AccountPage() {
   const [name, setName] = useState('')
   const [isEditingName, setIsEditingName] = useState(false)
   const [feedback, setFeedback] = useState('')
+  const [privacyError, setPrivacyError] = useState('')
+  const [deleteConfirmation, setDeleteConfirmation] = useState('')
+  const [isExporting, setIsExporting] = useState(false)
+  const [isDeleting, setIsDeleting] = useState(false)
+  const [leaderboardVisible, setLeaderboardVisible] = useState(false)
+  const [isSavingPrivacy, setIsSavingPrivacy] = useState(false)
 
   useEffect(() => {
     if (!loading && !user) {
@@ -47,6 +53,7 @@ export default function AccountPage() {
         const userDoc = await getDoc(userDocRef)
         if (userDoc.exists()) {
           setName(userDoc.data().name || '')
+          setLeaderboardVisible(userDoc.data().leaderboardVisible === true)
         }
       }
       fetchUserData()
@@ -65,30 +72,77 @@ export default function AccountPage() {
     return null
   }
 
-  const getCategoryDisplayName = (category: string) => {
-    const displayNames: { [key: string]: string } = {
-      'MANAGEMENT': 'Management',
-      'MARKETING': 'Marketing',
-      'FINANCE': 'Finance',
-      'HOSPITALITY': 'Hospitality',
-      'ENTREPRENEUR': 'Entrepreneurship'
-    }
-    return displayNames[category] || category
-  }
-
   const handleNameChange = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!user) return
+    const normalizedName = name.trim()
+    if (!normalizedName || normalizedName.length > 80) {
+      setFeedback('Display name must be between 1 and 80 characters.')
+      return
+    }
 
     const userDocRef = doc(db, 'users', user.uid)
     try {
-      await setDoc(userDocRef, { name }, { merge: true })
+      await setDoc(userDocRef, { name: normalizedName, displayName: normalizedName }, { merge: true })
+      setName(normalizedName)
       setFeedback('Name updated successfully!')
       setIsEditingName(false)
       setTimeout(() => setFeedback(''), 3000)
     } catch (error) {
       console.error('Error updating name:', error)
       setFeedback('Failed to update name.')
+    }
+  }
+
+  const handleExport = async () => {
+    setPrivacyError('')
+    setIsExporting(true)
+    try {
+      const response = await fetch('/api/account/data')
+      if (!response.ok) throw new Error('Export failed')
+      const data = await response.json()
+      const downloadUrl = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }))
+      const downloadLink = document.createElement('a')
+      downloadLink.href = downloadUrl
+      downloadLink.download = `deca-pal-data-${new Date().toISOString().slice(0, 10)}.json`
+      downloadLink.click()
+      URL.revokeObjectURL(downloadUrl)
+    } catch {
+      setPrivacyError('We could not export your data. Please try again.')
+    } finally {
+      setIsExporting(false)
+    }
+  }
+
+  const handleDeleteAccount = async () => {
+    if (deleteConfirmation !== 'DELETE') return
+    setPrivacyError('')
+    setIsDeleting(true)
+    try {
+      const response = await fetch('/api/account/data', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ confirmation: deleteConfirmation }),
+      })
+      if (!response.ok) throw new Error('Deletion failed')
+      localStorage.removeItem(`questionStats_${user.uid}`)
+      await logout()
+    } catch {
+      setPrivacyError('We could not delete your account. Please try again or contact privacy@decapal.org.')
+      setIsDeleting(false)
+    }
+  }
+
+  const handleLeaderboardVisibility = async (visible: boolean) => {
+    setPrivacyError('')
+    setIsSavingPrivacy(true)
+    try {
+      await setDoc(doc(db, 'users', user.uid), { leaderboardVisible: visible }, { merge: true })
+      setLeaderboardVisible(visible)
+    } catch {
+      setPrivacyError('We could not update your leaderboard preference. Please try again.')
+    } finally {
+      setIsSavingPrivacy(false)
     }
   }
 
@@ -121,22 +175,27 @@ export default function AccountPage() {
             <form onSubmit={handleNameChange}>
               <div className="flex items-center">
                 <input 
+                  id="display-name"
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
+                  maxLength={80}
+                  required
+                  autoComplete="name"
                   className="input-minimal"
                   placeholder="Enter your display name"
+                  aria-label="Display name"
                 />
-                <button type="submit" className="ml-3 px-4 py-2 border border-gray-300 dark:border-gray-700 hover:border-black dark:hover:border-white transition-colors duration-200">
+                <button type="submit" aria-label="Save display name" className="ml-3 px-4 py-2 border border-gray-300 dark:border-gray-700 hover:border-black dark:hover:border-white transition-colors duration-200">
                   <Save className="h-5 w-5" />
                 </button>
-                <button onClick={() => setIsEditingName(false)} className="ml-2 px-4 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors duration-200">
+                <button type="button" onClick={() => setIsEditingName(false)} className="ml-2 px-4 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors duration-200">
                   Cancel
                 </button>
               </div>
             </form>
           )}
-          {feedback && <p className="text-sm text-green-600 dark:text-green-400 mt-2">{feedback}</p>}
+          {feedback && <p role="status" className="text-sm text-green-700 dark:text-green-400 mt-2">{feedback}</p>}
         </div>
 
         {/* Stats Overview */}
@@ -173,6 +232,63 @@ export default function AccountPage() {
             <p className="text-gray-600 dark:text-gray-400 text-sm">Last Activity</p>
           </div>
           </div>
+
+        <section aria-labelledby="privacy-controls-heading" className="mt-10 border-t border-gray-300 p-6 dark:border-gray-700">
+          <h2 id="privacy-controls-heading" className="mb-2 text-xl font-light text-black dark:text-white">Your data</h2>
+          <p className="mb-6 text-sm leading-6 text-gray-600 dark:text-gray-400">
+            Download a copy of your server-stored information, or permanently delete your account, profile, and roleplay history.
+          </p>
+
+          {privacyError && <p role="alert" className="mb-4 text-sm text-red-700 dark:text-red-400">{privacyError}</p>}
+
+          <div className="mb-6 flex items-start gap-3">
+            <input
+              id="leaderboard-visible"
+              type="checkbox"
+              checked={leaderboardVisible}
+              disabled={isSavingPrivacy}
+              onChange={(event) => handleLeaderboardVisibility(event.target.checked)}
+              className="mt-1 h-5 w-5"
+            />
+            <label htmlFor="leaderboard-visible" className="text-sm leading-6 text-gray-700 dark:text-gray-300">
+              Show my display name and problems-completed total on the student leaderboard. This is off by default.
+            </label>
+          </div>
+
+          <button
+            type="button"
+            onClick={handleExport}
+            disabled={isExporting}
+            className="mb-8 inline-flex min-h-11 items-center border border-gray-400 px-4 py-2 text-sm disabled:opacity-50 dark:border-gray-600"
+          >
+            <Download aria-hidden="true" className="mr-2 h-4 w-4" />
+            {isExporting ? 'Preparing download…' : 'Download my data'}
+          </button>
+
+          <div className="border border-red-300 p-5 dark:border-red-900">
+            <h3 className="mb-2 text-lg font-medium text-red-800 dark:text-red-300">Delete account permanently</h3>
+            <p className="mb-4 text-sm leading-6 text-gray-700 dark:text-gray-300">
+              This cannot be undone. Type <strong>DELETE</strong> to confirm.
+            </p>
+            <label htmlFor="delete-confirmation" className="mb-2 block text-sm font-medium">Confirmation</label>
+            <input
+              id="delete-confirmation"
+              value={deleteConfirmation}
+              onChange={(event) => setDeleteConfirmation(event.target.value)}
+              autoComplete="off"
+              className="input-minimal mb-4 max-w-sm"
+            />
+            <button
+              type="button"
+              onClick={handleDeleteAccount}
+              disabled={deleteConfirmation !== 'DELETE' || isDeleting}
+              className="inline-flex min-h-11 items-center border border-red-700 px-4 py-2 text-sm font-medium text-red-800 disabled:cursor-not-allowed disabled:opacity-50 dark:text-red-300"
+            >
+              <Trash2 aria-hidden="true" className="mr-2 h-4 w-4" />
+              {isDeleting ? 'Deleting…' : 'Delete my account and data'}
+            </button>
+          </div>
+        </section>
 
       </div>
     </div>

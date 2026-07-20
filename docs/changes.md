@@ -1,5 +1,7 @@
 # DECA Pal Change Log & Release Notes
 
+> Historical planning notes may contain unverified targets or estimates. Treat only changes traceable to version control and test evidence as implemented facts.
+
 ## Executive Summary
 
 This document tracks all significant changes, updates, and releases for the DECA Pal platform. It serves as a historical record for technical teams, a communication tool for stakeholders, and a transparency mechanism for users. Each release is evaluated for business impact, technical improvements, and user value delivered.

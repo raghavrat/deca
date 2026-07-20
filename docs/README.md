@@ -1,5 +1,7 @@
 # DECA Pal Documentation
 
+> These documents include planning assumptions and targets. They are not audited financial materials, legal advice, security certifications, accessibility certifications, or measured product claims. Verify a claim before using it externally.
+
 ## Executive Summary
 
 DECA Pal is an educational technology platform designed to help DECA (Distributive Education Clubs of America) students prepare for competitive business events. The platform provides comprehensive study materials, practice tests, and gamified learning experiences across five key business categories.
@@ -27,6 +29,15 @@ This documentation is organized to provide both high-level business insights and
   - Retention strategies and gamification mechanics
 
 ### 🏗️ Technical Documentation
+
+- **[ai-test-copyright-safety.md](./ai-test-copyright-safety.md)** - Copyright research and independent AI-test generation controls
+  - Removal of the copied legacy question bank
+  - First-party blueprint, screening, provenance, and complaint workflow
+
+- **[roleplay-prompt-research.md](./roleplay-prompt-research.md)** - 2026–2027 format research and all-event case-frequency analysis
+  - Official event-family timing, PI counts and rubric structure
+  - Public case-bank frequency table for all 28 role-play events
+  - Event-specific prompt-profile methodology and refresh command
 
 - **[architecture.md](./architecture.md)** - System design and technical infrastructure
   - Technology stack overview
@@ -67,7 +78,7 @@ This documentation is organized to provide both high-level business insights and
 - 🎯 **Targeted Learning**: Performance indicators aligned with DECA standards
 - 🏆 **Competitive Edge**: Leaderboards and gamification for engagement
 - 📱 **Modern Experience**: Mobile-first design for on-the-go studying
-- 🔒 **Secure Access**: Enterprise-grade authentication and data protection
+- 🔒 **Secure Access**: Verified server sessions, scoped database rules, and documented data controls
 - 📊 **Progress Tracking**: Analytics to measure learning outcomes
 
 ## Contact & Support
@@ -79,4 +90,4 @@ For additional information or clarification on any documentation:
 
 ---
 
-*This documentation is maintained as part of the DECA Pal platform development. Last updated: 2025*
+*This documentation is maintained as part of the DECA Pal platform development. Last updated: July 2026.*

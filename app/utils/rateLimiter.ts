@@ -24,25 +24,7 @@ export class RateLimiter {
   checkRateLimit(request: NextRequest): RateLimitResult {
     try {
       const identifier = getClientIdentifier(request)
-      const now = Date.now()
-      const lastRequest = this.store.get(identifier)
-
-      if (lastRequest && (now - lastRequest) < this.windowMs) {
-        const timeRemaining = Math.ceil((this.windowMs - (now - lastRequest)) / 1000)
-        
-        console.log(`Rate limit exceeded for client ${maskIdentifier(identifier)}, ${timeRemaining}s remaining`)
-        
-        return {
-          allowed: false,
-          timeRemaining,
-          identifier: maskIdentifier(identifier)
-        }
-      }
-
-      return {
-        allowed: true,
-        identifier: maskIdentifier(identifier)
-      }
+      return this.checkIdentifier(identifier)
     } catch (error) {
       console.error('Error checking rate limit:', error)
       // In case of error, allow the request but log the issue
@@ -59,10 +41,7 @@ export class RateLimiter {
   recordRequest(request: NextRequest): void {
     try {
       const identifier = getClientIdentifier(request)
-      const now = Date.now()
-      
-      this.store.set(identifier, now)
-      console.log(`Request recorded for client ${maskIdentifier(identifier)}`)
+      this.recordIdentifier(identifier)
     } catch (error) {
       console.error('Error recording request:', error)
     }
@@ -73,6 +52,28 @@ export class RateLimiter {
    */
   getStatus(request: NextRequest): RateLimitResult {
     return this.checkRateLimit(request)
+  }
+
+  /** Check an authenticated or otherwise server-trusted identifier. */
+  checkIdentifier(identifier: string): RateLimitResult {
+    const now = Date.now()
+    const lastRequest = this.store.get(identifier)
+    const publicIdentifier = maskIdentifier(identifier)
+
+    if (lastRequest && (now - lastRequest) < this.windowMs) {
+      return {
+        allowed: false,
+        timeRemaining: Math.ceil((this.windowMs - (now - lastRequest)) / 1000),
+        identifier: publicIdentifier,
+      }
+    }
+
+    return { allowed: true, identifier: publicIdentifier }
+  }
+
+  /** Record an authenticated or otherwise server-trusted identifier. */
+  recordIdentifier(identifier: string): void {
+    this.store.set(identifier, Date.now())
   }
 
   /**
@@ -90,9 +91,7 @@ export class RateLimiter {
       }
     }
 
-    if (cleanedCount > 0) {
-      console.log(`Cleaned up ${cleanedCount} expired rate limit entries`)
-    }
+    void cleanedCount
   }
 
   /**
@@ -110,7 +109,6 @@ export class RateLimiter {
    */
   clear(): void {
     this.store.clear()
-    console.log('Rate limit store cleared')
   }
 
   /**

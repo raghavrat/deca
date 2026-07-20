@@ -1,78 +1,32 @@
 /** @type {import('next').NextConfig} */
-const crypto = require('crypto');
-
 const nextConfig = {
   output: 'standalone',
+  poweredByHeader: false,
+  reactStrictMode: true,
   experimental: {
     optimizePackageImports: ['lucide-react'],
   },
-  webpack: (config) => {
-    // Handle node: protocol imports with simple aliases
-    config.resolve.alias = {
-      ...config.resolve.alias,
-      'node:stream': 'stream',
-      'node:crypto': 'crypto',
-      'node:buffer': 'buffer',
-      'node:util': 'util',
-      'node:fs': 'fs',
-      'node:path': 'path',
-      'node:url': 'url',
-      'node:events': 'events',
-      'node:os': 'os',
-      'node:process': 'process',
-      'node:querystring': 'querystring',
-      'node:zlib': 'zlib',
-      'node:http': 'http',
-      'node:https': 'https',
-      'node:assert': 'assert',
-      'node:net': 'net',
-      'node:tls': 'tls',
-      'node:timers': 'timers',
-      'node:string_decoder': 'string_decoder',
+  compress: true,
+  async headers() {
+    const securityHeaders = [
+      { key: 'Content-Security-Policy', value: "default-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; object-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' blob:; font-src 'self'; connect-src 'self' https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com" },
+      { key: 'Cross-Origin-Opener-Policy', value: 'same-origin' },
+      { key: 'Referrer-Policy', value: 'no-referrer' },
+      { key: 'Permissions-Policy', value: 'camera=(), geolocation=(), microphone=(self)' },
+      { key: 'X-Content-Type-Options', value: 'nosniff' },
+      { key: 'X-Frame-Options', value: 'DENY' },
+      { key: 'X-Permitted-Cross-Domain-Policies', value: 'none' },
+    ]
+
+    if (process.env.NODE_ENV === 'production') {
+      securityHeaders.push({
+        key: 'Strict-Transport-Security',
+        value: 'max-age=63072000; includeSubDomains; preload',
+      })
     }
 
-    config.optimization = {
-      ...config.optimization,
-      splitChunks: {
-        chunks: 'all',
-        minSize: 20000,
-        maxSize: 90000,
-        cacheGroups: {
-          default: false,
-          vendors: false,
-          framework: {
-            chunks: 'all',
-            name: 'framework',
-            test: /(?<!node_modules.*)[\\/]node_modules[\\/](react|react-dom|scheduler|prop-types|use-subscription)[\\/]/,
-            priority: 40,
-            enforce: true
-          },
-          commons: {
-            name: 'commons',
-            chunks: 'initial',
-            minChunks: 2,
-            priority: 20
-          },
-          lib: {
-            test(module) {
-              return module.size() > 50000 &&
-                /node_modules[/\\]/.test(module.identifier())
-            },
-            name(module) {
-              const hash = crypto.createHash('sha1')
-              hash.update(module.identifier())
-              return 'lib-' + hash.digest('hex').substring(0, 8)
-            },
-            priority: 30,
-            minChunks: 1,
-            reuseExistingChunk: true
-          }
-        }
-      }
-    }
-    return config
+    return [{ source: '/(.*)', headers: securityHeaders }]
   },
-  compress: true
 }
 
 module.exports = nextConfig

@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { getErrorMessage, getErrorCode } from '../utils/errorHandling';
 
@@ -10,11 +9,8 @@ export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [showResetPassword, setShowResetPassword] = useState(false);
-  const { signIn, resetPassword } = useAuth();
-  const router = useRouter();
+  const { signIn } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -28,11 +24,7 @@ export default function Login() {
       const errorCode = getErrorCode(err);
       const errorMessage = getErrorMessage(err);
       
-      if (errorCode === 'auth/wrong-password') {
-        setError('Incorrect password');
-      } else if (errorCode === 'auth/user-not-found') {
-        setError('No account found with this email');
-      } else if (errorCode === 'auth/invalid-email') {
+      if (errorCode === 'auth/invalid-email') {
         setError('Invalid email address');
       } else if (errorMessage.includes('Email not verified')) {
         setError('Please verify your email before signing in');
@@ -48,33 +40,25 @@ export default function Login() {
     <div className="min-h-screen flex items-center justify-center p-4">
       <div className="w-full max-w-md space-y-8">
         <div>
-          <h2 className="text-4xl font-light tracking-tight text-center text-black dark:text-white">
+          <h1 className="text-4xl font-light tracking-tight text-center text-black dark:text-white">
             Sign in to your account
-          </h2>
+          </h1>
         </div>
         <form className="space-y-6" onSubmit={handleSubmit}>
           {error && (
-            <div className="text-sm text-red-600 dark:text-red-400">
+            <div role="alert" id="login-error" className="text-sm text-red-700 dark:text-red-400">
               {error}
             </div>
           )}
           <div className="space-y-4">
-            <input
-              type="email"
-              required
-              className="input-minimal"
-              placeholder="Email address"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-            <input
-              type="password"
-              required
-              className="input-minimal"
-              placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
+            <div>
+              <label htmlFor="login-email" className="mb-1 block text-sm font-medium">Email address</label>
+              <input id="login-email" type="email" required autoComplete="email" maxLength={254} className="input-minimal" value={email} onChange={(e) => setEmail(e.target.value)} aria-describedby={error ? 'login-error' : undefined} />
+            </div>
+            <div>
+              <label htmlFor="login-password" className="mb-1 block text-sm font-medium">Password</label>
+              <input id="login-password" type="password" required autoComplete="current-password" className="input-minimal" value={password} onChange={(e) => setPassword(e.target.value)} aria-describedby={error ? 'login-error' : undefined} />
+            </div>
           </div>
 
           <button

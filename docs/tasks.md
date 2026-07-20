@@ -1,5 +1,7 @@
 # DECA Pal Development Tasks & Roadmap
 
+> **Planning assumptions only:** Budgets, dates, ROI, impact percentages, and growth estimates are unverified projections and are not commitments or historical results.
+
 ## Executive Summary
 
 This document outlines the strategic development roadmap for DECA Pal, prioritizing tasks that deliver maximum business value while minimizing technical risk. Each task is evaluated based on ROI, implementation effort, and strategic importance. The roadmap is designed to achieve profitability within 12 months while building a defensible market position.

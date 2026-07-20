@@ -1,401 +1,304 @@
+import { randomUUID } from 'crypto'
 import { NextRequest, NextResponse } from 'next/server'
-import { DECAScenario } from '../../../types'
+import type { DECAScenario, DECAEvent, ScoringCriteria } from '../../../types'
 import { getEventById } from '../../../data/decaEvents'
+import {
+  CAREER_COMPETENCIES,
+  FORMAT_RULES,
+  chooseWeighted,
+  chooseWeightedInstructionalArea,
+  getRoleplayProfile,
+  type FormatRules,
+  type RoleplayProfile,
+  type ScenarioArchetype,
+} from '../../../data/roleplayProfiles'
+import {
+  PERSONAL_FINANCE_AREAS,
+  getPersonalFinanceIndicators,
+} from '../../../data/personalFinanceIndicators'
 import { getPerformanceIndicatorsByAreas, getInstructionalAreasByCategory } from '../../../utils/instructionalAreas'
+import {
+  buildEventSystemPrompt,
+  buildParticipantInstructions,
+  getSolutionCriteria,
+} from '../../../utils/roleplayPromptBuilder'
 import { RateLimiter } from '../../../utils/rateLimiter'
+import { RequestError, requireSameOrigin, requireSession } from '../../../utils/serverAuth'
 
 const OPENROUTER_API_URL = 'https://openrouter.ai/api/v1/chat/completions'
+const rateLimiter = new RateLimiter(5 * 60 * 1000)
 
-// Create a rate limiter instance: 1 request per 5 minutes
-const rateLimiter = new RateLimiter(5 * 60 * 1000) // 5 minutes in milliseconds
+const GENERAL_RULES: FormatRules = FORMAT_RULES['individual-series']
+const GENERAL_ARCHETYPE: ScenarioArchetype = {
+  id: 'category-practice',
+  label: 'General category decision',
+  weight: 100,
+  participantRoles: ['department associate', 'assistant manager', 'business consultant'],
+  judgeRoles: ['manager', 'owner', 'client'],
+  settings: ['management meeting', 'client consultation'],
+  tasks: ['analyze the facts', 'recommend a solution', 'explain implementation'],
+  complications: ['a limited budget', 'a short deadline', 'competing stakeholder priorities'],
+}
 
-export async function POST(request: NextRequest) {
-  try {
-    // Check rate limit using IP/fingerprint-based rate limiting
-    const rateLimitResult = rateLimiter.checkRateLimit(request)
-    
-    if (!rateLimitResult.allowed) {
-      console.log(`Rate limit blocked request for ${rateLimitResult.identifier}, ${rateLimitResult.timeRemaining}s remaining`)
-      return NextResponse.json(
-        {
-          error: 'Rate limit exceeded. Please wait a few minutes before generating another scenario.',
-          timeRemaining: rateLimitResult.timeRemaining
-        },
-        { status: 429 }
-      )
-    }
+const CATEGORY_MAP: Record<string, DECAEvent['category']> = {
+  FINANCE: 'FINANCE',
+  MARKETING: 'MARKETING',
+  HOSPITALITY: 'HOSPITALITY',
+  MANAGEMENT: 'MANAGEMENT',
+  MANAGMENT: 'MANAGEMENT',
+  ENTREPRENEUR: 'ENTREPRENEUR',
+  ENTREPRENEURSHIP: 'ENTREPRENEUR',
+}
 
-    console.log('Processing roleplay generation request')
-
-    const { category, eventId, selectedInstructionalArea } = await request.json()
-
-    console.log('DEBUG: Request data:', { category, eventId, selectedInstructionalArea })
-
-    if (!category) {
-      return NextResponse.json({ error: 'Category is required' }, { status: 400 })
-    }
-
-    const apiKey = process.env.OPENROUTER_API_KEY
-    if (!apiKey) {
-      return NextResponse.json({ error: 'OpenRouter API key not configured' }, { status: 500 })
-    }
-
-    // Get event details if eventId is provided
-    let selectedEvent = null
-    if (eventId) {
-      selectedEvent = getEventById(eventId)
-      if (!selectedEvent) {
-        return NextResponse.json({ error: 'Invalid event ID' }, { status: 400 })
-      }
-    }
-
-    // Determine the correct number of performance indicators based on event type
-    const getPICount = (eventId: string | null, eventName: string | null): number => {
-      // PFL and Principles events use 4 PIs
-      if (eventId === 'PFL' || eventName?.toLowerCase().includes('principles')) {
-        return 4
-      }
-
-      // Team events use 7 PIs (when implemented)
-      // TODO: Add team event detection when team events are added
-      // if (eventName?.toLowerCase().includes('team') || isTeamEvent(eventId)) {
-      //   return 7
-      // }
-
-      // Individual events use 5 PIs (default)
-      return 5
-    }
-
-    const piCount = getPICount(eventId, selectedEvent?.name || null)
-    console.log(`Using ${piCount} performance indicators for event: ${selectedEvent?.name || category}`)
-
-    // Get PIs for selected instructional area
-    let relevantPIs: string[]
-    let actualInstructionalArea: string
-    
-    const { performanceIndicators } = await import('../../../performanceIndicators')
-    const categoryMapping: { [key: string]: string } = {
-      'FINANCE': 'FINANCE',
-      'MARKETING': 'MARKETING',
-      'HOSPITALITY': 'HOSPITALITY',
-      'MANAGEMENT': 'MANAGEMENT',
-      'MANAGMENT': 'MANAGEMENT',
-      'ENTREPRENEUR': 'ENTREPRENEURSHIP',
-      'ENTREPRENEURSHIP': 'ENTREPRENEURSHIP'
-    }
-    const mappedCategory = categoryMapping[category] || 'MANAGEMENT'
-    
-    // Handle random instructional area selection
-    if (selectedInstructionalArea === 'RANDOM' || !selectedInstructionalArea) {
-      const availableAreas = getInstructionalAreasByCategory(category)
-      if (availableAreas.length > 0) {
-        const randomIndex = Math.floor(Math.random() * availableAreas.length)
-        actualInstructionalArea = availableAreas[randomIndex].name
-        console.log(`Randomly selected instructional area: ${actualInstructionalArea}`)
-      } else {
-        // Fallback if no areas found
-        return NextResponse.json({ error: 'No instructional areas found for this category' }, { status: 400 })
-      }
-    } else {
-      actualInstructionalArea = selectedInstructionalArea
-    }
-    
-    // Get all PIs from the selected instructional area
-    const areaPIs = getPerformanceIndicatorsByAreas(category, [actualInstructionalArea])
-    console.log(`Found ${areaPIs.length} PIs for instructional area: ${actualInstructionalArea}`)
-    
-    // Get all other PIs from the category (excluding the selected area)
-    const otherPIs = performanceIndicators
-      .filter(pi => {
-        if (!pi.category.includes(mappedCategory as any)) return false
-        const areaName = pi.area.replace('Instructional Area: ', '').trim()
-        return areaName !== actualInstructionalArea
-      })
-      .map(pi => pi.indicator.trim())
-    
-    // Shuffle the other PIs
-    const shuffledOtherPIs = otherPIs.sort(() => Math.random() - 0.5)
-    
-    // Combine: all PIs from selected area + additional PIs to reach target
-    if (areaPIs.length >= 100) {
-      // If area has 100+ PIs, use all area PIs + 20 random others
-      relevantPIs = [...areaPIs, ...shuffledOtherPIs.slice(0, 20)]
-    } else {
-      // Otherwise, use all area PIs + enough others to reach 100 total
-      const remainingCount = Math.max(100 - areaPIs.length, 0)
-      relevantPIs = [...areaPIs, ...shuffledOtherPIs.slice(0, remainingCount)]
-    }
-    
-    console.log(`Using ${areaPIs.length} PIs from ${actualInstructionalArea} + ${relevantPIs.length - areaPIs.length} other PIs`)
-
-    // Create clearer prompt for GPT OSS
-    const systemPrompt = selectedEvent
-      ? `Generate a DECA competition roleplay scenario for ${selectedEvent.name} (${selectedEvent.id}).
-
-Event Details:
-- Career Cluster: ${selectedEvent.careerCluster}
-- Career Pathway: ${selectedEvent.careerPathway}
-
-PERFORMANCE INDICATORS - Select exactly ${piCount} from this list:
-${relevantPIs.map((pi, index) => `${index + 1}. ${pi}`).join('\n')}
-
-INSTRUCTIONS:
-1. Create a realistic business scenario
-2. Copy exactly ${piCount} performance indicators from the list above
-3. Return ONLY valid JSON
-
-JSON FORMAT:
-{
-  "eventCode": "${selectedEvent.id}",
-  "careerCluster": "${selectedEvent.careerCluster}",
-  "careerPathway": "${selectedEvent.careerPathway}",
-  "participantInstructions": ["The event will be presented to you through your reading of the 21st Century Skills, Performance Indicators and Event Situation. You will have up to 10 minutes to review this information and prepare your presentation. You may make notes to use during your presentation.", "You will have up to 10 minutes to make your presentation to the judge (you may have more than one judge).", "You will be evaluated on how well you meet the performance indicators of this event.", "Turn in all of your notes and event materials when you have completed the event."],
-  "centurySkills": ["Critical Thinking – Reason effectively and use systems thinking.", "Problem Solving – Make judgments and decisions, and solve problems.", "Communication – Communicate clearly.", "Creativity and Innovation – Show evidence of creativity."],
-  "performanceIndicators": [Copy exactly ${piCount} indicators from the numbered list above],
-  "eventSituation": {
-    "roleDescription": "You are to assume the role of [job title] at [company]. The [judge role] wants [objective].",
-    "companyBackground": "[2-3 paragraphs about company history, market position, and context]",
-    "businessChallenge": "[Specific challenge that needs addressing and why it matters]",
-    "taskDescription": "[What participant must analyze/recommend]",
-    "presentationContext": "You will present to the [judge role] in [location]. The judge will greet you and ask for your ideas. After your presentation and questions, they will thank you."
-  },
-  "judgeInstructions": {
-    "roleCharacterization": "You are the [title] of [company]. [Description of judge's perspective and concerns]",
-    "questionsToAsk": ["[Specific question 1]", "[Specific question 2]", "[Specific question 3]"],
-    "evaluationCriteria": "The participant will present in your [location]. Greet them, listen to their ideas, ask questions, then thank them. Make no other comments after the event."
+function shuffled<T>(items: T[]): T[] {
+  const copy = [...items]
+  for (let index = copy.length - 1; index > 0; index -= 1) {
+    const swapIndex = Math.floor(Math.random() * (index + 1))
+    ;[copy[index], copy[swapIndex]] = [copy[swapIndex], copy[index]]
   }
-}`
-      : `You are a DECA competition scenario generator. Generate a realistic business roleplay scenario for the ${category} category following the official DECA format.
+  return copy
+}
 
-AVAILABLE PERFORMANCE INDICATORS (select exactly ${piCount} that are most relevant to your scenario):
-${relevantPIs.map((pi, index) => `${index + 1}. ${pi}`).join('\n')}
-
-You must return ONLY valid JSON in the following official DECA format. Do not include any markdown formatting, explanations, or text outside the JSON:
-{
-  "eventCode": "GENERAL",
-  "careerCluster": "Business",
-  "careerPathway": "${category} Management",
-  "participantInstructions": [
-    "The event will be presented to you through your reading of the 21st Century Skills, Performance Indicators and Event Situation. You will have up to 10 minutes to review this information and prepare your presentation. You may make notes to use during your presentation.",
-    "You will have up to 10 minutes to make your presentation to the judge (you may have more than one judge).",
-    "You will be evaluated on how well you meet the performance indicators of this event.",
-    "Turn in all of your notes and event materials when you have completed the event."
-  ],
-  "centurySkills": [
-    "Critical Thinking – Reason effectively and use systems thinking.",
-    "Problem Solving – Make judgments and decisions, and solve problems.",
-    "Communication – Communicate clearly.",
-    "Creativity and Innovation – Show evidence of creativity."
-  ],
-  "performanceIndicators": ["YOU MUST COPY EXACTLY ${piCount} INDICATORS FROM THE LIST PROVIDED - DO NOT CREATE YOUR OWN"],
-  "eventSituation": {
-    "roleDescription": "You are to assume the role of [specific job title] at [company name], a [company description]. The [stakeholder] (judge) [situation context].",
-    "companyBackground": "Detailed 2-3 paragraph description of the company, its history, current market position, and relevant business context.",
-    "businessChallenge": "Specific business challenge or decision that needs to be addressed, including why it's important and what factors are involved.",
-    "taskDescription": "Clear description of what the participant needs to analyze, decide, or recommend to address the business challenge.",
-    "presentationContext": "You will present your analysis and recommendation to the [stakeholder] (judge) in a role-play to take place in the [setting]. The [stakeholder] (judge) will begin the role-play by greeting you and asking to hear your ideas. After you have presented your recommendation and have answered the [stakeholder's] (judge's) questions, the [stakeholder] (judge) will conclude the role-play by thanking you for your work."
-  },
-  "judgeInstructions": {
-    "roleCharacterization": "You are to assume the role of [stakeholder title] of [company name]. [Detailed description of the judge's character, motivations, concerns, and perspective on the business challenge.]",
-    "questionsToAsk": ["Generate 3 specific questions the judge should ask each participant during the roleplay"],
-    "evaluationCriteria": "The participant will present ideas to you in a role-play to take place in your [location]. You will begin the role-play by greeting the participant and asking to hear about his/her ideas. Once the participant has presented an analysis and has answered your questions, you will conclude the role-play by thanking the participant for the work. You are not to make any comments after the event is over except to thank the participant."
+function scoreBands(maxPoints: number): ScoringCriteria['levels'] {
+  if (maxPoints === 17) return {
+    exceeds: { points: '14-17', description: 'Highly effective and thorough demonstration.' },
+    meets: { points: '10-13', description: 'Effective demonstration that meets expectations.' },
+    below: { points: '5-9', description: 'Partially effective demonstration with important gaps.' },
+    little: { points: '0-4', description: 'Little or no effective demonstration.' },
+  }
+  if (maxPoints === 12) return {
+    exceeds: { points: '10-12', description: 'Highly effective and thorough demonstration.' },
+    meets: { points: '7-9', description: 'Effective demonstration that meets expectations.' },
+    below: { points: '4-6', description: 'Partially effective demonstration with important gaps.' },
+    little: { points: '0-3', description: 'Little or no effective demonstration.' },
+  }
+  if (maxPoints === 10) return {
+    exceeds: { points: '8-10', description: 'Highly effective and thorough demonstration.' },
+    meets: { points: '6-7', description: 'Effective demonstration that meets expectations.' },
+    below: { points: '3-5', description: 'Partially effective demonstration with important gaps.' },
+    little: { points: '0-2', description: 'Little or no effective demonstration.' },
+  }
+  if (maxPoints === 8) return {
+    exceeds: { points: '7-8', description: 'Highly effective and well supported.' },
+    meets: { points: '5-6', description: 'Practical and generally effective.' },
+    below: { points: '3-4', description: 'Some useful content, but important gaps remain.' },
+    little: { points: '0-2', description: 'Little or no effective evidence.' },
+  }
+  if (maxPoints === 7) return {
+    exceeds: { points: '6-7', description: 'Excellent impression and responses.' },
+    meets: { points: '4-5', description: 'Professional impression and effective responses.' },
+    below: { points: '2-3', description: 'Uneven impression or incomplete responses.' },
+    little: { points: '0-1', description: 'Little evidence of readiness or responsiveness.' },
+  }
+  return {
+    exceeds: { points: '5-6', description: 'Excellent demonstration.' },
+    meets: { points: '4', description: 'Effective demonstration.' },
+    below: { points: '2-3', description: 'Limited demonstration.' },
+    little: { points: '0-1', description: 'Little or no demonstration.' },
   }
 }
 
-CRITICAL INSTRUCTIONS FOR PERFORMANCE INDICATORS:
-1. First, create the complete business scenario (company background, business challenge, task description, etc.)
-2. Then for "performanceIndicators" field, you MUST copy EXACTLY ${piCount} indicators word-for-word from the numbered list I provided above
-3. DO NOT write placeholder text like "Select indicators" or create your own indicators
-4. The performanceIndicators array should contain exactly ${piCount} strings, each one copied directly from my list
-5. Example of correct format: ["Explain the nature of business ethics", "Demonstrate ethical work habits", ...] - with actual indicators from the list
+function rubricItem(name: string, maxPoints: number): ScoringCriteria {
+  return { name, maxPoints, levels: scoreBands(maxPoints) }
+}
 
-Make sure the scenario is:
-- Realistic and relevant to modern business
-- Appropriate for high school DECA competitors
-- Challenging but achievable
-- Focused on the ${category} category
-- Performance indicators directly match the business challenge created
-- Follows official DECA competition format exactly`
+function careerCompetenciesFor(profile?: RoleplayProfile): string[] {
+  const indexes = profile?.format === 'team-decision' ? [0, 1, 4] : [0, 1, 2]
+  return indexes.map(index => CAREER_COMPETENCIES[index])
+}
 
-    const userPrompt = selectedEvent
-      ? `Create a ${selectedEvent.name} roleplay scenario focused on ${actualInstructionalArea}. Copy exactly ${piCount} performance indicators from the list.`
-      : `Create a ${category} roleplay scenario focused on ${actualInstructionalArea}. Copy exactly ${piCount} performance indicators from the list.`
-    
-    console.log('DEBUG: User prompt PI count:', { piCount, expectedCount: piCount })
+function generalSystemPrompt(
+  category: string,
+  instructionalArea: string,
+  performanceIndicators: string[],
+): string {
+  return `Create one original, unofficial DECA-style individual practice role-play for the ${category} category, focused on ${instructionalArea}.
 
-    const requestBody = {
-      model: 'openai/gpt-oss-20b',
-      messages: [
-        { role: 'system', content: systemPrompt },
-        { role: 'user', content: userPrompt }
-      ],
-      temperature: 0.8,
-      max_tokens: 5000,
-      provider: {
-        order: ['Fireworks']
+Required performance indicators (the server will attach these; design the case so all can be demonstrated):
+${performanceIndicators.map((indicator, index) => `${index + 1}. ${indicator}`).join('\n')}
+
+Invent a fictional organization, a participant role and a judge role. Include concrete facts, realistic constraints, a decision, implementation expectations and enough information to answer without outside research. Ask exactly two open-ended judge questions. Do not copy or reconstruct an official DECA case and do not imply DECA endorsement.
+
+Return ONLY valid JSON:
+{
+  "eventSituation": {
+    "roleDescription": "Participant role, organization, judge role and objective",
+    "companyBackground": "Organization and operating context",
+    "businessChallenge": "Facts, constraints, tensions and deadline",
+    "taskDescription": "Analysis, recommendation and implementation deliverables",
+    "presentationContext": "Meeting setting, opening and conclusion"
+  },
+  "judgeInstructions": {
+    "roleCharacterization": "Judge identity, priorities, concerns and matching facts",
+    "questionsToAsk": ["Question one", "Question two"],
+    "evaluationCriteria": "Conduct the meeting, ask both questions, then only thank the participant"
+  }
+}`
+}
+
+function isShortText(value: unknown, max = 4000): value is string {
+  return typeof value === 'string' && value.trim().length > 0 && value.length <= max
+}
+
+export async function POST(request: NextRequest) {
+  try {
+    requireSameOrigin(request)
+    const user = await requireSession()
+    const rateLimitKey = `user:${user.uid}`
+    const rateLimitResult = rateLimiter.checkIdentifier(rateLimitKey)
+    if (!rateLimitResult.allowed) {
+      return NextResponse.json({
+        error: 'Rate limit exceeded. Please wait a few minutes before generating another scenario.',
+        timeRemaining: rateLimitResult.timeRemaining,
+      }, { status: 429 })
+    }
+    rateLimiter.recordIdentifier(rateLimitKey)
+
+    const payload = await request.json()
+    const { category, eventId, selectedInstructionalArea } = payload as Record<string, unknown>
+    if (typeof category !== 'string' || !CATEGORY_MAP[category]) {
+      return NextResponse.json({ error: 'Invalid category' }, { status: 400 })
+    }
+    if (eventId !== null && eventId !== undefined && (typeof eventId !== 'string' || eventId.length > 20)) {
+      return NextResponse.json({ error: 'Invalid event ID' }, { status: 400 })
+    }
+    if (typeof selectedInstructionalArea !== 'string' || selectedInstructionalArea.length > 120) {
+      return NextResponse.json({ error: 'Invalid instructional area' }, { status: 400 })
+    }
+
+    const apiKey = process.env.OPENROUTER_API_KEY
+    if (!apiKey) return NextResponse.json({ error: 'OpenRouter API key not configured' }, { status: 500 })
+
+    const selectedEvent = typeof eventId === 'string' ? getEventById(eventId) : undefined
+    if (eventId && !selectedEvent) return NextResponse.json({ error: 'Invalid event ID' }, { status: 400 })
+    if (selectedEvent && selectedEvent.category !== CATEGORY_MAP[category]) {
+      return NextResponse.json({ error: 'Event does not belong to this category' }, { status: 400 })
+    }
+
+    const profile = selectedEvent ? getRoleplayProfile(selectedEvent.id) : undefined
+    if (selectedEvent && !profile) {
+      return NextResponse.json({ error: 'This event does not have a role-play profile' }, { status: 400 })
+    }
+    const rules = profile ? FORMAT_RULES[profile.format] : GENERAL_RULES
+    const availableAreas = profile?.format === 'personal-financial-literacy'
+      ? PERSONAL_FINANCE_AREAS
+      : getInstructionalAreasByCategory(category)
+    if (!availableAreas.length) {
+      return NextResponse.json({ error: 'No instructional areas found for this category' }, { status: 400 })
+    }
+
+    let actualInstructionalArea: string
+    if (selectedInstructionalArea === 'RANDOM') {
+      actualInstructionalArea = profile
+        ? chooseWeightedInstructionalArea(profile, availableAreas.map(area => area.name)) || availableAreas[0].name
+        : availableAreas[Math.floor(Math.random() * availableAreas.length)].name
+    } else {
+      if (!availableAreas.some(area => area.name === selectedInstructionalArea)) {
+        return NextResponse.json({ error: 'Invalid instructional area' }, { status: 400 })
       }
+      actualInstructionalArea = selectedInstructionalArea
     }
 
-    const requestHeaders = {
-      'Authorization': `Bearer ${apiKey}`,
-      'Content-Type': 'application/json',
-      'HTTP-Referer': process.env.NEXT_PUBLIC_SITE_URL || 'https://decapal.org',
-      'X-Title': 'DECA Pal'
+    const areaIndicators = profile?.format === 'personal-financial-literacy'
+      ? getPersonalFinanceIndicators(actualInstructionalArea)
+      : getPerformanceIndicatorsByAreas(category, [actualInstructionalArea])
+    if (areaIndicators.length < rules.performanceIndicatorCount) {
+      return NextResponse.json({ error: 'Not enough performance indicators for this instructional area' }, { status: 400 })
     }
+    const selectedIndicators = shuffled(Array.from(new Set(areaIndicators))).slice(0, rules.performanceIndicatorCount)
+    const archetype = profile ? chooseWeighted(profile.archetypes) : GENERAL_ARCHETYPE
+    const systemPrompt = selectedEvent && profile
+      ? buildEventSystemPrompt({
+        event: selectedEvent,
+        profile,
+        archetype,
+        instructionalArea: actualInstructionalArea,
+        performanceIndicators: selectedIndicators,
+      })
+      : generalSystemPrompt(category, actualInstructionalArea, selectedIndicators)
 
     const response = await fetch(OPENROUTER_API_URL, {
       method: 'POST',
-      headers: requestHeaders,
-      body: JSON.stringify(requestBody)
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+        'HTTP-Referer': process.env.NEXT_PUBLIC_SITE_URL || 'https://decapal.org',
+        'X-Title': 'DECA Pal',
+      },
+      body: JSON.stringify({
+        model: 'openai/gpt-oss-20b',
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: `Generate the ${archetype.label} practice case now.` },
+        ],
+        temperature: 0.85,
+        max_tokens: 4200,
+        provider: { order: ['Fireworks'], data_collection: 'deny', zdr: true },
+      }),
     })
-
-    if (!response.ok) {
-      const errorText = await response.text()
-      throw new Error(`OpenRouter API error: ${response.status} - ${errorText}`)
-    }
+    if (!response.ok) throw new Error(`OpenRouter request failed with status ${response.status}`)
 
     const data = await response.json()
+    const content = data.choices?.[0]?.message?.content
+    if (typeof content !== 'string' || !content.trim()) throw new Error('No content received from OpenRouter API')
 
-    const content = data.choices[0]?.message?.content
-
-    if (!content) {
-      throw new Error('No content received from OpenRouter API')
-    }
-
-    // Parse the JSON response from the AI
-    console.log('Raw AI response length:', content.length)
-    console.log('Raw AI response preview:', content.substring(0, 200) + '...')
-
-    let scenarioData
+    let scenarioData: Record<string, any>
     try {
-      // Try to extract JSON from the response if it's wrapped in markdown
       let jsonContent = content.trim()
-      
-      // Remove markdown code blocks if present
-      if (jsonContent.startsWith('```json')) {
-        jsonContent = jsonContent.replace(/^```json\s*/, '').replace(/\s*```$/, '')
-      } else if (jsonContent.startsWith('```')) {
-        jsonContent = jsonContent.replace(/^```\s*/, '').replace(/\s*```$/, '')
-      }
-      
-      // Clean up any remaining whitespace
-      jsonContent = jsonContent.trim()
-
-      // Check if the JSON appears to be truncated
-      if (!jsonContent.endsWith('}')) {
-        console.log('JSON appears to be truncated - does not end with }')
-        throw new Error('AI response appears to be truncated. The JSON is incomplete.')
-      }
-
-      console.log('Cleaned JSON content length:', jsonContent.length)
-      console.log('Cleaned JSON content preview:', jsonContent.substring(0, 200) + '...')
-      console.log('Cleaned JSON content ending:', jsonContent.substring(jsonContent.length - 100))
-      
+      if (jsonContent.startsWith('```json')) jsonContent = jsonContent.replace(/^```json\s*/, '').replace(/\s*```$/, '')
+      else if (jsonContent.startsWith('```')) jsonContent = jsonContent.replace(/^```\s*/, '').replace(/\s*```$/, '')
+      if (!jsonContent.trim().endsWith('}')) throw new Error('AI response appears to be truncated')
       scenarioData = JSON.parse(jsonContent)
-      console.log('Successfully parsed JSON:', Object.keys(scenarioData))
-      
-      // Validate and fix performance indicators
-      if (scenarioData.performanceIndicators) {
-        // Check if PIs are placeholder strings
-        const hasPlaceholder = scenarioData.performanceIndicators.some((pi: any) => 
-          typeof pi === 'string' && (
-            pi.toLowerCase().includes('select') || 
-            pi.toLowerCase().includes('choose') ||
-            pi.includes('[') ||
-            pi.length > 200 // Suspiciously long PI
-          )
-        )
-        
-        if (hasPlaceholder || scenarioData.performanceIndicators.length !== piCount) {
-          console.log('Invalid PIs detected, selecting random ones from the list')
-          // Select random PIs from the relevant list
-          const shuffled = [...relevantPIs].sort(() => Math.random() - 0.5)
-          scenarioData.performanceIndicators = shuffled.slice(0, piCount)
-        }
-      }
-      
-      // Validate centurySkills - ensure they're the standard 4
-      const standardCenturySkills = [
-        "Critical Thinking – Reason effectively and use systems thinking.",
-        "Problem Solving – Make judgments and decisions, and solve problems.",
-        "Communication – Communicate clearly.",
-        "Creativity and Innovation – Show evidence of creativity."
-      ]
-      
-      if (!scenarioData.centurySkills || scenarioData.centurySkills.length !== 4) {
-        scenarioData.centurySkills = standardCenturySkills
-      }
-      
-    } catch (parseError) {
-      console.error('JSON parsing failed:', parseError)
-      console.log('Full content that failed to parse:', content)
-
-      // Check if it's a truncation issue
-      if (parseError instanceof SyntaxError && parseError.message.includes('Unterminated')) {
-        throw new Error('AI response was truncated. Please try again - the response may have exceeded token limits.')
-      }
-
-      // If JSON parsing fails, return an error instead of fallback
-      const errorMessage = parseError instanceof Error ? parseError.message : String(parseError)
-      throw new Error('Failed to parse AI response as JSON. Error: ' + errorMessage)
+    } catch (error) {
+      throw new Error(`Failed to parse AI response: ${error instanceof Error ? error.message : 'invalid JSON'}`)
     }
 
+    const situationKeys = ['roleDescription', 'companyBackground', 'businessChallenge', 'taskDescription', 'presentationContext']
+    const validSituation = scenarioData.eventSituation && situationKeys.every(key => isShortText(scenarioData.eventSituation[key]))
+    const judge = scenarioData.judgeInstructions
+    const validJudge = judge && isShortText(judge.roleCharacterization) && isShortText(judge.evaluationCriteria) &&
+      Array.isArray(judge.questionsToAsk) && judge.questionsToAsk.length === 2 &&
+      judge.questionsToAsk.every((question: unknown) => isShortText(question, 1000))
+    if (!validSituation || !validJudge) throw new Error('AI response did not match the required scenario format')
+
+    const competencies = careerCompetenciesFor(profile)
+    const solutionCriteria = getSolutionCriteria(selectedEvent?.id || 'GENERAL')
     const scenario: DECAScenario = {
-      id: `scenario_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`,
-      eventCode: scenarioData.eventCode,
-      careerCluster: scenarioData.careerCluster,
-      careerPathway: scenarioData.careerPathway,
-      participantInstructions: scenarioData.participantInstructions,
-      centurySkills: scenarioData.centurySkills,
-      performanceIndicators: scenarioData.performanceIndicators,
+      id: `scenario_${randomUUID()}`,
+      eventCode: selectedEvent?.id || 'GENERAL',
+      careerCluster: selectedEvent?.careerCluster || 'Business',
+      careerPathway: selectedEvent?.careerPathway || `${category} Management`,
+      participantInstructions: profile
+        ? buildParticipantInstructions(profile)
+        : [
+          `Review the Career Competencies, Performance Indicators and Event Situation. You have up to ${rules.prepMinutes} minutes to prepare.`,
+          `You have up to ${rules.presentationMinutes} minutes to present to the judge.`,
+          'This is an original unofficial practice scenario and is not an official DECA competitive event case.',
+        ],
+      centurySkills: competencies,
+      performanceIndicators: selectedIndicators,
+      practiceMetadata: profile ? {
+        format: profile.format,
+        archetypeId: archetype.id,
+        archetypeLabel: archetype.label,
+        instructionalArea: actualInstructionalArea,
+        researchBasis: `${profile.historicalSample.publicCases} public DECA case-bank entries (${profile.historicalSample.yearRange.join('–')}); descriptive variety weighting only`,
+      } : undefined,
       eventSituation: scenarioData.eventSituation,
       judgeInstructions: scenarioData.judgeInstructions,
       scoringRubric: {
-        performanceIndicators: scenarioData.performanceIndicators.map((indicator: string) => ({
-          name: indicator,
-          maxPoints: 14,
-          levels: {
-            exceeds: { points: "12-14", description: "Participant demonstrated the performance indicator in an extremely professional manner; greatly exceeds business standards; would rank in the top 10% of business personnel performing this performance indicator." },
-            meets: { points: "9-11", description: "Participant demonstrated the performance indicator in an acceptable and effective manner; meets at least minimal business standards; there would be no need for additional formalized training at this time; would rank in the 70-89th percentile of business personnel performing this performance indicator." },
-            below: { points: "5-8", description: "Participant demonstrated the performance indicator with limited effectiveness; performance generally fell below minimal business standards; additional training would be required to improve knowledge, attitude and/or skills; would rank in the 50-69th percentile of business personnel performing this performance indicator." },
-            little: { points: "0-4", description: "Participant demonstrated the performance indicator with little or no effectiveness; a great deal of formal training would be needed immediately; perhaps this person should seek other employment; would rank in the 0-49th percentile of business personnel performing this performance indicator." }
-          }
-        })),
-        centurySkills: scenarioData.centurySkills.map((skill: string) => ({
-          name: skill,
-          maxPoints: 6,
-          levels: {
-            exceeds: { points: "5-6", description: "Excellent demonstration of 21st century skill" },
-            meets: { points: "4", description: "Good demonstration of 21st century skill" },
-            below: { points: "2-3", description: "Limited demonstration of 21st century skill" },
-            little: { points: "0-1", description: "Little to no demonstration of 21st century skill" }
-          }
-        })),
-        overallImpression: {
-          name: "Overall impression and responses to the judge's questions",
-          maxPoints: 6,
-          levels: {
-            exceeds: { points: "5-6", description: "Excellent overall performance and responses" },
-            meets: { points: "4", description: "Good overall performance and responses" },
-            below: { points: "2-3", description: "Limited overall performance and responses" },
-            little: { points: "0-1", description: "Poor overall performance and responses" }
-          }
-        }
+        performanceIndicators: selectedIndicators.map(indicator => rubricItem(indicator, rules.performanceIndicatorMax)),
+        solution: solutionCriteria.map(criterion => rubricItem(criterion, rules.solutionMax)),
+        centurySkills: competencies.map(skill => rubricItem(skill, rules.careerCompetencyMax)),
+        overallImpression: rubricItem("Overall impression and responses to the judge's questions", rules.overallImpressionMax),
       },
-      createdAt: new Date()
+      createdAt: new Date(),
     }
 
-    // Record the request in the rate limiter after successful generation
-    rateLimiter.recordRequest(request)
-    
-    console.log('Successfully generated scenario')
     return NextResponse.json({ scenario })
-
   } catch (error) {
-    console.error('Error generating roleplay scenario:', error)
-    return NextResponse.json(
-      { error: 'Failed to generate roleplay scenario' },
-      { status: 500 }
-    )
+    if (error instanceof RequestError) return NextResponse.json({ error: error.message }, { status: error.status })
+    console.error('Error generating roleplay scenario', error instanceof Error ? error.message : 'unknown error')
+    return NextResponse.json({ error: 'Failed to generate roleplay scenario' }, { status: 500 })
   }
 }

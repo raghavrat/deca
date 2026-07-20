@@ -1,57 +1,36 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { adminAuth, adminDb } from '../../../firebase/admin'
+import { NextResponse } from 'next/server'
+import { RequestError, requireSession } from '../../../utils/serverAuth'
+import { getRoleplaysForUser } from '../../../utils/roleplayStore'
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
-    const searchParams = request.nextUrl.searchParams
-    const email = searchParams.get('email')
-    
-    if (!email) {
-      return NextResponse.json({ error: 'Email is required' }, { status: 400 })
-    }
-    
-    console.log('Fetching roleplay history for:', email)
-    
-    // Check if Firebase Admin is properly initialized
-    if (!adminDb) {
-      console.error('Firebase Admin SDK not initialized - adminDb is null')
-      return NextResponse.json({ error: 'Server configuration error' }, { status: 500 })
-    }
-    
-    // Fetch all roleplays for this user
-    const docRef = adminDb.collection('roleplays').doc(email)
-    const docSnap = await docRef.get()
-    
-    if (!docSnap.exists) {
-      console.log('No roleplay history found for:', email)
-      return NextResponse.json({ sessions: [] })
-    }
-    
-    const data = docSnap.data() || {}
+    const user = await requireSession()
+    const data = await getRoleplaysForUser(user)
     
     // Convert the object of sessions to an array
-    const sessions = Object.keys(data).map(sessionId => ({
+    const sessions: Array<Record<string, unknown> & { sessionId: string }> = Object.keys(data).map(sessionId => ({
       ...data[sessionId],
       sessionId
     }))
     
     // Sort by creation date (newest first)
     sessions.sort((a, b) => {
-      const dateA = new Date(a.createdAt || a.processedAt).getTime()
-      const dateB = new Date(b.createdAt || b.processedAt).getTime()
+      const dateA = new Date(String(a['createdAt'] || a['processedAt'] || 0)).getTime()
+      const dateB = new Date(String(b['createdAt'] || b['processedAt'] || 0)).getTime()
       return dateB - dateA
     })
-    
-    console.log(`Found ${sessions.length} sessions for user`)
     
     return NextResponse.json({ 
       success: true,
       sessions
-    })
+    }, { headers: { 'Cache-Control': 'no-store' } })
   } catch (error) {
-    console.error('Error fetching roleplay history:', error)
+    if (error instanceof RequestError) {
+      return NextResponse.json({ error: error.message }, { status: error.status })
+    }
+    console.error('Error fetching roleplay history')
     return NextResponse.json(
-      { error: 'Failed to fetch history', details: error instanceof Error ? error.message : 'Unknown error' },
+      { error: 'Failed to fetch history' },
       { status: 500 }
     )
   }

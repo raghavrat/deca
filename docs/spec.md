@@ -1,8 +1,10 @@
 # DECA Pal Product Specifications
 
+> **Document status:** Product plan, not a statement of current performance, legal compliance, market size, or learning outcomes. Figures and projections below are hypotheses or targets unless backed by a dated source or production measurement. Do not use them in public marketing without verification.
+
 ## Executive Summary
 
-DECA Pal is a competitive advantage platform for DECA students, transforming traditional study methods into an engaging, gamified learning experience. With 225,000+ potential users nationwide and a clear monetization path, DECA Pal represents a significant opportunity in the EdTech market. The platform combines comprehensive content coverage with modern engagement mechanics to drive superior learning outcomes.
+DECA Pal is a study and roleplay-practice platform for DECA students. It combines reference content, quizzes, and AI-assisted practice. The product has not established that it improves competition or learning outcomes.
 
 **Market Opportunity:**
 - **TAM (Total Addressable Market)**: $45M (225,000 students × $200/year)
@@ -23,21 +25,21 @@ We provide DECA students with a modern, comprehensive, and engaging platform tha
 
 1. **For Students**
    - 24/7 access to comprehensive study materials
-   - Gamified learning increases retention by 40%
+   - Gamified practice intended to encourage repeat use
    - Real-time feedback accelerates improvement
    - Mobile-first design enables studying anywhere
 
 2. **For Educators**
    - Track student progress and engagement
    - Identify knowledge gaps quickly
-   - Reduce preparation time by 60%
+   - Tools intended to reduce manual preparation time
    - Align curriculum with DECA standards
 
 3. **For Schools**
    - Improve DECA competition results
    - Demonstrate commitment to business education
    - Cost-effective compared to printed materials
-   - Enterprise-grade security and compliance
+   - Documented privacy and security controls appropriate to the deployment
 
 ## Feature Specifications
 
@@ -60,9 +62,9 @@ We provide DECA students with a modern, comprehensive, and engaging platform tha
 #### 2. Practice Test System
 **Description**: Interactive quiz platform with immediate feedback
 **Specifications**:
-- Multiple-choice questions aligned with DECA format
+- Randomized multiple-choice practice from a deterministic 5,000-item first-party bank based on original business concept blueprints
 - Immediate feedback with explanations
-- Randomized question order
+- Server-side originality checks, randomized answer order, and signed answer verification
 - Progress tracking via local storage
 - Category-specific tests
 
@@ -183,7 +185,7 @@ We provide DECA students with a modern, comprehensive, and engaging platform tha
 
 ### Design Principles
 1. **Mobile-First**: Optimized for smartphones
-2. **Accessibility**: WCAG 2.1 AA compliant
+2. **Accessibility**: Target WCAG 2.2 Level AA; require automated and manual verification before claiming conformance
 3. **Speed**: <3 second load times
 4. **Intuitive**: No training required
 5. **Engaging**: Gamification at every step
@@ -203,19 +205,19 @@ We provide DECA students with a modern, comprehensive, and engaging platform tha
 
 ## Technical Specifications
 
-### Performance Requirements
+### Performance Targets (not current guarantees)
 - **Page Load**: <3 seconds on 3G
 - **Time to Interactive**: <5 seconds
 - **API Response**: <200ms average
-- **Uptime**: 99.9% availability
+- **Uptime**: 99.9% service objective after monitoring is implemented
 - **Concurrent Users**: 10,000+
 
-### Security Requirements
+### Security and Privacy Requirements
 - **Authentication**: Multi-factor (planned)
-- **Encryption**: TLS 1.3, AES-256
-- **Compliance**: FERPA, COPPA, GDPR
-- **Auditing**: All actions logged
-- **Penetration Testing**: Annual
+- **Encryption**: HTTPS in transit and provider-managed encryption at rest, verified against production provider settings
+- **Legal scope**: Determine applicable privacy laws with counsel; execute school/vendor agreements where required
+- **Auditing**: Security-relevant events logged without credentials, raw audio, or unnecessary personal data
+- **Security testing**: Dependency scanning in CI and independent testing before a broad or paid launch
 
 ### Integration Specifications
 1. **Learning Management Systems**
@@ -361,8 +363,8 @@ We provide DECA students with a modern, comprehensive, and engaging platform tha
 
 ### Regulatory Risks
 - **Risk**: Student data privacy concerns
-- **Mitigation**: SOC 2 compliance, transparent policies
+- **Mitigation**: Data minimization, accurate notices, documented retention/deletion, school agreements where applicable, and legal review before launch
 
 ## Conclusion
 
-DECA Pal represents a significant opportunity to modernize business education preparation while building a sustainable, profitable EdTech company. With clear product-market fit, multiple revenue streams, and a focused go-to-market strategy, the platform is positioned to capture significant market share in the DECA preparation space while expanding to adjacent markets over time.
+DECA Pal is an early-stage product hypothesis. Product-market fit, learning outcomes, revenue potential, and legal readiness must be established through measured operation, user research, and professional review.

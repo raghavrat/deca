@@ -101,8 +101,8 @@ function AuthActionContent() {
     }
 
     // Validate password strength
-    if (newPassword.length < 6) {
-      setError('Password must be at least 6 characters long');
+    if (newPassword.length < 12) {
+      setError('Password must be at least 12 characters long');
       return;
     }
 
@@ -151,8 +151,8 @@ function AuthActionContent() {
     return (
       <div className="min-h-screen flex items-center justify-center p-4">
         <div className="w-full max-w-md space-y-6 text-center">
-          <h2 className="text-4xl font-light text-gray-800 dark:text-white">Email Verified!</h2>
-          <div className="text-sm text-green-600 dark:text-green-400 my-4">
+          <h1 className="text-4xl font-light text-gray-800 dark:text-white">Email Verified!</h1>
+          <div role="status" className="text-sm text-green-700 dark:text-green-400 my-4">
             {success}
           </div>
           <Link 
@@ -172,9 +172,9 @@ function AuthActionContent() {
       <div className="min-h-screen flex items-center justify-center p-4">
         <div className="w-full max-w-md space-y-8">
           <div>
-            <h2 className="text-4xl font-light mb-4 text-center text-gray-800 dark:text-white">
+            <h1 className="text-4xl font-light mb-4 text-center text-gray-800 dark:text-white">
               Set new password
-            </h2>
+            </h1>
             {userEmail && (
               <p className="text-center text-gray-600 dark:text-gray-400 mb-4">
                 Reset password for: <strong>{userEmail}</strong>
@@ -183,36 +183,18 @@ function AuthActionContent() {
           </div>
           <form className="space-y-6" onSubmit={handlePasswordReset}>
             {error && (
-              <div className="text-sm text-red-600 dark:text-red-400 mb-4">
+              <div role="alert" id="password-reset-error" className="text-sm text-red-700 dark:text-red-400 mb-4">
                 {error}
               </div>
             )}
             {success && (
-              <div className="bg-green-100 dark:bg-green-900/30 border border-green-400 dark:border-green-600 text-green-700 dark:text-green-400 px-4 py-3 rounded-[15px]">
+              <div role="status" className="bg-green-100 dark:bg-green-900/30 border border-green-400 dark:border-green-600 text-green-800 dark:text-green-400 px-4 py-3 rounded-[15px]">
                 {success}
               </div>
             )}
             <div className="space-y-4">
-              <input
-                type="password"
-                required
-                className="input-minimal"
-                placeholder="New password"
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                disabled={isLoading || !!success}
-                minLength={6}
-              />
-              <input
-                type="password"
-                required
-                className="input-minimal"
-                placeholder="Confirm new password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                disabled={isLoading || !!success}
-                minLength={6}
-              />
+              <div><label htmlFor="new-password" className="mb-1 block text-sm font-medium">New password</label><input id="new-password" type="password" required autoComplete="new-password" className="input-minimal" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} disabled={isLoading || !!success} minLength={12} aria-describedby="new-password-help" /><p id="new-password-help" className="mt-2 text-xs text-gray-600 dark:text-gray-400">Use at least 12 characters. Password managers and paste are supported.</p></div>
+              <div><label htmlFor="confirm-new-password" className="mb-1 block text-sm font-medium">Confirm new password</label><input id="confirm-new-password" type="password" required autoComplete="new-password" className="input-minimal" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} disabled={isLoading || !!success} minLength={12} /></div>
             </div>
 
             <button
@@ -242,14 +224,14 @@ function AuthActionContent() {
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
       <div className="w-full max-w-md space-y-6 text-center">
-        <h2 className="text-4xl font-light text-gray-800 dark:text-white">Action Required</h2>
+        <h1 className="text-4xl font-light text-gray-800 dark:text-white">Action Required</h1>
         {error && (
-          <div className="text-sm text-red-600 dark:text-red-400 mb-4">
+          <div role="alert" className="text-sm text-red-700 dark:text-red-400 mb-4">
             {error}
           </div>
         )}
         {success && (
-          <div className="text-sm text-green-600 dark:text-green-400 my-4">
+          <div role="status" className="text-sm text-green-700 dark:text-green-400 my-4">
             {success}
           </div>
         )}

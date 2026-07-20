@@ -155,16 +155,20 @@ export default function PerformancePage() {
       <div className="w-full max-w-md mb-8">
         <div className="relative">
           <input
-            type="text"
+            id="performance-search"
+            type="search"
+            aria-label="Search performance indicators"
             placeholder="Search performance indicators..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            onKeyPress={handleKeyPress}
+            onKeyDown={handleKeyPress}
             className="input-minimal w-full pr-10"
           />
           <button 
+            type="button"
             onClick={handleSearch}
-            className="absolute right-0 top-1/2 transform -translate-y-1/2 p-2 text-gray-400 dark:text-gray-500 hover:text-black dark:hover:text-white transition-colors"
+            aria-label="Search performance indicators"
+            className="absolute right-0 top-1/2 min-h-11 min-w-11 transform -translate-y-1/2 p-2 text-gray-700 dark:text-gray-300 hover:text-black dark:hover:text-white transition-colors"
           >
             <Search className="h-5 w-5" />
           </button>
@@ -176,6 +180,7 @@ export default function PerformancePage() {
           <div key={cluster} className="relative">
             <button
               onClick={() => handleClusterClick(cluster)}
+              aria-expanded={selectedCluster === cluster && isOpen}
               className={`w-full py-4 px-6 border border-gray-300 dark:border-gray-700 hover:border-black dark:hover:border-white text-black dark:text-white font-light text-center transition-all duration-200 flex justify-between items-center ${
                 selectedCluster === cluster && isOpen ? 'border-black dark:border-white' : ''
               }`}

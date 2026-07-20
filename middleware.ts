@@ -5,26 +5,34 @@ export async function middleware(request: NextRequest) {
   const session = request.cookies.get('session')
   const currentPath = request.nextUrl.pathname
 
-  console.log('Middleware check for path:', currentPath);
-  console.log('Session cookie:', session);
-
   // Paths that don't require authentication
-  const publicPaths = ['/', '/login', '/signup', '/pricing', '/about', '/forgot-password', '/auth/action', '/api/auth/session']
+  const publicPaths = [
+    '/',
+    '/login',
+    '/signup',
+    '/pricing',
+    '/about',
+    '/privacy',
+    '/terms',
+    '/accessibility',
+    '/forgot-password',
+    '/auth/action',
+    '/api/auth/session',
+  ]
   
   // Allow public paths and API routes
   if (publicPaths.includes(currentPath) || currentPath.startsWith('/api/')) {
-    console.log('Allowing public path or API route');
     return NextResponse.next()
   }
 
   // For protected routes, only check if session cookie exists
   // Detailed session validation will be done by individual pages using Firebase Admin SDK
   if (!session?.value) {
-    console.log('No session cookie found, redirecting to login')
-    return NextResponse.redirect(new URL('/login', request.url))
+    const loginUrl = new URL('/login', request.url)
+    loginUrl.searchParams.set('next', currentPath)
+    return NextResponse.redirect(loginUrl)
   }
 
-  console.log('Session cookie found, allowing access');
   // If session cookie exists, allow access
   // The actual session validation will happen in API routes or server components
   return NextResponse.next()
@@ -44,4 +52,4 @@ export const config = {
      */
     '/((?!api/auth|_next/static|_next/image|favicon.ico|images/|screenshots/).*)',
   ],
-} 
+}

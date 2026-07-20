@@ -78,7 +78,7 @@ export default function RoleplayPage() {
       
       setLoadingHistory(true)
       try {
-        const response = await fetch(`/api/roleplay/history?email=${encodeURIComponent(user.email!)}`)
+        const response = await fetch('/api/roleplay/history')
         if (response.ok) {
           const data = await response.json()
           setRoleplayHistory(data.sessions || [])

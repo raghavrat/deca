@@ -2,8 +2,11 @@ import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
 import { adminAuth } from '../../../firebase/admin'
 import { isEmailAllowed } from '../../../config/allowedEmails'
-import { getErrorMessage, getErrorCode } from '../../../utils/errorHandling'
+import { getErrorCode } from '../../../utils/errorHandling'
 import { logger } from '../../../utils/logger'
+import { RequestError, requireSameOrigin } from '../../../utils/serverAuth'
+
+const noStoreHeaders = { 'Cache-Control': 'no-store' }
 
 export async function GET() {
   logger.log('Session GET endpoint called');
@@ -13,12 +16,12 @@ export async function GET() {
 
     if (!sessionCookie?.value) {
       logger.log('No session cookie found');
-      return NextResponse.json({ error: 'No session cookie' }, { status: 401 })
+      return NextResponse.json({ error: 'No session cookie' }, { status: 401, headers: noStoreHeaders })
     }
 
     if (!adminAuth) {
       logger.errorProduction('Firebase Admin SDK not initialized - adminAuth is null');
-      return NextResponse.json({ error: 'Server configuration error' }, { status: 500 })
+      return NextResponse.json({ error: 'Server configuration error' }, { status: 500, headers: noStoreHeaders })
     }
 
     try {
@@ -26,11 +29,11 @@ export async function GET() {
       
       // Validate email against whitelist
       if (!decodedClaims.email || !isEmailAllowed(decodedClaims.email)) {
-        logger.log('Email not in whitelist:', decodedClaims.email);
-        return NextResponse.json({ error: 'This email domain is not allowed to access the system' }, { status: 403 })
+        logger.log('Session account is not authorized');
+        return NextResponse.json({ error: 'This account is not allowed to access the system' }, { status: 403, headers: noStoreHeaders })
       }
 
-      logger.log('Session validated successfully for user:', decodedClaims.email);
+      logger.log('Session validated successfully');
       return NextResponse.json({ 
         status: 'success',
         user: {
@@ -38,39 +41,39 @@ export async function GET() {
           email: decodedClaims.email,
           email_verified: decodedClaims.email_verified
         }
-      })
+      }, { headers: noStoreHeaders })
     } catch (verifyError: unknown) {
-      logger.error('Session verification error:', verifyError)
+      logger.error('Session verification failed')
       const errorCode = getErrorCode(verifyError)
       
       if (errorCode === 'auth/session-cookie-expired') {
-        return NextResponse.json({ error: 'Session expired' }, { status: 401 })
+        return NextResponse.json({ error: 'Session expired' }, { status: 401, headers: noStoreHeaders })
       }
       
-      return NextResponse.json({ error: 'Invalid session' }, { status: 401 })
+      return NextResponse.json({ error: 'Invalid session' }, { status: 401, headers: noStoreHeaders })
     }
-  } catch (error: unknown) {
-    logger.errorProduction('Session validation error:', error)
-    const errorMessage = getErrorMessage(error)
-    return NextResponse.json({ error: errorMessage || 'Internal server error' }, { status: 500 })
+  } catch {
+    logger.errorProduction('Session validation failed')
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500, headers: noStoreHeaders })
   }
 }
 
 export async function POST(request: Request) {
   logger.log('Session POST endpoint called');
   try {
+    requireSameOrigin(request)
     const { idToken } = await request.json()
     logger.log('Received ID token:', idToken ? 'Yes' : 'No');
     
-    if (!idToken) {
+    if (typeof idToken !== 'string' || idToken.length < 100 || idToken.length > 10000) {
       logger.log('No ID token provided');
-      return NextResponse.json({ error: 'No ID token provided' }, { status: 400 })
+      return NextResponse.json({ error: 'Invalid ID token' }, { status: 400, headers: noStoreHeaders })
     }
 
     // Check if adminAuth is properly initialized
     if (!adminAuth) {
       logger.errorProduction('Firebase Admin SDK not initialized - adminAuth is null');
-      return NextResponse.json({ error: 'Server configuration error' }, { status: 500 })
+      return NextResponse.json({ error: 'Server configuration error' }, { status: 500, headers: noStoreHeaders })
     }
     logger.log('Firebase Admin SDK is available');
 
@@ -80,13 +83,13 @@ export async function POST(request: Request) {
       // Only allow verified emails
       if (!decodedToken.email_verified) {
         logger.log('Email not verified');
-        return NextResponse.json({ error: 'Email not verified' }, { status: 401 })
+        return NextResponse.json({ error: 'Email not verified' }, { status: 401, headers: noStoreHeaders })
       }
 
       // Validate email against whitelist
       if (!decodedToken.email || !isEmailAllowed(decodedToken.email)) {
-        logger.log('Email not in whitelist:', decodedToken.email);
-        return NextResponse.json({ error: 'This email domain is not allowed to access the system' }, { status: 403 })
+        logger.log('Token account is not authorized');
+        return NextResponse.json({ error: 'This account is not allowed to access the system' }, { status: 403, headers: noStoreHeaders })
       }
 
       // Create session cookie
@@ -103,37 +106,30 @@ export async function POST(request: Request) {
         maxAge: expiresIn / 1000, // maxAge is in seconds, not milliseconds
         httpOnly: true, // Prevents client-side JavaScript access (XSS protection)
         secure: isProduction, // HTTPS only in production (man-in-the-middle protection)
-        sameSite: 'lax', // Allows cookie to be sent on navigation from external sites (needed for redirects)
+        sameSite: 'strict',
         path: '/', // Cookie available for entire domain
       })
 
       logger.log('Session cookie set successfully');
-      // Also log the cookie for debugging (remove in production)
-      console.log('Setting session cookie:', {
-        value: sessionCookie.substring(0, 20) + '...', // Log first 20 chars for security
-        maxAge: expiresIn / 1000,
-        httpOnly: true,
-        secure: isProduction,
-        sameSite: 'lax',
-        path: '/'
-      });
-      return NextResponse.json({ status: 'success' })
+      return NextResponse.json({ status: 'success' }, { headers: noStoreHeaders })
     } catch (verifyError: unknown) {
-      logger.error('Token verification error:', verifyError)
+      logger.error('Token verification failed')
       const errorCode = getErrorCode(verifyError)
       
       // More specific error messages
       if (errorCode === 'auth/id-token-expired') {
-        return NextResponse.json({ error: 'Token expired' }, { status: 401 })
+        return NextResponse.json({ error: 'Token expired' }, { status: 401, headers: noStoreHeaders })
       } else if (errorCode === 'auth/argument-error') {
-        return NextResponse.json({ error: 'Invalid token format' }, { status: 400 })
+        return NextResponse.json({ error: 'Invalid token format' }, { status: 400, headers: noStoreHeaders })
       }
       
-      return NextResponse.json({ error: 'Invalid token' }, { status: 401 })
+      return NextResponse.json({ error: 'Invalid token' }, { status: 401, headers: noStoreHeaders })
     }
   } catch (error: unknown) {
-    logger.errorProduction('Session creation error:', error)
-    const errorMessage = getErrorMessage(error)
-    return NextResponse.json({ error: errorMessage || 'Internal server error' }, { status: 500 })
+    logger.errorProduction('Session creation failed')
+    if (error instanceof RequestError) {
+      return NextResponse.json({ error: error.message }, { status: error.status, headers: noStoreHeaders })
+    }
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500, headers: noStoreHeaders })
   }
-} 
+}

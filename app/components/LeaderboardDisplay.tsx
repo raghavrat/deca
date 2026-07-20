@@ -1,8 +1,6 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { collection, getDocs, query, orderBy, limit } from 'firebase/firestore'
-import { db } from '../firebase/config'
 import { Trophy } from 'lucide-react'
 
 interface LeaderboardEntry {
@@ -19,19 +17,10 @@ export default function LeaderboardDisplay() {
   useEffect(() => {
     const fetchLeaderboard = async () => {
       try {
-        const usersCollection = collection(db, 'users')
-        const q = query(
-          usersCollection,
-          orderBy('problemsCompleted', 'desc'),
-          limit(100)
-        )
-        const querySnapshot = await getDocs(q)
-        const leaderboardData = querySnapshot.docs.map(doc => ({
-          id: doc.id,
-          name: doc.data().name || 'Anonymous',
-          problemsCompleted: doc.data().problemsCompleted || 0,
-        }))
-        setLeaderboard(leaderboardData)
+        const response = await fetch('/api/leaderboard')
+        if (!response.ok) throw new Error('Leaderboard request failed')
+        const data = await response.json()
+        setLeaderboard(data.leaderboard || [])
       } catch (err) {
         console.error('Error fetching leaderboard:', err)
         setError('Failed to load leaderboard. Please try again later.')
@@ -59,7 +48,9 @@ export default function LeaderboardDisplay() {
       {error && <div className="text-center text-sm text-black dark:text-white">{error}</div>}
 
       {!loading && !error && (
-        <ul role="list" className="divide-y divide-gray-200 dark:divide-gray-800">
+        leaderboard.length === 0 ? (
+          <p className="text-sm text-gray-700 dark:text-gray-300">No students have opted in to the leaderboard yet.</p>
+        ) : <ol className="divide-y divide-gray-200 dark:divide-gray-800" aria-label="Leaderboard rankings">
           {leaderboard.map((user, index) => (
             <li key={user.id} className="py-3 flex items-center justify-between border-b border-gray-200 dark:border-gray-800 last:border-b-0">
               <div className="flex items-center">
@@ -75,7 +66,7 @@ export default function LeaderboardDisplay() {
               </div>
             </li>
           ))}
-        </ul>
+        </ol>
       )}
     </div>
   )

@@ -5,11 +5,9 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowLeft, Trophy, TrendingUp, AlertCircle, CheckCircle, Clock, MessageSquare, Star, Target, FileText, ChevronDown } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
-import { logger } from '../../utils/logger'
 
 interface SessionData {
   userId: string
-  userEmail: string
   scenario: any
   category: string
   duration: number
@@ -23,6 +21,11 @@ interface SessionData {
     }>
     centurySkills: Array<{
       skill: string
+      score: number
+      feedback: string
+    }>
+    solution?: Array<{
+      criterion: string
       score: number
       feedback: string
     }>
@@ -57,29 +60,22 @@ function RoleplayReviewContent() {
       // Get session ID from URL parameters
       const sessionId = searchParams.get('id')
       
-      logger.log('Review page loaded with session ID:', sessionId)
-      
       if (!sessionId) {
-        logger.error('No session ID found in URL')
         router.push('/roleplay')
         return
       }
       
       if (!user) {
-        logger.error('No user logged in')
         router.push('/login')
         return
       }
 
       try {
-        logger.log('Fetching session data via API for user:', user.email)
-        
         // Fetch the roleplay data through the API endpoint
-        const response = await fetch(`/api/roleplay/get?id=${sessionId}&email=${encodeURIComponent(user.email!)}`)
+        const response = await fetch(`/api/roleplay/get?id=${encodeURIComponent(sessionId)}`)
         
         if (!response.ok) {
           const error = await response.json()
-          logger.error('API error:', error)
           alert(`Failed to load session: ${error.error}`)
           router.push('/roleplay')
           return
@@ -87,22 +83,8 @@ function RoleplayReviewContent() {
         
         const { data: sessionData } = await response.json()
         
-        logger.log('Session data retrieved:', {
-          hasScores: !!sessionData.scores,
-          hasTranscript: !!sessionData.transcript,
-          totalScore: sessionData.scores?.total
-        })
-        
-        // Add userEmail to match the expected interface
-        const completeSessionData = {
-          ...sessionData,
-          userEmail: user.email
-        } as SessionData
-        
-        setSessionData(completeSessionData)
-        logger.log('Session data set successfully')
-      } catch (error) {
-        logger.error('Error fetching session data:', error)
+        setSessionData(sessionData as SessionData)
+      } catch {
         alert('Failed to load review data. Redirecting back to roleplay page.')
         router.push('/roleplay')
       }
@@ -144,7 +126,7 @@ function RoleplayReviewContent() {
       const mod = await import('../../performanceIndicators')
       const text = findPIExplanation(mod.performanceIndicators as any, indicatorName)
       setIndicatorExplanationMap(prev => ({ ...prev, [indicatorName]: text || '' }))
-    } catch (e) {
+    } catch {
       setIndicatorExplanationMap(prev => ({ ...prev, [indicatorName]: '' }))
     } finally {
       setLoadingExplanation(prev => ({ ...prev, [indicatorName]: false }))
@@ -176,6 +158,16 @@ function RoleplayReviewContent() {
     if (percentage >= 50) return 'Below Expectations'
     return 'Needs Improvement'
   }
+
+  const piMaximum = (index: number) =>
+    sessionData.scenario?.scoringRubric?.performanceIndicators?.[index]?.maxPoints || 14
+  const solutionMaximum = (index: number) =>
+    sessionData.scenario?.scoringRubric?.solution?.[index]?.maxPoints || 8
+  const overallMaximum = sessionData.scenario?.scoringRubric?.overallImpression?.maxPoints || 6
+  const performanceIndicatorMaximumTotal = (sessionData.scenario?.performanceIndicators || [])
+    .reduce((sum: number, _indicator: string, index: number) => sum + piMaximum(index), 0)
+  const solutionMaximumTotal = (sessionData.scores?.solution || [])
+    .reduce((sum, _criterion, index) => sum + solutionMaximum(index), 0)
 
   return (
     <div className="min-h-screen bg-white dark:bg-black p-4">
@@ -231,24 +223,32 @@ function RoleplayReviewContent() {
           </div>
 
           {/* Quick Stats */}
-          <div className="grid grid-cols-3 gap-4">
+          <div className={`grid gap-4 ${sessionData.scores?.solution?.length ? 'grid-cols-2 md:grid-cols-4' : 'grid-cols-3'}`}>
             <div className="text-center">
               <div className="text-2xl font-light text-black dark:text-white">
                 {sessionData.scores?.performanceIndicators?.reduce((sum, pi) => sum + (pi.score || 0), 0) || 0}/
-                {(sessionData.scenario?.performanceIndicators?.length || 0) * 14}
+                {performanceIndicatorMaximumTotal}
               </div>
               <p className="text-sm text-gray-600 dark:text-gray-400">Performance Indicators</p>
             </div>
+            {sessionData.scores?.solution?.length ? (
+              <div className="text-center">
+                <div className="text-2xl font-light text-black dark:text-white">
+                  {sessionData.scores.solution.reduce((sum, criterion) => sum + (criterion.score || 0), 0)}/{solutionMaximumTotal}
+                </div>
+                <p className="text-sm text-gray-600 dark:text-gray-400">Solution</p>
+              </div>
+            ) : null}
             <div className="text-center">
               <div className="text-2xl font-light text-black dark:text-white">
                 {sessionData.scores?.centurySkills?.reduce((sum, skill) => sum + (skill.score || 0), 0) || 0}/
                 {(sessionData.scores?.centurySkills?.length || 0) * 6}
               </div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">21st Century Skills</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">Career Competencies</p>
             </div>
             <div className="text-center">
               <div className="text-2xl font-light text-black dark:text-white">
-                {sessionData.scores?.overallImpression?.score || 0}/6
+                {sessionData.scores?.overallImpression?.score || 0}/{overallMaximum}
               </div>
               <p className="text-sm text-gray-600 dark:text-gray-400">Overall Impression</p>
             </div>
@@ -258,9 +258,10 @@ function RoleplayReviewContent() {
         {/* Tab Navigation */}
         <div className="bg-white dark:bg-black border border-gray-300 dark:border-gray-700 mb-6">
           <div className="border-b border-gray-200 dark:border-gray-700">
-            <div className="flex">
+            <div className="flex flex-wrap" aria-label="Review sections">
               <button
                 onClick={() => setActiveTab('scores')}
+                aria-pressed={activeTab === 'scores'}
                 className={`px-6 py-3 text-sm font-medium transition-colors ${
                   activeTab === 'scores'
                     ? 'text-black dark:text-white border-b-2 border-black dark:border-white'
@@ -272,6 +273,7 @@ function RoleplayReviewContent() {
               </button>
               <button
                 onClick={() => setActiveTab('transcript')}
+                aria-pressed={activeTab === 'transcript'}
                 className={`px-6 py-3 text-sm font-medium transition-colors ${
                   activeTab === 'transcript'
                     ? 'text-black dark:text-white border-b-2 border-black dark:border-white'
@@ -283,6 +285,7 @@ function RoleplayReviewContent() {
               </button>
               <button
                 onClick={() => setActiveTab('feedback')}
+                aria-pressed={activeTab === 'feedback'}
                 className={`px-6 py-3 text-sm font-medium transition-colors ${
                   activeTab === 'feedback'
                     ? 'text-black dark:text-white border-b-2 border-black dark:border-white'
@@ -294,6 +297,7 @@ function RoleplayReviewContent() {
               </button>
               <button
                 onClick={() => setActiveTab('scenario')}
+                aria-pressed={activeTab === 'scenario'}
                 className={`px-6 py-3 text-sm font-medium transition-colors ${
                   activeTab === 'scenario'
                     ? 'text-black dark:text-white border-b-2 border-black dark:border-white'
@@ -329,13 +333,14 @@ function RoleplayReviewContent() {
                                   await ensureExplanationLoaded(piName)
                                 }
                               }}
+                              aria-expanded={expandedIndicator === piName}
                               className="w-full text-left"
                             >
                               <div className="flex justify-between items-start">
                                 <p className="font-light text-black dark:text-white flex-1 pr-4">{piName}</p>
                                 <div className="flex items-center space-x-3">
                                   <span className={`font-light text-black dark:text-white`}>
-                                    {piScore?.score || 0}/14
+                                    {piScore?.score || 0}/{piMaximum(index)}
                                   </span>
                                   <ChevronDown className={`h-5 w-5 text-gray-500 transition-transform ${expandedIndicator === piName ? 'rotate-180' : ''}`} />
                                 </div>
@@ -364,8 +369,27 @@ function RoleplayReviewContent() {
                   </div>
                 </div>
 
+                {sessionData.scores?.solution?.length ? (
+                  <div>
+                    <h3 className="text-lg font-light text-black dark:text-white mb-4">Solution</h3>
+                    <div className="space-y-3">
+                      {sessionData.scores.solution.map((criterion, index) => (
+                        <div key={criterion.criterion} className="border border-gray-200 dark:border-gray-700 p-4">
+                          <div className="flex justify-between items-start mb-2">
+                            <p className="font-light text-black dark:text-white flex-1">{criterion.criterion}</p>
+                            <span className="font-light ml-4 text-black dark:text-white">
+                              {criterion.score || 0}/{solutionMaximum(index)}
+                            </span>
+                          </div>
+                          <p className="text-sm text-gray-600 dark:text-gray-400">{criterion.feedback || 'Not graded yet'}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ) : null}
+
                 <div>
-                  <h3 className="text-lg font-light text-black dark:text-white mb-4">21st Century Skills</h3>
+                  <h3 className="text-lg font-light text-black dark:text-white mb-4">Career Competencies</h3>
                   <div className="space-y-3">
                     {sessionData.scenario?.centurySkills ? (
                       sessionData.scenario.centurySkills.map((skillName: string, index: number) => {
@@ -387,7 +411,7 @@ function RoleplayReviewContent() {
                         )
                       })
                     ) : (
-                      <p className="text-gray-500 dark:text-gray-400">No 21st century skills available</p>
+                      <p className="text-gray-500 dark:text-gray-400">No Career Competencies available</p>
                     )}
                   </div>
                 </div>
@@ -398,7 +422,7 @@ function RoleplayReviewContent() {
                     <div className="flex justify-between items-start mb-2">
                       <p className="font-light text-black dark:text-white">Judge's Overall Assessment</p>
                       <span className={`font-light text-black dark:text-white`}>
-                        {sessionData.scores?.overallImpression?.score || 0}/6
+                        {sessionData.scores?.overallImpression?.score || 0}/{overallMaximum}
                       </span>
                     </div>
                     <p className="text-sm text-gray-600 dark:text-gray-400">{sessionData.scores?.overallImpression?.feedback || 'No feedback available'}</p>
@@ -577,7 +601,7 @@ function RoleplayReviewContent() {
 
                 {sessionData.scenario.centurySkills && (
                   <div>
-                    <h3 className="text-lg font-light text-black dark:text-white mb-4">21st Century Skills</h3>
+                    <h3 className="text-lg font-light text-black dark:text-white mb-4">Career Competencies</h3>
                     <ol className="list-decimal list-inside space-y-2 text-gray-600 dark:text-gray-400">
                       {sessionData.scenario.centurySkills.map((skill: string, index: number) => (
                         <li key={index}>{skill}</li>
