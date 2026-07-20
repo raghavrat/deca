@@ -14,11 +14,21 @@ interface QuestionTokenPayload {
 const base64url = (value: string | Buffer) => Buffer.from(value).toString('base64url')
 
 export function getQuestionSigningSecret(): string {
-  const secret = process.env.TEST_QUESTION_SIGNING_SECRET
-  if (!secret || secret.length < 32) {
-    throw new Error('TEST_QUESTION_SIGNING_SECRET must contain at least 32 characters')
+  const configuredSecret = process.env.TEST_QUESTION_SIGNING_SECRET
+  if (configuredSecret && configuredSecret.length >= 32) {
+    return configuredSecret
   }
-  return secret
+
+  const firebaseCredential = process.env.FIREBASE_SERVICE_ACCOUNT_BASE64
+  if (firebaseCredential) {
+    // Keep this derivation domain-specific so the Firebase credential is never
+    // used directly as an HMAC key and cannot be recovered from a token.
+    return createHmac('sha256', firebaseCredential)
+      .update('deca-pal-question-token-signing:v1')
+      .digest('base64url')
+  }
+
+  throw new Error('Question token signing is not configured')
 }
 
 export function digestQuestion(question: string): string {

@@ -48,12 +48,22 @@ export default function TestPage({ params }: PageProps) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ category: requestedCategory, count: 8 }),
       })
-      const data = await response.json()
-      if (!response.ok) throw new Error(data.error || 'Unable to generate a practice set')
-      if (!Array.isArray(data.questions) || data.questions.length === 0) {
+      const contentType = response.headers.get('content-type') || ''
+      const data: unknown = contentType.includes('application/json')
+        ? await response.json()
+        : null
+      const payload = typeof data === 'object' && data !== null
+        ? data as { error?: unknown; questions?: unknown }
+        : null
+
+      if (!response.ok) {
+        const apiError = typeof payload?.error === 'string' ? payload.error : null
+        throw new Error(apiError || 'The practice service is temporarily unavailable. Please try again shortly.')
+      }
+      if (!Array.isArray(payload?.questions) || payload.questions.length === 0) {
         throw new Error('No original questions were returned')
       }
-      setQuestions(data.questions)
+      setQuestions(payload.questions as PracticeQuestion[])
     } catch (generationError) {
       setError(generationError instanceof Error ? generationError.message : 'Unable to generate a practice set')
     } finally {

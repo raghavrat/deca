@@ -1,10 +1,38 @@
 jest.mock('server-only', () => ({}), { virtual: true })
 
-import { issueQuestionToken, verifyQuestionToken } from '../testQuestionToken'
+import { getQuestionSigningSecret, issueQuestionToken, verifyQuestionToken } from '../testQuestionToken'
 
 const secret = 'test-only-question-signing-secret-that-is-long-enough'
 
 describe('signed practice-question tokens', () => {
+  const originalSigningSecret = process.env.TEST_QUESTION_SIGNING_SECRET
+  const originalFirebaseCredential = process.env.FIREBASE_SERVICE_ACCOUNT_BASE64
+
+  afterEach(() => {
+    if (originalSigningSecret === undefined) delete process.env.TEST_QUESTION_SIGNING_SECRET
+    else process.env.TEST_QUESTION_SIGNING_SECRET = originalSigningSecret
+
+    if (originalFirebaseCredential === undefined) delete process.env.FIREBASE_SERVICE_ACCOUNT_BASE64
+    else process.env.FIREBASE_SERVICE_ACCOUNT_BASE64 = originalFirebaseCredential
+  })
+
+  test('prefers a dedicated signing secret', () => {
+    process.env.TEST_QUESTION_SIGNING_SECRET = secret
+    process.env.FIREBASE_SERVICE_ACCOUNT_BASE64 = 'server-only-firebase-credential'
+
+    expect(getQuestionSigningSecret()).toBe(secret)
+  })
+
+  test('derives a stable signing key from the server credential when needed', () => {
+    delete process.env.TEST_QUESTION_SIGNING_SECRET
+    process.env.FIREBASE_SERVICE_ACCOUNT_BASE64 = 'server-only-firebase-credential'
+
+    const first = getQuestionSigningSecret()
+    expect(first).toHaveLength(43)
+    expect(getQuestionSigningSecret()).toBe(first)
+    expect(first).not.toContain(process.env.FIREBASE_SERVICE_ACCOUNT_BASE64)
+  })
+
   test('accepts the signed question and correct answer', () => {
     const token = issueQuestionToken({ uid: 'user-1', question: 'Original question text', answerIndex: 2, ttlMs: 60_000 }, secret)
     expect(verifyQuestionToken(token, {

@@ -6,7 +6,7 @@ import {
   type AuthoredPracticeQuestion,
 } from '../../../data/practiceQuestionBank'
 import { RequestError, requireSameOrigin, requireSession } from '../../../utils/serverAuth'
-import { issueQuestionToken } from '../../../utils/testQuestionToken'
+import { getQuestionSigningSecret, issueQuestionToken } from '../../../utils/testQuestionToken'
 
 const categories = new Set<TestCategory>(['MANAGEMENT', 'MARKETING', 'FINANCE', 'HOSPITALITY', 'ENTREPRENEURSHIP'])
 const QUESTION_BANK_VERSION = '2026-07-20'
@@ -45,7 +45,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid category or question count' }, { status: 400 })
     }
 
-    if (!process.env.TEST_QUESTION_SIGNING_SECRET || process.env.TEST_QUESTION_SIGNING_SECRET.length < 32) {
+    let signingSecret: string
+    try {
+      signingSecret = getQuestionSigningSecret()
+    } catch {
       return NextResponse.json({ error: 'Question verification is not configured' }, { status: 500 })
     }
 
@@ -72,7 +75,7 @@ export async function POST(request: NextRequest) {
           uid: user.uid,
           question: question.text,
           answerIndex: answerSet.answerType,
-        }),
+        }, signingSecret),
         provenance: {
           kind: 'first-party-authored',
           bankVersion: QUESTION_BANK_VERSION,
