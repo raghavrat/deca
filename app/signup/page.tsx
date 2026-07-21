@@ -1,9 +1,11 @@
 'use client'
 
+import { SignUp } from '@clerk/nextjs'
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import Link from 'next/link';
 import { getErrorMessage, getErrorCode } from '../utils/errorHandling';
+import { isClerkClientEnabled } from '../config/authProvider';
 
 export default function Signup() {
   const [email, setEmail] = useState('');
@@ -15,7 +17,76 @@ export default function Signup() {
   const [isLoading, setIsLoading] = useState(false);
   const [ageConfirmed, setAgeConfirmed] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
+  const [clerkConsentAt, setClerkConsentAt] = useState('');
   const { signUp } = useAuth();
+
+  if (isClerkClientEnabled()) {
+    if (clerkConsentAt) {
+      return (
+        <div className="min-h-screen flex items-center justify-center p-4">
+          <SignUp
+            routing="hash"
+            signInUrl="/login"
+            fallbackRedirectUrl="/performance"
+            unsafeMetadata={{
+              age13Confirmed: true,
+              termsAcceptedAt: clerkConsentAt,
+              privacyPolicyVersion: '2026-07-20',
+              displayName: name.trim(),
+            }}
+          />
+        </div>
+      )
+    }
+
+    return (
+      <div className="min-h-screen flex items-center justify-center p-4">
+        <div className="w-full max-w-md space-y-8">
+          <h1 className="text-4xl font-light tracking-tight text-center text-black dark:text-white">
+            Create your account
+          </h1>
+          <div className="space-y-6">
+            <div>
+              <label htmlFor="clerk-signup-name" className="mb-1 block text-sm font-medium">Display name</label>
+              <input
+                id="clerk-signup-name"
+                type="text"
+                required
+                autoComplete="name"
+                maxLength={80}
+                className="input-minimal"
+                value={name}
+                onChange={event => setName(event.target.value)}
+              />
+            </div>
+            <div className="space-y-4">
+              <div className="flex items-start gap-3">
+                <input id="clerk-age-confirmation" type="checkbox" checked={ageConfirmed} onChange={event => setAgeConfirmed(event.target.checked)} className="mt-1 h-5 w-5" />
+                <label htmlFor="clerk-age-confirmation" className="text-sm leading-6">I am at least 13 years old. If I am under the age of legal majority, my parent or guardian has permitted me to use Deca Pal.</label>
+              </div>
+              <div className="flex items-start gap-3">
+                <input id="clerk-terms-confirmation" type="checkbox" checked={termsAccepted} onChange={event => setTermsAccepted(event.target.checked)} className="mt-1 h-5 w-5" />
+                <label htmlFor="clerk-terms-confirmation" className="text-sm leading-6">I agree to the <Link href="/terms" className="underline underline-offset-2">Terms of Use</Link> and acknowledge the <Link href="/privacy" className="underline underline-offset-2">Privacy Policy</Link>.</label>
+              </div>
+            </div>
+            <button
+              type="button"
+              disabled={!name.trim() || name.trim().length > 80 || !ageConfirmed || !termsAccepted}
+              onClick={() => setClerkConsentAt(new Date().toISOString())}
+              className="w-full py-3 text-sm font-medium border border-neutral-300 dark:border-neutral-700 hover:border-black dark:hover:border-white transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Continue
+            </button>
+          </div>
+          <div className="text-center">
+            <Link href="/login" className="text-sm text-neutral-600 dark:text-neutral-400 hover:text-black dark:hover:text-white transition-colors duration-200">
+              Already have an account? Sign in
+            </Link>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

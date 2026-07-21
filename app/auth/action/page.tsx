@@ -27,6 +27,7 @@ function AuthActionContent() {
   const searchParams = useSearchParams();
 
   useEffect(() => {
+    const firebaseAuth = auth;
     const mode = searchParams.get('mode');
     const oobCode = searchParams.get('oobCode');
     
@@ -34,6 +35,11 @@ function AuthActionContent() {
     setActionCode(oobCode || '');
 
     const handleAction = async () => {
+      if (!firebaseAuth) {
+        setError('Authentication is not configured. Please contact support.');
+        setVerifying(false);
+        return;
+      }
       if (!mode || !oobCode) {
         setError('Invalid or missing action parameters.');
         setVerifying(false);
@@ -44,14 +50,14 @@ function AuthActionContent() {
         switch (mode) {
           case 'resetPassword':
             // Verify the password reset code
-            const email = await verifyPasswordResetCode(auth, oobCode);
+            const email = await verifyPasswordResetCode(firebaseAuth, oobCode);
             setUserEmail(email);
             setIsValidCode(true);
             break;
             
           case 'verifyEmail':
             // Apply the email verification code
-            await applyActionCode(auth, oobCode);
+            await applyActionCode(firebaseAuth, oobCode);
             setSuccess('Email verified successfully! Redirecting to login...');
             setTimeout(() => {
               router.push('/login');
@@ -60,9 +66,9 @@ function AuthActionContent() {
             
           case 'recoverEmail':
             // Check the action code for email recovery
-            const info = await checkActionCode(auth, oobCode);
+            const info = await checkActionCode(firebaseAuth, oobCode);
             if (info.data.email) {
-              await applyActionCode(auth, oobCode);
+              await applyActionCode(firebaseAuth, oobCode);
               setSuccess('Email recovered successfully!');
             }
             break;
@@ -114,6 +120,7 @@ function AuthActionContent() {
     setIsLoading(true);
 
     try {
+      if (!auth) throw new Error('Authentication is not configured');
       // Reset the password
       await confirmPasswordReset(auth, actionCode, newPassword);
       setSuccess('Password successfully reset! Redirecting to login...');

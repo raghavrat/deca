@@ -46,9 +46,13 @@ export async function POST(request: Request) {
     if (!adminDb) throw new RequestError(500, 'Server configuration error')
 
     progressRateLimiter.recordIdentifier(rateLimitKey)
-    await adminDb.collection('users').doc(user.uid).update({
+    await adminDb.collection('users').doc(user.uid).set({
+      email: user.email,
+      displayName: user.displayName || '',
+      authProvider: user.provider,
+      authUid: user.authUid,
       problemsCompleted: FieldValue.increment(1),
-    })
+    }, { merge: true })
 
     return NextResponse.json({ correct: true }, { headers: { 'Cache-Control': 'no-store' } })
   } catch (error) {

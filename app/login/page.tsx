@@ -1,9 +1,11 @@
 'use client'
 
+import { SignIn } from '@clerk/nextjs'
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import Link from 'next/link';
 import { getErrorMessage, getErrorCode } from '../utils/errorHandling';
+import { isClerkClientEnabled } from '../config/authProvider';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -11,6 +13,18 @@ export default function Login() {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const { signIn } = useAuth();
+
+  if (isClerkClientEnabled()) {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-4">
+        <SignIn
+          routing="hash"
+          signUpUrl="/signup"
+          fallbackRedirectUrl="/performance"
+        />
+      </div>
+    )
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

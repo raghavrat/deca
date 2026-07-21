@@ -27,3 +27,5 @@ Deploy `firestore.rules` with the Firebase project used by the application. The 
 - Legal applicability depends on the operator, users, schools, jurisdictions, contracts, and actual deployment. Do not market the repository as ADA, COPPA, FERPA, GDPR, CCPA/CPRA, SOC 2, or other legally compliant without appropriate professional review and operational evidence.
 
 See [the internal audit](docs/internal-audit-2026-07-20.md), [the AI-test copyright review](docs/ai-test-copyright-safety.md), [the roleplay prompt research](docs/roleplay-prompt-research.md), [the security policy](SECURITY.md), and [the content provenance checklist](docs/content-provenance.md).
+
+For the staged Clerk Auth and Billing cutover, use the [Clerk migration runbook](docs/clerk-auth-billing-migration.md). Firebase remains the default provider until both migration switches are explicitly changed.

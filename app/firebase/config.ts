@@ -1,6 +1,5 @@
 import { initializeApp, getApps } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
-import { getFirestore } from 'firebase/firestore';
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -11,9 +10,15 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID
 };
 
-// Initialize Firebase
-const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
-const auth = getAuth(app);
-const db = getFirestore(app);
+const firebaseClientConfigured = Object.values(firebaseConfig).every(
+  value => typeof value === 'string' && value.length > 0,
+)
 
-export { app, auth, db }; 
+// Clerk-only deployments do not need Firebase browser credentials. The Admin
+// SDK remains separately configured for Firestore on the server.
+const app = firebaseClientConfigured
+  ? (getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0])
+  : null
+const auth = app ? getAuth(app) : null
+
+export { app, auth };

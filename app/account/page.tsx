@@ -1,10 +1,9 @@
 'use client'
 
 import { useAuth } from '../context/AuthContext'
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import { doc, getDoc, setDoc } from 'firebase/firestore'
-import { db } from '../firebase/config'
 import { Target, Clock, TrendingUp, User as UserIcon, Save, Download, Trash2 } from 'lucide-react'
 
 interface QuestionStats {
@@ -48,12 +47,14 @@ export default function AccountPage() {
           setStats(JSON.parse(savedStats))
         }
 
-        // Fetch name from Firestore
-        const userDocRef = doc(db, 'users', user.uid)
-        const userDoc = await getDoc(userDocRef)
-        if (userDoc.exists()) {
-          setName(userDoc.data().name || '')
-          setLeaderboardVisible(userDoc.data().leaderboardVisible === true)
+        try {
+          const response = await fetch('/api/account/profile', { cache: 'no-store' })
+          if (!response.ok) throw new Error('Profile request failed')
+          const profile = await response.json()
+          setName(typeof profile.name === 'string' ? profile.name : '')
+          setLeaderboardVisible(profile.leaderboardVisible === true)
+        } catch {
+          setPrivacyError('We could not load your account preferences. Please refresh and try again.')
         }
       }
       fetchUserData()
@@ -81,9 +82,13 @@ export default function AccountPage() {
       return
     }
 
-    const userDocRef = doc(db, 'users', user.uid)
     try {
-      await setDoc(userDocRef, { name: normalizedName, displayName: normalizedName }, { merge: true })
+      const response = await fetch('/api/account/profile', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: normalizedName }),
+      })
+      if (!response.ok) throw new Error('Profile update failed')
       setName(normalizedName)
       setFeedback('Name updated successfully!')
       setIsEditingName(false)
@@ -126,7 +131,11 @@ export default function AccountPage() {
       })
       if (!response.ok) throw new Error('Deletion failed')
       localStorage.removeItem(`questionStats_${user.uid}`)
-      await logout()
+      try {
+        await logout()
+      } catch {
+        window.location.assign('/')
+      }
     } catch {
       setPrivacyError('We could not delete your account. Please try again or contact privacy@decapal.org.')
       setIsDeleting(false)
@@ -137,7 +146,12 @@ export default function AccountPage() {
     setPrivacyError('')
     setIsSavingPrivacy(true)
     try {
-      await setDoc(doc(db, 'users', user.uid), { leaderboardVisible: visible }, { merge: true })
+      const response = await fetch('/api/account/profile', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ leaderboardVisible: visible }),
+      })
+      if (!response.ok) throw new Error('Preference update failed')
       setLeaderboardVisible(visible)
     } catch {
       setPrivacyError('We could not update your leaderboard preference. Please try again.')
@@ -154,6 +168,16 @@ export default function AccountPage() {
           <h1 className="text-4xl font-light text-black dark:text-white mb-2">Account Dashboard</h1>
           <p className="text-sm text-neutral-600 dark:text-neutral-400">{user.email}</p>
         </div>
+
+        {user.provider === 'clerk' && (
+          <div className="mb-6 flex items-center justify-between border-b border-neutral-300 p-6 dark:border-neutral-700">
+            <div>
+              <h2 className="text-xl font-light text-black dark:text-white">Plan</h2>
+              <p className="mt-1 text-sm text-neutral-600 dark:text-neutral-400">Manage your subscription and billing interval.</p>
+            </div>
+            <Link href="/pricing" className="btn-ghost">Manage plan</Link>
+          </div>
+        )}
 
         {/* Name Section */}
         <div className="p-6 mb-6 border-b border-neutral-300 dark:border-neutral-700">
