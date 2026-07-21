@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useParams, useSearchParams, useRouter } from 'next/navigation'
 import { ArrowLeft, RefreshCw, Trophy, ClipboardList, ChevronUp, ChevronDown, Sparkles, Video, Play, Square, Upload, RotateCcw, Mic, Clock } from 'lucide-react'
 import Link from 'next/link'
@@ -12,17 +12,33 @@ const ReactMediaRecorder = dynamic(
   { ssr: false }
 )
 import { DECAScenario } from '../../types'
-import { getInstructionalAreasByCategory, InstructionalArea } from '../../utils/instructionalAreas'
+import type { InstructionalArea } from '../../utils/instructionalAreas'
 import { getEventById } from '../../data/decaEvents'
 import { PERSONAL_FINANCE_AREAS } from '../../data/personalFinanceIndicators'
+import { getInstructionalAreaCatalog } from '../../data/instructionalAreaCatalog'
 import { useAuth } from '../../context/AuthContext'
+import { FORMAT_RULES, getRoleplayProfile } from '../../data/roleplayProfiles'
+import { getApiErrorMessage, readApiPayload } from '../../utils/apiResponse'
+import { getElapsedRecordingSeconds } from '../../utils/recordingTime'
 
 const categoryDisplayNames: { [key: string]: string } = {
-  managment: 'Management',
+  management: 'Management',
   marketing: 'Marketing',
   finance: 'Finance',
-  hospitiality: 'Hospitality',
+  hospitality: 'Hospitality',
   entrepreneur: 'Entrepreneurship'
+}
+
+function blobToDataUrl(blob: Blob): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onloadend = () => {
+      if (typeof reader.result === 'string') resolve(reader.result)
+      else reject(new Error('Failed to read audio file'))
+    }
+    reader.onerror = () => reject(new Error('Failed to read audio file'))
+    reader.readAsDataURL(blob)
+  })
 }
 
 export default function CategoryRoleplayPage() {
@@ -43,6 +59,7 @@ export default function CategoryRoleplayPage() {
 
   const [showScoring, setShowScoring] = useState(false)
   const [scores, setScores] = useState<{ [key: string]: number }>({})
+  const [isSavingSelfScore, setIsSavingSelfScore] = useState(false)
   
   // Audio recording states
   const [showAudioRecording, setShowAudioRecording] = useState(false)
@@ -51,6 +68,7 @@ export default function CategoryRoleplayPage() {
   const [recordingStartTime, setRecordingStartTime] = useState<Date | null>(null)
   const [recordingDuration, setRecordingDuration] = useState(0)
   const [hasAiProcessingConsent, setHasAiProcessingConsent] = useState(false)
+  const recordingStopTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   
   // Tab states
   const [activeTab, setActiveTab] = useState<'scenario' | 'prep' | 'record'>('scenario')
@@ -84,16 +102,19 @@ export default function CategoryRoleplayPage() {
         }),
       })
 
-      const data = await response.json()
+      const data = await readApiPayload<{ scenario?: DECAScenario; error?: string; message?: string }>(
+        response,
+        'Scenario generation is temporarily unavailable. Please try again.',
+      )
 
       if (!response.ok) {
         if (response.status === 429) {
-          // Rate limit error
-          throw new Error(`Rate limit exceeded. Please wait a few minutes before generating another scenario.`)
+          throw new Error('Rate limit exceeded. Please wait a few minutes before generating another scenario.')
         }
-        throw new Error(data.error || 'Failed to generate scenario')
+        throw new Error(getApiErrorMessage(data, 'Failed to generate scenario'))
       }
 
+      if (!data.scenario) throw new Error('The generated scenario was incomplete. Please try again.')
       setScenario(data.scenario)
       setShowInstructionalAreaSelection(false)
     } catch (err) {
@@ -110,13 +131,21 @@ export default function CategoryRoleplayPage() {
     let interval: NodeJS.Timeout
     if (recordingStartTime) {
       interval = setInterval(() => {
-        setRecordingDuration(Math.floor((Date.now() - recordingStartTime.getTime()) / 1000))
+        setRecordingDuration(getElapsedRecordingSeconds(
+          recordingStartTime,
+          Date.now(),
+          roleplayDuration * 60,
+        ))
       }, 1000)
     }
     return () => {
       if (interval) clearInterval(interval)
     }
-  }, [recordingStartTime])
+  }, [recordingStartTime, roleplayDuration])
+
+  useEffect(() => () => {
+    if (recordingStopTimeoutRef.current) clearTimeout(recordingStopTimeoutRef.current)
+  }, [])
 
   // Prep timer effect
   useEffect(() => {
@@ -142,9 +171,12 @@ export default function CategoryRoleplayPage() {
   useEffect(() => {
     try {
       // Load instructional areas for this category
-      const areas = selectedEvent?.id === 'PFL'
+      const profile = selectedEvent ? getRoleplayProfile(selectedEvent.id) : undefined
+      const rules = profile ? FORMAT_RULES[profile.format] : FORMAT_RULES['individual-series']
+      const allAreas = selectedEvent?.id === 'PFL'
         ? PERSONAL_FINANCE_AREAS
-        : getInstructionalAreasByCategory(category.toUpperCase())
+        : getInstructionalAreaCatalog(category.toUpperCase())
+      const areas = allAreas.filter(area => area.piCount >= rules.performanceIndicatorCount)
       setInstructionalAreas(areas)
       setSelectedInstructionalArea('')
       setShowInstructionalAreaSelection(true)
@@ -165,11 +197,11 @@ export default function CategoryRoleplayPage() {
     <div className="min-h-screen bg-white dark:bg-black p-4">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center">
+        <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+          <div className="flex items-start sm:items-center">
             <Link
               href="/roleplay"
-              className="flex items-center text-black dark:text-white hover:text-gray-600 dark:hover:text-gray-400 transition-colors mr-4"
+              className="flex items-center text-black dark:text-white hover:text-neutral-600 dark:hover:text-neutral-400 transition-colors mr-4"
             >
               <ArrowLeft className="h-5 w-5 mr-1" />
               Back to Categories
@@ -177,7 +209,7 @@ export default function CategoryRoleplayPage() {
             <div>
               <h1 className="text-3xl font-light text-black dark:text-white">{displayName} Roleplay</h1>
               {selectedEvent && (
-                <p className="text-sm text-gray-600 dark:text-gray-400 mt-1 flex items-center">
+                <p className="text-sm text-neutral-600 dark:text-neutral-400 mt-1 flex items-center">
                   <Trophy className="h-4 w-4 mr-1" />
                   {selectedEvent.name} ({selectedEvent.id})
                 </p>
@@ -185,13 +217,13 @@ export default function CategoryRoleplayPage() {
             </div>
           </div>
           {!showInstructionalAreaSelection && (
-            <div className="flex flex-col items-end">
+            <div className="flex w-full flex-col items-stretch lg:w-auto lg:items-end">
               <button
                 onClick={() => {
                   setShowInstructionalAreaSelection(true)
                   setScenario(null)
                 }}
-                className="flex items-center px-4 py-2 border border-gray-300 dark:border-gray-700 hover:border-black dark:hover:border-white text-black dark:text-white text-sm font-medium bg-white dark:bg-black transition-colors mr-2 mb-2 click-animation"
+                className="mb-2 flex items-center justify-center border border-neutral-300 bg-white px-4 py-2 text-sm font-medium text-black transition-colors hover:border-black dark:border-neutral-700 dark:bg-black dark:text-white dark:hover:border-white lg:mr-2 click-animation"
               >
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 Change Instructional Area
@@ -199,13 +231,13 @@ export default function CategoryRoleplayPage() {
               <button
                 onClick={generateScenario}
                 disabled={loading || !selectedInstructionalArea}
-                className="flex items-center px-4 py-2 border border-gray-300 dark:border-gray-700 hover:border-black dark:hover:border-white text-black dark:text-white text-sm font-medium bg-white dark:bg-black transition-colors duration-200 focus:outline-none disabled:opacity-50 click-animation"
+                className="flex items-center justify-center border border-neutral-300 bg-white px-4 py-2 text-sm font-medium text-black transition-colors duration-200 hover:border-black focus:outline-none disabled:opacity-50 dark:border-neutral-700 dark:bg-black dark:text-white dark:hover:border-white click-animation"
               >
                 <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
                 Generate New Scenario
               </button>
-              <div className="mt-2 px-3 py-1 border border-gray-300 dark:border-gray-700 bg-white dark:bg-black">
-                <p className="text-xs text-gray-600 dark:text-gray-400">
+              <div className="mt-2 px-3 py-1 border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-black">
+                <p className="text-xs text-neutral-600 dark:text-neutral-400">
                   <span className="inline-block w-2 h-2 bg-yellow-500 rounded-full mr-1"></span>
                   Rate limit: 1 scenario per 5 minutes
                 </p>
@@ -228,22 +260,22 @@ export default function CategoryRoleplayPage() {
 
         {/* Loading State */}
         {loading && (
-          <div className="bg-white dark:bg-black border border-gray-300 dark:border-gray-700 p-8 text-center">
+          <div className="bg-white dark:bg-black border border-neutral-300 dark:border-neutral-700 p-8 text-center">
             <RefreshCw className="h-8 w-8 animate-spin mx-auto mb-4 text-black dark:text-white" />
-            <p className="text-gray-600 dark:text-gray-400">Generating your roleplay scenario...</p>
+            <p className="text-neutral-600 dark:text-neutral-400">Generating your roleplay scenario...</p>
           </div>
         )}
 
 
         {/* Instructional Area Selection */}
         {showInstructionalAreaSelection && !loading && (
-          <div className="bg-white dark:bg-black border border-gray-300 dark:border-gray-700 p-8 max-w-2xl mx-auto">
+          <div className="bg-white dark:bg-black border border-neutral-300 dark:border-neutral-700 p-8 max-w-2xl mx-auto">
             <div className="text-center mb-8">
               <div className="inline-flex items-center justify-center w-16 h-16 bg-black/10 dark:bg-white/10 mb-4">
                 <Trophy className="h-8 w-8 text-black dark:text-white" />
               </div>
               <h2 className="text-2xl font-light text-black dark:text-white mb-2">Select an Instructional Area</h2>
-              <p className="text-gray-600 dark:text-gray-400">
+              <p className="text-neutral-600 dark:text-neutral-400">
                 Choose an instructional area to focus your {displayName.toLowerCase()} roleplay scenario
                 {selectedEvent && (
                   <span className="block mt-1 text-sm">
@@ -255,13 +287,13 @@ export default function CategoryRoleplayPage() {
 
             <div className="space-y-6">
               <div className="relative">
-                <p id="instructional-area-label" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <p id="instructional-area-label" className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2">
                   Instructional Area
                 </p>
                 
                 {/* Selected Area Display */}
                 {selectedInstructionalArea && (
-                  <div className="mb-4 p-4 bg-gray-50 dark:bg-gray-900/30 border border-gray-200 dark:border-gray-600">
+                  <div className="mb-4 p-4 bg-neutral-50 dark:bg-neutral-900/30 border border-neutral-200 dark:border-neutral-600">
                     <div className="flex items-center justify-between">
                       <div>
                         <p className="text-sm font-medium text-black dark:text-white">
@@ -275,7 +307,7 @@ export default function CategoryRoleplayPage() {
                       </div>
                       <button
                         onClick={() => setSelectedInstructionalArea('')}
-                        className="text-black dark:text-white hover:text-gray-600 dark:hover:text-gray-400 text-sm font-medium"
+                        className="text-black dark:text-white hover:text-neutral-600 dark:hover:text-neutral-400 text-sm font-medium"
                       >
                         Change
                       </button>
@@ -290,10 +322,10 @@ export default function CategoryRoleplayPage() {
                     aria-labelledby="instructional-area-label"
                     aria-expanded={isDropdownOpen}
                     aria-controls="instructional-area-options"
-                    className="w-full bg-white dark:bg-black border border-gray-300 dark:border-gray-700 hover:border-black dark:hover:border-white text-black dark:text-white text-sm font-medium py-4 px-6 text-center transition-colors duration-200 focus:outline-none flex justify-between items-center click-animation"
+                    className="w-full bg-white dark:bg-black border border-neutral-300 dark:border-neutral-700 hover:border-black dark:hover:border-white text-black dark:text-white text-sm font-medium py-4 px-6 text-center transition-colors duration-200 focus:outline-none flex justify-between items-center click-animation"
                   >
                     <span>Choose an instructional area</span>
-                    {isDropdownOpen ? <ChevronUp className="h-5 w-5 text-gray-600 dark:text-gray-400" /> : <ChevronDown className="h-5 w-5 text-gray-600 dark:text-gray-400" />}
+                    {isDropdownOpen ? <ChevronUp className="h-5 w-5 text-neutral-600 dark:text-neutral-400" /> : <ChevronDown className="h-5 w-5 text-neutral-600 dark:text-neutral-400" />}
                   </button>
                 )}
                 
@@ -306,7 +338,7 @@ export default function CategoryRoleplayPage() {
                       setSelectedInstructionalArea('RANDOM')
                       setIsDropdownOpen(false)
                     }}
-                    className="w-full bg-black dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-200 text-white dark:text-black text-sm font-medium py-3 px-6 text-center transition-colors duration-200 focus:outline-none flex items-center justify-center click-animation"
+                    className="w-full bg-black dark:bg-white hover:bg-neutral-800 dark:hover:bg-neutral-200 text-white dark:text-black text-sm font-medium py-3 px-6 text-center transition-colors duration-200 focus:outline-none flex items-center justify-center click-animation"
                   >
                     <Sparkles className="h-4 w-4 mr-2" />
                     Random Selection
@@ -315,10 +347,10 @@ export default function CategoryRoleplayPage() {
                   {/* Divider */}
                   <div className="relative">
                     <div className="absolute inset-0 flex items-center">
-                      <div className="w-full border-t border-gray-200 dark:border-gray-700"></div>
+                      <div className="w-full border-t border-neutral-200 dark:border-neutral-700"></div>
                     </div>
                     <div className="relative flex justify-center text-sm">
-                      <span className="px-2 bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400">or choose specific area</span>
+                      <span className="px-2 bg-white dark:bg-neutral-800 text-neutral-500 dark:text-neutral-400">or choose specific area</span>
                     </div>
                   </div>
                   
@@ -331,7 +363,7 @@ export default function CategoryRoleplayPage() {
                           setSelectedInstructionalArea(area.name)
                           setIsDropdownOpen(false)
                         }}
-                        className="w-full bg-black dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-200 text-white dark:text-black text-sm font-medium py-3 px-6 text-left transition-colors duration-200 focus:outline-none flex justify-between items-center click-animation"
+                        className="w-full bg-black dark:bg-white hover:bg-neutral-800 dark:hover:bg-neutral-200 text-white dark:text-black text-sm font-medium py-3 px-6 text-left transition-colors duration-200 focus:outline-none flex justify-between items-center click-animation"
                       >
                         <span>{area.name}</span>
                         <span className="text-xs bg-white/20 px-2 py-1 ">
@@ -348,7 +380,7 @@ export default function CategoryRoleplayPage() {
                 <button
                   onClick={generateScenario}
                   disabled={!selectedInstructionalArea || loading}
-                  className="w-full px-8 py-4 border border-gray-300 dark:border-gray-700 hover:border-black dark:hover:border-white text-black dark:text-white text-sm font-medium bg-white dark:bg-black transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center click-animation"
+                  className="w-full px-8 py-4 border border-neutral-300 dark:border-neutral-700 hover:border-black dark:hover:border-white text-black dark:text-white text-sm font-medium bg-white dark:bg-black transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center click-animation"
                 >
                   {loading ? (
                     <>
@@ -362,13 +394,13 @@ export default function CategoryRoleplayPage() {
                     </>
                   )}
                 </button>
-                <div className="mt-4 p-3 border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/30">
-                  <div className="flex items-center justify-center text-xs text-gray-600 dark:text-gray-400">
+                <div className="mt-4 p-3 border border-neutral-300 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-900/30">
+                  <div className="flex items-center justify-center text-xs text-neutral-600 dark:text-neutral-400">
                     <div className="flex items-center">
                       <span className="inline-block w-2 h-2 bg-yellow-500 rounded-full mr-2"></span>
                       <span>Rate Limited: 1 scenario per 5 minutes</span>
                     </div>
-                    <span className="mx-2 text-gray-400">•</span>
+                    <span className="mx-2 text-neutral-400">•</span>
                     <span>Please use responsibly</span>
                   </div>
                 </div>
@@ -379,15 +411,21 @@ export default function CategoryRoleplayPage() {
 
         {/* Tabbed Interface with Left Sidebar */}
         {scenario && !loading && !showInstructionalAreaSelection && (
-          <div className="flex gap-6">
+          <div className="flex flex-col gap-6 lg:flex-row">
             {/* Left Sidebar Tabs */}
-            <div className="w-64 bg-white dark:bg-black border border-gray-300 dark:border-gray-700 p-4">
-              <div className="space-y-2">
-                <div
-                  className={`w-full text-left px-4 py-3 border transition-colors cursor-default ${
+            <div className="w-full border border-neutral-300 bg-white p-4 dark:border-neutral-700 dark:bg-black lg:w-64 lg:flex-none">
+              <div className="grid grid-cols-3 gap-2 lg:block lg:space-y-2">
+                <button
+                  type="button"
+                  aria-pressed={activeTab === 'scenario'}
+                  onClick={() => {
+                    setActiveTab('scenario')
+                    setIsPrepTimerRunning(false)
+                  }}
+                  className={`w-full border px-3 py-3 text-left transition-colors sm:px-4 ${
                     activeTab === 'scenario'
                       ? 'border-black dark:border-white bg-black dark:bg-white text-white dark:text-black'
-                      : 'border-gray-300 dark:border-gray-700 text-gray-500 dark:text-gray-500'
+                      : 'border-neutral-300 dark:border-neutral-700 text-neutral-500 dark:text-neutral-500'
                   }`}
                 >
                   <div className="flex items-center">
@@ -397,13 +435,19 @@ export default function CategoryRoleplayPage() {
                       <div className="text-xs opacity-75">Read the case</div>
                     </div>
                   </div>
-                </div>
+                </button>
 
-                <div
-                  className={`w-full text-left px-4 py-3 border transition-colors cursor-default ${
+                <button
+                  type="button"
+                  aria-pressed={activeTab === 'prep'}
+                  onClick={() => {
+                    setActiveTab('prep')
+                    if (prepTimeRemaining === 0) setPrepTimeRemaining(prepTime * 60)
+                  }}
+                  className={`w-full border px-3 py-3 text-left transition-colors sm:px-4 ${
                     activeTab === 'prep'
                       ? 'border-black dark:border-white bg-black dark:bg-white text-white dark:text-black'
-                      : 'border-gray-300 dark:border-gray-700 text-gray-500 dark:text-gray-500'
+                      : 'border-neutral-300 dark:border-neutral-700 text-neutral-500 dark:text-neutral-500'
                   }`}
                 >
                   <div className="flex items-center">
@@ -413,13 +457,19 @@ export default function CategoryRoleplayPage() {
                       <div className="text-xs opacity-75">{prepTime} min timer</div>
                     </div>
                   </div>
-                </div>
+                </button>
 
-                <div
-                  className={`w-full text-left px-4 py-3 border transition-colors cursor-default ${
+                <button
+                  type="button"
+                  aria-pressed={activeTab === 'record'}
+                  onClick={() => {
+                    setActiveTab('record')
+                    setIsPrepTimerRunning(false)
+                  }}
+                  className={`w-full border px-3 py-3 text-left transition-colors sm:px-4 ${
                     activeTab === 'record'
                       ? 'border-black dark:border-white bg-black dark:bg-white text-white dark:text-black'
-                      : 'border-gray-300 dark:border-gray-700 text-gray-500 dark:text-gray-500'
+                      : 'border-neutral-300 dark:border-neutral-700 text-neutral-500 dark:text-neutral-500'
                   }`}
                 >
                   <div className="flex items-center">
@@ -429,15 +479,15 @@ export default function CategoryRoleplayPage() {
                       <div className="text-xs opacity-75">{roleplayDuration} min roleplay</div>
                     </div>
                   </div>
-                </div>
+                </button>
               </div>
 
               {/* Timer Settings */}
-              <div className="mt-8 pt-4 border-t border-gray-300 dark:border-gray-700">
-                <h4 className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-3">Timer Settings</h4>
+              <div className="mt-8 pt-4 border-t border-neutral-300 dark:border-neutral-700">
+                <h4 className="text-sm font-medium text-neutral-600 dark:text-neutral-400 mb-3">Timer Settings</h4>
                 <div className="space-y-3">
                   <div>
-                    <label htmlFor="prep-time" className="text-xs text-gray-600 dark:text-gray-400">Prep Time (minutes)</label>
+                    <label htmlFor="prep-time" className="text-xs text-neutral-600 dark:text-neutral-400">Prep Time (minutes)</label>
                     <input
                       id="prep-time"
                       type="number"
@@ -445,11 +495,11 @@ export default function CategoryRoleplayPage() {
                       max="30"
                       value={prepTime}
                       onChange={(e) => setPrepTime(Math.max(1, Math.min(30, parseInt(e.target.value) || 10)))}
-                      className="w-full mt-1 px-2 py-1 border border-gray-300 dark:border-gray-700 bg-white dark:bg-black text-black dark:text-white text-sm"
+                      className="w-full mt-1 px-2 py-1 border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-black text-black dark:text-white text-sm"
                     />
                   </div>
                   <div>
-                    <label htmlFor="roleplay-time" className="text-xs text-gray-600 dark:text-gray-400">Roleplay Time (minutes)</label>
+                    <label htmlFor="roleplay-time" className="text-xs text-neutral-600 dark:text-neutral-400">Roleplay Time (minutes)</label>
                     <input
                       id="roleplay-time"
                       type="number"
@@ -457,7 +507,7 @@ export default function CategoryRoleplayPage() {
                       max="30"
                       value={roleplayDuration}
                       onChange={(e) => setRoleplayDuration(Math.max(1, Math.min(30, parseInt(e.target.value) || 10)))}
-                      className="w-full mt-1 px-2 py-1 border border-gray-300 dark:border-gray-700 bg-white dark:bg-black text-black dark:text-white text-sm"
+                      className="w-full mt-1 px-2 py-1 border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-black text-black dark:text-white text-sm"
                     />
                   </div>
                 </div>
@@ -465,21 +515,21 @@ export default function CategoryRoleplayPage() {
             </div>
 
             {/* Main Content Area */}
-            <div className="flex-1 space-y-6">
+            <div className="min-w-0 flex-1 space-y-6">
               {/* Tab 1: Scenario */}
               {activeTab === 'scenario' && (
-                <div className="bg-white dark:bg-black border border-gray-300 dark:border-gray-700 p-8">
+                <div className="bg-white dark:bg-black border border-neutral-300 dark:border-neutral-700 p-8">
               <div className="text-center mb-6">
                 <h2 className="text-2xl font-light text-black dark:text-white mb-2">{scenario.eventCode}</h2>
-                <div className="space-y-1 text-gray-600 dark:text-gray-400">
+                <div className="space-y-1 text-neutral-600 dark:text-neutral-400">
                   <p><strong>CAREER CLUSTER:</strong> {scenario.careerCluster}</p>
                   <p><strong>CAREER PATHWAY:</strong> {scenario.careerPathway}</p>
                 </div>
                 {scenario.practiceMetadata && (
-                  <div className="mt-4 flex flex-wrap justify-center gap-2 text-xs text-gray-600 dark:text-gray-400">
-                    <span className="border border-gray-300 dark:border-gray-700 px-2 py-1">{scenario.practiceMetadata.archetypeLabel}</span>
-                    <span className="border border-gray-300 dark:border-gray-700 px-2 py-1">{scenario.practiceMetadata.instructionalArea}</span>
-                    <span className="border border-gray-300 dark:border-gray-700 px-2 py-1">Unofficial practice case</span>
+                  <div className="mt-4 flex flex-wrap justify-center gap-2 text-xs text-neutral-600 dark:text-neutral-400">
+                    <span className="border border-neutral-300 dark:border-neutral-700 px-2 py-1">{scenario.practiceMetadata.archetypeLabel}</span>
+                    <span className="border border-neutral-300 dark:border-neutral-700 px-2 py-1">{scenario.practiceMetadata.instructionalArea}</span>
+                    <span className="border border-neutral-300 dark:border-neutral-700 px-2 py-1">Unofficial practice case</span>
                   </div>
                 )}
               </div>
@@ -489,7 +539,7 @@ export default function CategoryRoleplayPage() {
                 <h3 className="text-lg font-light text-black dark:text-white mb-4">PARTICIPANT INSTRUCTIONS</h3>
                 <div className="space-y-2">
                   {scenario.participantInstructions.map((instruction, index) => (
-                    <p key={index} className="text-gray-700 dark:text-gray-300">• {instruction}</p>
+                    <p key={index} className="text-neutral-700 dark:text-neutral-300">• {instruction}</p>
                   ))}
                 </div>
               </div>
@@ -499,7 +549,7 @@ export default function CategoryRoleplayPage() {
                 <h3 className="text-lg font-light text-black dark:text-white mb-4">CAREER COMPETENCIES</h3>
                 <div className="space-y-2">
                   {scenario.centurySkills.map((skill, index) => (
-                    <p key={index} className="text-gray-700 dark:text-gray-300">• {skill}</p>
+                    <p key={index} className="text-neutral-700 dark:text-neutral-300">• {skill}</p>
                   ))}
                 </div>
               </div>
@@ -509,7 +559,7 @@ export default function CategoryRoleplayPage() {
                 <h3 className="text-lg font-light text-black dark:text-white mb-4">PERFORMANCE INDICATORS</h3>
                 <div className="space-y-2">
                   {scenario.performanceIndicators.map((indicator, index) => (
-                    <p key={index} className="text-gray-700 dark:text-gray-300">{index + 1}. {indicator}</p>
+                    <p key={index} className="text-neutral-700 dark:text-neutral-300">{index + 1}. {indicator}</p>
                   ))}
                 </div>
               </div>
@@ -519,7 +569,7 @@ export default function CategoryRoleplayPage() {
                 <h3 className="text-lg font-light text-black dark:text-white mb-4">
                   {scenario.practiceMetadata?.format === 'team-decision' ? 'CASE STUDY SITUATION' : 'EVENT SITUATION'}
                 </h3>
-                <div className="space-y-4 text-gray-700 dark:text-gray-300 leading-relaxed">
+                <div className="space-y-4 text-neutral-700 dark:text-neutral-300 leading-relaxed">
                   <p>{scenario.eventSituation.roleDescription}</p>
                   <p>{scenario.eventSituation.companyBackground}</p>
                   <p>{scenario.eventSituation.businessChallenge}</p>
@@ -534,21 +584,21 @@ export default function CategoryRoleplayPage() {
 
                 <div className="mb-6">
                   <h4 className="font-light text-black dark:text-white mb-2">JUDGE ROLE-PLAY CHARACTERIZATION</h4>
-                  <p className="text-gray-700 dark:text-gray-300 leading-relaxed">{scenario.judgeInstructions.roleCharacterization}</p>
+                  <p className="text-neutral-700 dark:text-neutral-300 leading-relaxed">{scenario.judgeInstructions.roleCharacterization}</p>
                 </div>
 
                 <div className="mb-6">
                   <h4 className="font-light text-black dark:text-white mb-2">QUESTIONS TO ASK DURING ROLEPLAY</h4>
                   <div className="space-y-2">
                     {scenario.judgeInstructions.questionsToAsk.map((question, index) => (
-                      <p key={index} className="text-gray-700 dark:text-gray-300">{index + 1}. {question}</p>
+                      <p key={index} className="text-neutral-700 dark:text-neutral-300">{index + 1}. {question}</p>
                     ))}
                   </div>
                 </div>
 
                 <div>
                   <h4 className="font-light text-black dark:text-white mb-2">EVALUATION CRITERIA</h4>
-                  <p className="text-gray-700 dark:text-gray-300 leading-relaxed">{scenario.judgeInstructions.evaluationCriteria}</p>
+                  <p className="text-neutral-700 dark:text-neutral-300 leading-relaxed">{scenario.judgeInstructions.evaluationCriteria}</p>
                 </div>
               </div>
 
@@ -559,7 +609,7 @@ export default function CategoryRoleplayPage() {
               {activeTab === 'prep' && (
                 <div className="space-y-6">
                   {/* Timer Section */}
-                  <div className="bg-white dark:bg-black border border-gray-300 dark:border-gray-700 p-6">
+                  <div className="bg-white dark:bg-black border border-neutral-300 dark:border-neutral-700 p-6">
                     <div className="text-center">
                       <h2 className="text-2xl font-light text-black dark:text-white mb-4">Preparation Time</h2>
                       
@@ -574,7 +624,7 @@ export default function CategoryRoleplayPage() {
                         {!isPrepTimerRunning && prepTimeRemaining > 0 && (
                           <button
                             onClick={() => setIsPrepTimerRunning(true)}
-                            className="px-4 py-2 border border-gray-300 dark:border-gray-700 hover:border-black dark:hover:border-white text-black dark:text-white bg-white dark:bg-black transition-colors"
+                            className="px-4 py-2 border border-neutral-300 dark:border-neutral-700 hover:border-black dark:hover:border-white text-black dark:text-white bg-white dark:bg-black transition-colors"
                           >
                             <Play className="w-4 h-4 inline mr-2" />
                             Resume
@@ -583,7 +633,7 @@ export default function CategoryRoleplayPage() {
                         {isPrepTimerRunning && (
                           <button
                             onClick={() => setIsPrepTimerRunning(false)}
-                            className="px-4 py-2 border border-gray-300 dark:border-gray-700 hover:border-black dark:hover:border-white text-black dark:text-white bg-white dark:bg-black transition-colors"
+                            className="px-4 py-2 border border-neutral-300 dark:border-neutral-700 hover:border-black dark:hover:border-white text-black dark:text-white bg-white dark:bg-black transition-colors"
                           >
                             <Square className="w-4 h-4 inline mr-2" />
                             Pause
@@ -594,7 +644,7 @@ export default function CategoryRoleplayPage() {
                             setPrepTimeRemaining(prepTime * 60)
                             setIsPrepTimerRunning(false)
                           }}
-                          className="px-4 py-2 border border-gray-300 dark:border-gray-700 hover:border-black dark:hover:border-white text-black dark:text-white bg-white dark:bg-black transition-colors"
+                          className="px-4 py-2 border border-neutral-300 dark:border-neutral-700 hover:border-black dark:hover:border-white text-black dark:text-white bg-white dark:bg-black transition-colors"
                         >
                           <RotateCcw className="w-4 h-4 inline mr-2" />
                           Reset
@@ -604,10 +654,10 @@ export default function CategoryRoleplayPage() {
                   </div>
 
                   {/* Scenario Display During Prep */}
-                  <div className="bg-white dark:bg-black border border-gray-300 dark:border-gray-700 p-8 opacity-90">
+                  <div className="bg-white dark:bg-black border border-neutral-300 dark:border-neutral-700 p-8 opacity-90">
                     <div className="text-center mb-6">
                       <h2 className="text-2xl font-light text-black dark:text-white mb-2">{scenario.eventCode}</h2>
-                      <div className="space-y-1 text-gray-600 dark:text-gray-400">
+                      <div className="space-y-1 text-neutral-600 dark:text-neutral-400">
                         <p><strong>CAREER CLUSTER:</strong> {scenario.careerCluster}</p>
                         <p><strong>CAREER PATHWAY:</strong> {scenario.careerPathway}</p>
                       </div>
@@ -618,7 +668,7 @@ export default function CategoryRoleplayPage() {
                       <h3 className="text-lg font-light text-black dark:text-white mb-4">PERFORMANCE INDICATORS</h3>
                       <div className="space-y-2">
                         {scenario.performanceIndicators.map((indicator, index) => (
-                          <p key={index} className="text-gray-700 dark:text-gray-300">{index + 1}. {indicator}</p>
+                          <p key={index} className="text-neutral-700 dark:text-neutral-300">{index + 1}. {indicator}</p>
                         ))}
                       </div>
                     </div>
@@ -628,7 +678,7 @@ export default function CategoryRoleplayPage() {
                       <h3 className="text-lg font-light text-black dark:text-white mb-4">
                         {scenario.practiceMetadata?.format === 'team-decision' ? 'CASE STUDY SITUATION' : 'EVENT SITUATION'}
                       </h3>
-                      <div className="space-y-4 text-gray-700 dark:text-gray-300 leading-relaxed">
+                      <div className="space-y-4 text-neutral-700 dark:text-neutral-300 leading-relaxed">
                         <p>{scenario.eventSituation.roleDescription}</p>
                         <p>{scenario.eventSituation.companyBackground}</p>
                         <p>{scenario.eventSituation.businessChallenge}</p>
@@ -644,23 +694,23 @@ export default function CategoryRoleplayPage() {
               {activeTab === 'record' && (
                 <div className="space-y-6">
                   {/* Judge's Questions Section */}
-                  <div className="bg-white dark:bg-black border border-gray-300 dark:border-gray-700 p-6">
+                  <div className="bg-white dark:bg-black border border-neutral-300 dark:border-neutral-700 p-6">
                     <h3 className="text-lg font-light text-black dark:text-white mb-4">JUDGE'S QUESTIONS</h3>
-                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                    <p className="text-sm text-neutral-600 dark:text-neutral-400 mb-4">
                       The judge may ask you the following questions during or after your presentation:
                     </p>
                     <div className="space-y-3">
                       {scenario.judgeInstructions.questionsToAsk.map((question, index) => (
                         <div key={index} className="flex items-start">
                           <span className="text-black dark:text-white font-medium mr-3">{index + 1}.</span>
-                          <p className="text-gray-700 dark:text-gray-300 flex-1">{question}</p>
+                          <p className="text-neutral-700 dark:text-neutral-300 flex-1">{question}</p>
                         </div>
                       ))}
                     </div>
                   </div>
 
                   {/* Recording Mode Toggle */}
-                  <div className="bg-white dark:bg-black border border-gray-300 dark:border-gray-700 p-4">
+                  <div className="bg-white dark:bg-black border border-neutral-300 dark:border-neutral-700 p-4">
                     <div className="flex justify-center gap-4">
                       <button
                         onClick={() => {
@@ -670,7 +720,7 @@ export default function CategoryRoleplayPage() {
                         className={`px-6 py-2 border transition-colors ${
                           showAudioRecording && !showScoring
                             ? 'border-black dark:border-white bg-black dark:bg-white text-white dark:text-black'
-                            : 'border-gray-300 dark:border-gray-700 hover:border-black dark:hover:border-white text-black dark:text-white'
+                            : 'border-neutral-300 dark:border-neutral-700 hover:border-black dark:hover:border-white text-black dark:text-white'
                         }`}
                       >
                         <Video className="h-4 w-4 inline mr-2" />
@@ -685,7 +735,7 @@ export default function CategoryRoleplayPage() {
                         className={`px-6 py-2 border transition-colors ${
                           showScoring && !showAudioRecording
                             ? 'border-black dark:border-white bg-black dark:bg-white text-white dark:text-black'
-                            : 'border-gray-300 dark:border-gray-700 hover:border-black dark:hover:border-white text-black dark:text-white'
+                            : 'border-neutral-300 dark:border-neutral-700 hover:border-black dark:hover:border-white text-black dark:text-white'
                         }`}
                       >
                         <ClipboardList className="h-4 w-4 inline mr-2" />
@@ -696,7 +746,7 @@ export default function CategoryRoleplayPage() {
 
                   {/* Audio Recording Section - Inline */}
                   {showAudioRecording && !showScoring && (
-                    <div className="bg-white dark:bg-black border border-gray-300 dark:border-gray-700 p-8">
+                    <div className="bg-white dark:bg-black border border-neutral-300 dark:border-neutral-700 p-8">
                       <h3 className="text-2xl font-light text-black dark:text-white mb-6 text-center">
                         Audio Practice - {scenario.eventCode}
                       </h3>
@@ -704,15 +754,12 @@ export default function CategoryRoleplayPage() {
                       {ReactMediaRecorder ? (
                       <ReactMediaRecorder
                         audio={true}
-                        mediaRecorderOptions={{
-                          mimeType: 'audio/webm'
-                        }}
                         askPermissionOnMount={false}
                         render={({ status, startRecording, stopRecording, mediaBlobUrl, error }) => (
                           <div>
                             {/* Show error if microphone access fails */}
                             {error && (
-                              <div className="mb-4 p-4 border border-gray-300 dark:border-gray-700">
+                              <div className="mb-4 p-4 border border-neutral-300 dark:border-neutral-700">
                                 <p className="text-red-700 dark:text-red-300 font-semibold">Microphone Error</p>
                                 <p className="text-red-600 dark:text-red-400 text-sm mt-1">
                                   {error === 'permission_denied' 
@@ -725,9 +772,9 @@ export default function CategoryRoleplayPage() {
                             {/* Recording Instructions */}
                             {!recordedAudioBlob && status === 'idle' && (
                               <div className="space-y-4">
-                                <div className="p-4 border border-gray-300 dark:border-gray-700">
+                                <div className="p-4 border border-neutral-300 dark:border-neutral-700">
                                   <h4 className="font-light text-black dark:text-white mb-2">Instructions</h4>
-                                  <ul className="text-sm text-gray-600 dark:text-gray-300 space-y-1">
+                                  <ul className="text-sm text-neutral-600 dark:text-neutral-300 space-y-1">
                                     <li>• Present your solution to the scenario as if speaking to the judge</li>
                                     <li>• Time limit: {roleplayDuration} minutes</li>
                                     <li>• Speak clearly and professionally</li>
@@ -750,7 +797,7 @@ export default function CategoryRoleplayPage() {
                                   aria-label="Review your roleplay recording"
                                   className="w-full"
                                 />
-                                <div className="mt-4 flex items-start gap-3 rounded border border-gray-300 p-4 dark:border-gray-700">
+                                <div className="mt-4 flex items-start gap-3 rounded border border-neutral-300 p-4 dark:border-neutral-700">
                                   <input
                                     id="ai-processing-consent"
                                     type="checkbox"
@@ -758,7 +805,7 @@ export default function CategoryRoleplayPage() {
                                     onChange={(event) => setHasAiProcessingConsent(event.target.checked)}
                                     className="mt-1 h-5 w-5"
                                   />
-                                  <label htmlFor="ai-processing-consent" className="text-sm leading-6 text-gray-700 dark:text-gray-300">
+                                  <label htmlFor="ai-processing-consent" className="text-sm leading-6 text-neutral-700 dark:text-neutral-300">
                                     I agree to send this audio to OpenRouter and its AI model provider for transcription and grading. The audio is not saved by Deca Pal; the transcript and feedback are saved to my account. See the{' '}
                                     <Link href="/privacy" className="underline underline-offset-2">Privacy Policy</Link>.
                                   </label>
@@ -775,7 +822,7 @@ export default function CategoryRoleplayPage() {
                                     <span className="text-black dark:text-white font-medium">Recording...</span>
                                   </div>
                                 </div>
-                                <div className="text-center text-2xl font-mono text-gray-800 dark:text-white">
+                                <div className="text-center text-2xl font-mono text-neutral-800 dark:text-white">
                                   {Math.floor(recordingDuration / 60).toString().padStart(2, '0')}:
                                   {(recordingDuration % 60).toString().padStart(2, '0')} / {roleplayDuration}:00
                                 </div>
@@ -799,20 +846,17 @@ export default function CategoryRoleplayPage() {
                                     setRecordingStartTime(new Date())
                                     setRecordingDuration(0)
                                     startRecording()
-                                    // Start timer
-                                    const interval = setInterval(() => {
-                                      setRecordingDuration(prev => {
-                                        const newDuration = prev + 1
-                                        // Auto-stop at time limit
-                                        if (newDuration >= roleplayDuration * 60) {
-                                          stopRecording()
-                                          clearInterval(interval)
-                                        }
-                                        return newDuration
-                                      })
-                                    }, 1000)
+                                    if (recordingStopTimeoutRef.current) {
+                                      clearTimeout(recordingStopTimeoutRef.current)
+                                    }
+                                    recordingStopTimeoutRef.current = setTimeout(() => {
+                                      setRecordingDuration(roleplayDuration * 60)
+                                      setRecordingStartTime(null)
+                                      recordingStopTimeoutRef.current = null
+                                      stopRecording()
+                                    }, roleplayDuration * 60 * 1000)
                                   }}
-                                  className="flex items-center px-6 py-3 border border-gray-300 dark:border-gray-700 hover:border-black dark:hover:border-white text-black dark:text-white text-sm font-medium bg-white dark:bg-black transition-colors"
+                                  className="flex items-center px-6 py-3 border border-neutral-300 dark:border-neutral-700 hover:border-black dark:hover:border-white text-black dark:text-white text-sm font-medium bg-white dark:bg-black transition-colors"
                                 >
                                   <Play className="w-5 h-5 mr-2" />
                                   Start Recording
@@ -821,8 +865,22 @@ export default function CategoryRoleplayPage() {
 
                               {status === 'recording' && (
                                 <button
-                                  onClick={stopRecording}
-                                  className="flex items-center px-6 py-3 border border-gray-300 dark:border-gray-700 hover:border-black dark:hover:border-white text-black dark:text-white text-sm font-medium bg-white dark:bg-black transition-colors"
+                                  onClick={() => {
+                                    if (recordingStopTimeoutRef.current) {
+                                      clearTimeout(recordingStopTimeoutRef.current)
+                                      recordingStopTimeoutRef.current = null
+                                    }
+                                    if (recordingStartTime) {
+                                      setRecordingDuration(getElapsedRecordingSeconds(
+                                        recordingStartTime,
+                                        Date.now(),
+                                        roleplayDuration * 60,
+                                      ))
+                                    }
+                                    setRecordingStartTime(null)
+                                    stopRecording()
+                                  }}
+                                  className="flex items-center px-6 py-3 border border-neutral-300 dark:border-neutral-700 hover:border-black dark:hover:border-white text-black dark:text-white text-sm font-medium bg-white dark:bg-black transition-colors"
                                 >
                                   <Square className="w-5 h-5 mr-2" />
                                   Stop Recording
@@ -833,11 +891,16 @@ export default function CategoryRoleplayPage() {
                                 <>
                                   <button
                                     onClick={() => {
+                                      if (recordingStopTimeoutRef.current) {
+                                        clearTimeout(recordingStopTimeoutRef.current)
+                                        recordingStopTimeoutRef.current = null
+                                      }
+                                      setRecordingStartTime(null)
                                       setRecordedAudioBlob(null)
                                       setRecordingDuration(0)
                                       setHasAiProcessingConsent(false)
                                     }}
-                                    className="flex items-center px-6 py-3 border border-gray-300 dark:border-gray-700 hover:border-black dark:hover:border-white text-black dark:text-white text-sm font-medium bg-white dark:bg-black transition-colors"
+                                    className="flex items-center px-6 py-3 border border-neutral-300 dark:border-neutral-700 hover:border-black dark:hover:border-white text-black dark:text-white text-sm font-medium bg-white dark:bg-black transition-colors"
                                   >
                                     <RotateCcw className="w-5 h-5 mr-2" />
                                     Re-record
@@ -849,67 +912,51 @@ export default function CategoryRoleplayPage() {
                                       
                                       setIsSubmitting(true)
                                       try {
-                                        // Convert blob to base64
-                                        const reader = new FileReader()
-                                        reader.readAsDataURL(recordedAudioBlob)
-                                        reader.onloadend = async () => {
-                                          const base64Audio = reader.result as string
-                                          const response = await fetch('/api/roleplay/process', {
-                                            method: 'POST',
-                                            headers: { 'Content-Type': 'application/json' },
-                                            body: JSON.stringify({
-                                              audio: base64Audio,
-                                              scenario,
-                                              category: displayName,
-                                              duration: recordingDuration
-                                            })
+                                        const base64Audio = await blobToDataUrl(recordedAudioBlob)
+                                        const response = await fetch('/api/roleplay/process', {
+                                          method: 'POST',
+                                          headers: { 'Content-Type': 'application/json' },
+                                          body: JSON.stringify({
+                                            audio: base64Audio,
+                                            scenario,
+                                            category: displayName,
+                                            duration: recordingDuration
                                           })
-                                          
-                                          if (!response.ok) {
-                                            const errorData = await response.json()
-                                            // Check for silent audio error
-                                            if (errorData.error === 'silent_audio') {
-                                              alert(errorData.message || 'No audio detected in your recording. Please ensure your microphone is working and try again.')
-                                              // Reset recording states for retry
-                                              setRecordedAudioBlob(null)
-                                              setRecordingDuration(0)
-                                              setIsSubmitting(false)
-                                              return
-                                            }
-                                            
-                                            // Check for grading error
-                                            if (errorData.error === 'grading_failed') {
-                                              alert(`AI Grading Error: ${errorData.message}\n\n${errorData.details || 'Please try submitting again.'}`)
-                                              setIsSubmitting(false)
-                                              return
-                                            }
-                                            
-                                            throw new Error(errorData.message || errorData.error || `Failed to process audio`)
+                                        })
+                                        const responseData = await readApiPayload<{
+                                          error?: string
+                                          message?: string
+                                          details?: string
+                                          sessionId?: string
+                                        }>(response, 'AI grading is temporarily unavailable. Your recording is still available to retry.')
+
+                                        if (!response.ok) {
+                                          if (responseData.error === 'silent_audio') {
+                                            alert(getApiErrorMessage(responseData, 'No audio was detected. Please check your microphone and record again.'))
+                                            setRecordedAudioBlob(null)
+                                            setRecordingDuration(0)
+                                            setHasAiProcessingConsent(false)
+                                            setIsSubmitting(false)
+                                            return
                                           }
-                                          
-                                          const responseData = await response.json()
-                                          const { sessionId } = responseData
-                                          
-                                          if (!sessionId) {
-                                            throw new Error('No session ID returned from API')
+
+                                          if (responseData.error === 'grading_failed') {
+                                            throw new Error(getApiErrorMessage(responseData, 'AI grading could not be completed. Please try again.'))
                                           }
-                                          
-                                          // Navigate to review page with just session ID
-                                          router.push(`/roleplay/review?id=${sessionId}`)
+
+                                          throw new Error(getApiErrorMessage(responseData, 'Failed to process audio'))
                                         }
-                                        
-                                        reader.onerror = () => {
-                                          alert('Failed to read audio file. Please try again.')
-                                          setIsSubmitting(false)
-                                        }
+
+                                        if (!responseData.sessionId) throw new Error('No session ID returned from API')
+                                        router.push(`/roleplay/review?id=${responseData.sessionId}`)
                                       } catch (error) {
                                         console.error('Error processing audio:', error)
-                                        alert(`Failed to process audio: ${error instanceof Error ? error.message : 'Unknown error'}`)
+                                        alert(error instanceof Error ? error.message : 'Failed to process audio. Please try again.')
                                         setIsSubmitting(false)
                                       }
                                     }}
                                     disabled={isSubmitting || !hasAiProcessingConsent}
-                                    className="flex items-center px-6 py-3 border border-gray-300 dark:border-gray-700 hover:border-black dark:hover:border-white text-black dark:text-white text-sm font-medium bg-white dark:bg-black transition-colors disabled:opacity-50"
+                                    className="flex items-center px-6 py-3 border border-neutral-300 dark:border-neutral-700 hover:border-black dark:hover:border-white text-black dark:text-white text-sm font-medium bg-white dark:bg-black transition-colors disabled:opacity-50"
                                   >
                                     <Upload className="w-5 h-5 mr-2" />
                                     {isSubmitting ? 'Processing...' : 'Submit for AI Grading'}
@@ -920,7 +967,7 @@ export default function CategoryRoleplayPage() {
 
                             {isSubmitting && (
                               <div className="mt-6">
-                                <div className="border border-gray-300 dark:border-gray-700 p-6">
+                                <div className="border border-neutral-300 dark:border-neutral-700 p-6">
                                   <div className="flex flex-col items-center space-y-4">
                                     {/* Animated Mic Icon */}
                                     <div className="relative">
@@ -933,27 +980,27 @@ export default function CategoryRoleplayPage() {
                                     {/* Progress Steps */}
                                     <div className="w-full max-w-md">
                                       <div className="flex justify-between mb-2">
-                                        <span className="text-xs text-gray-600 dark:text-gray-400">Transcribing Audio</span>
-                                        <span className="text-xs text-gray-600 dark:text-gray-400">Analyzing Performance</span>
-                                        <span className="text-xs text-gray-600 dark:text-gray-400">Generating Feedback</span>
+                                        <span className="text-xs text-neutral-600 dark:text-neutral-400">Transcribing Audio</span>
+                                        <span className="text-xs text-neutral-600 dark:text-neutral-400">Analyzing Performance</span>
+                                        <span className="text-xs text-neutral-600 dark:text-neutral-400">Generating Feedback</span>
                                       </div>
-                                      <div className="w-full border border-gray-300 dark:border-gray-700 h-2">
+                                      <div className="w-full border border-neutral-300 dark:border-neutral-700 h-2">
                                         <div className="bg-black dark:bg-white h-2  animate-pulse" style={{width: '60%'}}></div>
                                       </div>
                                     </div>
                                     
                                     <div className="text-center">
-                                      <p className="text-sm font-medium text-gray-800 dark:text-white mb-1">
+                                      <p className="text-sm font-medium text-neutral-800 dark:text-white mb-1">
                                         AI Judge is reviewing your performance...
                                       </p>
-                                      <p className="text-xs text-gray-600 dark:text-gray-400">
+                                      <p className="text-xs text-neutral-600 dark:text-neutral-400">
                                         This typically takes 30-60 seconds
                                       </p>
                                     </div>
                                     
                                     {/* Prompt While Waiting */}
-                                    <div className="border border-gray-300 dark:border-gray-700 p-3 max-w-sm">
-                                      <p className="text-xs text-gray-600 dark:text-gray-400 italic">
+                                    <div className="border border-neutral-300 dark:border-neutral-700 p-3 max-w-sm">
+                                      <p className="text-xs text-neutral-600 dark:text-neutral-400 italic">
                                         Tip: Think of one strength and one improvement area in your presentation.
                                       </p>
                                     </div>
@@ -964,8 +1011,16 @@ export default function CategoryRoleplayPage() {
                           </div>
                         )}
                         onStop={(blobUrl, blob) => {
+                          if (recordingStopTimeoutRef.current) {
+                            clearTimeout(recordingStopTimeoutRef.current)
+                            recordingStopTimeoutRef.current = null
+                          }
+                          setRecordingStartTime(null)
                           if (blob.size === 0) {
                             alert('Recording failed - no audio data captured. Please check your microphone.')
+                            setRecordedAudioBlob(null)
+                            setRecordingDuration(0)
+                            return
                           }
                           setRecordedAudioBlob(blob)
                         }}
@@ -973,7 +1028,7 @@ export default function CategoryRoleplayPage() {
                       ) : (
                         <div className="text-center py-8">
                           <div className="animate-spin  h-8 w-8 border-b-2 border-black dark:border-white mx-auto mb-4"></div>
-                          <p className="text-gray-600 dark:text-gray-400">Loading recording interface...</p>
+                          <p className="text-neutral-600 dark:text-neutral-400">Loading recording interface...</p>
                         </div>
                       )}
                     </div>
@@ -981,7 +1036,7 @@ export default function CategoryRoleplayPage() {
 
                   {/* Self Scoring Section - Inline */}
                   {showScoring && !showAudioRecording && scenario && (
-                    <div className="bg-white dark:bg-black border border-gray-300 dark:border-gray-700 p-8">
+                    <div className="bg-white dark:bg-black border border-neutral-300 dark:border-neutral-700 p-8">
                       <h3 className="text-2xl font-light text-black dark:text-white mb-6 text-center">Score Performance - {scenario.eventCode}</h3>
 
                       {/* Performance Indicators Scoring */}
@@ -989,9 +1044,9 @@ export default function CategoryRoleplayPage() {
                         <h4 className="font-light text-black dark:text-white mb-3">Performance Indicators</h4>
                         <div className="space-y-4">
                           {scenario.performanceIndicators.map((indicator, index) => (
-                            <div key={index} className="border border-gray-300 dark:border-gray-700 p-4">
+                            <div key={index} className="border border-neutral-300 dark:border-neutral-700 p-4">
                               <p className="font-light text-black dark:text-white mb-2">{index + 1}. {indicator}</p>
-                              <div className="flex items-center space-x-4">
+                              <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:gap-4">
                                 <input
                                   aria-label={`Self score for performance indicator ${index + 1}: ${indicator}`}
                                   type="number"
@@ -1004,14 +1059,14 @@ export default function CategoryRoleplayPage() {
                                     const value = Math.min(maximum, Math.max(0, parseInt(e.target.value) || 0));
                                     setScores(prev => ({ ...prev, [`indicator-${index}`]: value }));
                                   }}
-                                  className="w-20 px-3 py-2 border border-gray-300 dark:border-gray-600 focus:outline-none bg-white dark:bg-black text-black dark:text-white"
+                                  className="w-20 px-3 py-2 border border-neutral-300 dark:border-neutral-600 focus:outline-none bg-white dark:bg-black text-black dark:text-white"
                                 />
-                                <span className="text-sm text-gray-600 dark:text-gray-400">/ {scenario.scoringRubric.performanceIndicators[index]?.maxPoints || 14} points</span>
-                                <div className="flex-1 flex space-x-2 text-xs">
-                                  <span className="px-2 py-1 border border-gray-300 dark:border-gray-700 text-black dark:text-white">{scenario.scoringRubric.performanceIndicators[index]?.levels.little.points}: Little/No</span>
-                                  <span className="px-2 py-1 border border-gray-300 dark:border-gray-700 text-black dark:text-white">{scenario.scoringRubric.performanceIndicators[index]?.levels.below.points}: Below</span>
-                                  <span className="px-2 py-1 border border-gray-300 dark:border-gray-700 text-black dark:text-white">{scenario.scoringRubric.performanceIndicators[index]?.levels.meets.points}: Meets</span>
-                                  <span className="px-2 py-1 border border-gray-300 dark:border-gray-700 text-black dark:text-white">{scenario.scoringRubric.performanceIndicators[index]?.levels.exceeds.points}: Exceeds</span>
+                                <span className="text-sm text-neutral-600 dark:text-neutral-400">/ {scenario.scoringRubric.performanceIndicators[index]?.maxPoints || 14} points</span>
+                                <div className="flex flex-1 flex-wrap gap-2 text-xs">
+                                  <span className="px-2 py-1 border border-neutral-300 dark:border-neutral-700 text-black dark:text-white">{scenario.scoringRubric.performanceIndicators[index]?.levels.little.points}: Little/No</span>
+                                  <span className="px-2 py-1 border border-neutral-300 dark:border-neutral-700 text-black dark:text-white">{scenario.scoringRubric.performanceIndicators[index]?.levels.below.points}: Below</span>
+                                  <span className="px-2 py-1 border border-neutral-300 dark:border-neutral-700 text-black dark:text-white">{scenario.scoringRubric.performanceIndicators[index]?.levels.meets.points}: Meets</span>
+                                  <span className="px-2 py-1 border border-neutral-300 dark:border-neutral-700 text-black dark:text-white">{scenario.scoringRubric.performanceIndicators[index]?.levels.exceeds.points}: Exceeds</span>
                                 </div>
                               </div>
                             </div>
@@ -1024,9 +1079,9 @@ export default function CategoryRoleplayPage() {
                         <h4 className="font-light text-black dark:text-white mb-3">Solution</h4>
                         <div className="space-y-4">
                           {scenario.scoringRubric.solution.map((criterion, index) => (
-                            <div key={criterion.name} className="border border-gray-300 dark:border-gray-700 p-4">
+                            <div key={criterion.name} className="border border-neutral-300 dark:border-neutral-700 p-4">
                               <p className="font-light text-black dark:text-white mb-2">{criterion.name}</p>
-                              <div className="flex items-center space-x-4">
+                              <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:gap-4">
                                 <input
                                   aria-label={`Self score for solution criterion ${criterion.name}`}
                                   type="number"
@@ -1038,9 +1093,9 @@ export default function CategoryRoleplayPage() {
                                     const value = Math.min(criterion.maxPoints, Math.max(0, parseInt(e.target.value) || 0))
                                     setScores(prev => ({ ...prev, [`solution-${index}`]: value }))
                                   }}
-                                  className="w-20 px-3 py-2 border border-gray-300 dark:border-gray-600 focus:outline-none bg-white dark:bg-black text-black dark:text-white"
+                                  className="w-20 px-3 py-2 border border-neutral-300 dark:border-neutral-600 focus:outline-none bg-white dark:bg-black text-black dark:text-white"
                                 />
-                                <span className="text-sm text-gray-600 dark:text-gray-400">/ {criterion.maxPoints} points</span>
+                                <span className="text-sm text-neutral-600 dark:text-neutral-400">/ {criterion.maxPoints} points</span>
                               </div>
                             </div>
                           ))}
@@ -1052,9 +1107,9 @@ export default function CategoryRoleplayPage() {
                         <h4 className="font-light text-black dark:text-white mb-3">Career Competencies (0-6 points each)</h4>
                         <div className="space-y-4">
                           {scenario.centurySkills.map((skill, index) => (
-                            <div key={index} className="border border-gray-300 dark:border-gray-700 p-4">
+                            <div key={index} className="border border-neutral-300 dark:border-neutral-700 p-4">
                               <p className="font-light text-black dark:text-white mb-2">{skill}</p>
-                              <div className="flex items-center space-x-4">
+                              <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:gap-4">
                                 <input
                                   aria-label={`Self score for career competency ${index + 1}: ${skill}`}
                                   type="number"
@@ -1066,14 +1121,14 @@ export default function CategoryRoleplayPage() {
                                     const value = Math.min(6, Math.max(0, parseInt(e.target.value) || 0));
                                     setScores(prev => ({ ...prev, [`skill-${index}`]: value }));
                                   }}
-                                  className="w-20 px-3 py-2 border border-gray-300 dark:border-gray-600 focus:outline-none bg-white dark:bg-black text-black dark:text-white"
+                                  className="w-20 px-3 py-2 border border-neutral-300 dark:border-neutral-600 focus:outline-none bg-white dark:bg-black text-black dark:text-white"
                                 />
-                                <span className="text-sm text-gray-600 dark:text-gray-400">/ 6 points</span>
-                                <div className="flex-1 flex space-x-2 text-xs">
-                                  <span className="px-2 py-1 border border-gray-300 dark:border-gray-700 text-black dark:text-white">0-1: Little/No</span>
-                                  <span className="px-2 py-1 border border-gray-300 dark:border-gray-700 text-black dark:text-white">2-3: Below</span>
-                                  <span className="px-2 py-1 border border-gray-300 dark:border-gray-700 text-black dark:text-white">4: Meets</span>
-                                  <span className="px-2 py-1 border border-gray-300 dark:border-gray-700 text-black dark:text-white">5-6: Exceeds</span>
+                                <span className="text-sm text-neutral-600 dark:text-neutral-400">/ 6 points</span>
+                                <div className="flex flex-1 flex-wrap gap-2 text-xs">
+                                  <span className="px-2 py-1 border border-neutral-300 dark:border-neutral-700 text-black dark:text-white">0-1: Little/No</span>
+                                  <span className="px-2 py-1 border border-neutral-300 dark:border-neutral-700 text-black dark:text-white">2-3: Below</span>
+                                  <span className="px-2 py-1 border border-neutral-300 dark:border-neutral-700 text-black dark:text-white">4: Meets</span>
+                                  <span className="px-2 py-1 border border-neutral-300 dark:border-neutral-700 text-black dark:text-white">5-6: Exceeds</span>
                                 </div>
                               </div>
                             </div>
@@ -1084,9 +1139,9 @@ export default function CategoryRoleplayPage() {
                       {/* Overall Impression */}
                       <div className="mb-6">
                         <h4 className="font-light text-black dark:text-white mb-3">Overall Impression (0-{scenario.scoringRubric.overallImpression.maxPoints} points)</h4>
-                        <div className="border border-gray-300 dark:border-gray-700 p-4">
+                        <div className="border border-neutral-300 dark:border-neutral-700 p-4">
                           <p className="font-light text-black dark:text-white mb-2">10. Overall impression and responses to the judge's questions</p>
-                          <div className="flex items-center space-x-4">
+                          <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:gap-4">
                             <input
                               aria-label="Self score for overall impression"
                               type="number"
@@ -1098,21 +1153,21 @@ export default function CategoryRoleplayPage() {
                                 const value = Math.min(scenario.scoringRubric.overallImpression.maxPoints, Math.max(0, parseInt(e.target.value) || 0));
                                 setScores(prev => ({ ...prev, overall: value }));
                               }}
-                              className="w-20 px-3 py-2 border border-gray-300 dark:border-gray-600 focus:outline-none bg-white dark:bg-black text-black dark:text-white"
+                              className="w-20 px-3 py-2 border border-neutral-300 dark:border-neutral-600 focus:outline-none bg-white dark:bg-black text-black dark:text-white"
                             />
-                            <span className="text-sm text-gray-600">/ {scenario.scoringRubric.overallImpression.maxPoints} points</span>
-                            <div className="flex-1 flex space-x-2 text-xs">
-                              <span className="px-2 py-1 border border-gray-300 dark:border-gray-700 text-black dark:text-white">0-1: Little/No</span>
-                              <span className="px-2 py-1 border border-gray-300 dark:border-gray-700 text-black dark:text-white">2-3: Below</span>
-                              <span className="px-2 py-1 border border-gray-300 dark:border-gray-700 text-black dark:text-white">4: Meets</span>
-                              <span className="px-2 py-1 border border-gray-300 dark:border-gray-700 text-black dark:text-white">5-6: Exceeds</span>
+                            <span className="text-sm text-neutral-600">/ {scenario.scoringRubric.overallImpression.maxPoints} points</span>
+                            <div className="flex flex-1 flex-wrap gap-2 text-xs">
+                              <span className="px-2 py-1 border border-neutral-300 dark:border-neutral-700 text-black dark:text-white">0-1: Little/No</span>
+                              <span className="px-2 py-1 border border-neutral-300 dark:border-neutral-700 text-black dark:text-white">2-3: Below</span>
+                              <span className="px-2 py-1 border border-neutral-300 dark:border-neutral-700 text-black dark:text-white">4: Meets</span>
+                              <span className="px-2 py-1 border border-neutral-300 dark:border-neutral-700 text-black dark:text-white">5-6: Exceeds</span>
                             </div>
                           </div>
                         </div>
                       </div>
 
                       {/* Total Score */}
-                      <div className="mb-6 p-4 border border-gray-300 dark:border-gray-700">
+                      <div className="mb-6 p-4 border border-neutral-300 dark:border-neutral-700">
                         <h4 className="font-light text-black dark:text-white mb-2">Total Score</h4>
                         <p className="text-2xl font-light text-black dark:text-white">
                           {Object.values(scores).reduce((sum, score) => sum + score, 0)} / 100
@@ -1125,18 +1180,43 @@ export default function CategoryRoleplayPage() {
                           onClick={() => {
                             setScores({})
                           }}
-                          className="px-6 py-2 border border-gray-300 dark:border-gray-700 hover:border-black dark:hover:border-white text-black dark:text-white text-sm font-medium bg-white dark:bg-black transition-colors"
+                          className="px-6 py-2 border border-neutral-300 dark:border-neutral-700 hover:border-black dark:hover:border-white text-black dark:text-white text-sm font-medium bg-white dark:bg-black transition-colors"
                         >
                           Clear Scores
                         </button>
                         <button
-                          onClick={() => {
-                            // Save scores logic here
-                            alert(`Performance scored: ${Object.values(scores).reduce((sum, score) => sum + score, 0)}/100`);
+                          onClick={async () => {
+                            setIsSavingSelfScore(true)
+                            try {
+                              const response = await fetch('/api/roleplay/self-score', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                  scenario,
+                                  category: displayName,
+                                  duration: 0,
+                                  scores,
+                                }),
+                              })
+                              const responseData = await readApiPayload<{
+                                error?: string
+                                message?: string
+                                sessionId?: string
+                              }>(response, 'Your self-score could not be saved. Please try again.')
+                              if (!response.ok) {
+                                throw new Error(getApiErrorMessage(responseData, 'Your self-score could not be saved.'))
+                              }
+                              if (!responseData.sessionId) throw new Error('No session ID returned from API')
+                              router.push(`/roleplay/review?id=${responseData.sessionId}`)
+                            } catch (error) {
+                              alert(error instanceof Error ? error.message : 'Your self-score could not be saved. Please try again.')
+                              setIsSavingSelfScore(false)
+                            }
                           }}
-                          className="px-6 py-2 border border-gray-300 dark:border-gray-700 hover:border-black dark:hover:border-white text-black dark:text-white text-sm font-medium bg-white dark:bg-black transition-colors"
+                          disabled={isSavingSelfScore}
+                          className="border border-neutral-300 bg-white px-6 py-2 text-sm font-medium text-black transition-colors hover:border-black disabled:opacity-50 dark:border-neutral-700 dark:bg-black dark:text-white dark:hover:border-white"
                         >
-                          Save Score
+                          {isSavingSelfScore ? 'Saving...' : 'Save Score'}
                         </button>
                       </div>
                     </div>
@@ -1145,7 +1225,7 @@ export default function CategoryRoleplayPage() {
               )}
 
               {/* Floating Navigation Buttons */}
-              <div className="fixed bottom-8 right-8 flex gap-4 z-40">
+              <div className="fixed bottom-4 left-4 right-4 z-40 flex flex-wrap justify-end gap-3 lg:bottom-8 lg:left-auto lg:right-8 lg:gap-4">
                 {activeTab === 'scenario' && (
                   <button
                     onClick={() => {
@@ -1153,7 +1233,7 @@ export default function CategoryRoleplayPage() {
                       setPrepTimeRemaining(prepTime * 60)
                       setIsPrepTimerRunning(true)
                     }}
-                    className="px-6 py-3 border border-gray-300 dark:border-gray-700 hover:border-black dark:hover:border-white text-black dark:text-white font-medium bg-white dark:bg-black shadow-lg transition-all hover:shadow-xl"
+                    className="px-6 py-3 border border-neutral-300 dark:border-neutral-700 hover:border-black dark:hover:border-white text-black dark:text-white font-medium bg-white dark:bg-black shadow-lg transition-all hover:shadow-xl"
                   >
                     Start Prep Time →
                   </button>
@@ -1162,7 +1242,7 @@ export default function CategoryRoleplayPage() {
                   <>
                     <button
                       onClick={() => setActiveTab('scenario')}
-                      className="px-6 py-3 border border-gray-300 dark:border-gray-700 hover:border-black dark:hover:border-white text-black dark:text-white font-medium bg-white dark:bg-black shadow-lg transition-all hover:shadow-xl"
+                      className="px-6 py-3 border border-neutral-300 dark:border-neutral-700 hover:border-black dark:hover:border-white text-black dark:text-white font-medium bg-white dark:bg-black shadow-lg transition-all hover:shadow-xl"
                     >
                       ← Back
                     </button>
@@ -1171,7 +1251,7 @@ export default function CategoryRoleplayPage() {
                         setActiveTab('record')
                         setIsPrepTimerRunning(false)
                       }}
-                      className="px-6 py-3 border border-gray-300 dark:border-gray-700 hover:border-black dark:hover:border-white text-black dark:text-white font-medium bg-white dark:bg-black shadow-lg transition-all hover:shadow-xl"
+                      className="px-6 py-3 border border-neutral-300 dark:border-neutral-700 hover:border-black dark:hover:border-white text-black dark:text-white font-medium bg-white dark:bg-black shadow-lg transition-all hover:shadow-xl"
                     >
                       Start Recording →
                     </button>
@@ -1180,7 +1260,7 @@ export default function CategoryRoleplayPage() {
                 {activeTab === 'record' && (
                   <button
                     onClick={() => setActiveTab('prep')}
-                    className="px-6 py-3 border border-gray-300 dark:border-gray-700 hover:border-black dark:hover:border-white text-black dark:text-white font-medium bg-white dark:bg-black shadow-lg transition-all hover:shadow-xl"
+                    className="px-6 py-3 border border-neutral-300 dark:border-neutral-700 hover:border-black dark:hover:border-white text-black dark:text-white font-medium bg-white dark:bg-black shadow-lg transition-all hover:shadow-xl"
                   >
                     ← Back to Prep
                   </button>

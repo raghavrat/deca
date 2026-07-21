@@ -32,8 +32,8 @@ export default function ImageCarousel({ images, autoPlayInterval = 4000 }: Image
   if (!images || images.length === 0) {
     return (
       <div className="relative w-full max-w-6xl mx-auto">
-        <div className="relative aspect-video bg-gray-100 dark:bg-gray-800 rounded-lg overflow-hidden shadow-2xl flex items-center justify-center">
-          <p className="text-gray-600 dark:text-gray-400">No images to display</p>
+        <div className="relative aspect-video bg-neutral-100 dark:bg-neutral-800 rounded-lg overflow-hidden shadow-2xl flex items-center justify-center">
+          <p className="text-neutral-600 dark:text-neutral-400">No images to display</p>
         </div>
       </div>
     )
@@ -57,7 +57,7 @@ export default function ImageCarousel({ images, autoPlayInterval = 4000 }: Image
   return (
     <section aria-label="Deca Pal feature screenshots" aria-roledescription="carousel" className="relative w-full max-w-4xl mx-auto">
       {/* Main Image Container */}
-      <div className="relative aspect-video bg-gray-50 dark:bg-gray-900 rounded-2xl overflow-hidden shadow-xl" role="group" aria-roledescription="slide" aria-label={`${currentIndex + 1} of ${images.length}`}>
+      <div className="relative aspect-video bg-neutral-50 dark:bg-neutral-900 rounded-2xl overflow-hidden shadow-xl" role="group" aria-roledescription="slide" aria-label={`${currentIndex + 1} of ${images.length}`}>
         <Image
           src={images[currentIndex].src}
           alt={images[currentIndex].alt}
@@ -108,7 +108,7 @@ export default function ImageCarousel({ images, autoPlayInterval = 4000 }: Image
             aria-label={`Go to slide ${index + 1}`}
             aria-current={index === currentIndex ? 'true' : undefined}
           >
-            <span aria-hidden="true" className={`h-2.5 w-2.5 rounded-full ${index === currentIndex ? 'bg-black dark:bg-white' : 'bg-gray-400 dark:bg-gray-500'}`} />
+            <span aria-hidden="true" className={`h-2.5 w-2.5 rounded-full ${index === currentIndex ? 'bg-black dark:bg-white' : 'bg-neutral-400 dark:bg-neutral-500'}`} />
           </button>
         ))}
         <button type="button" onClick={() => setIsPlaying(value => !value)} className="min-h-11 px-3 text-sm underline underline-offset-4">

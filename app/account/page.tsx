@@ -63,7 +63,7 @@ export default function AccountPage() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="text-gray-500 dark:text-gray-400">Loading...</div>
+        <div className="text-neutral-500 dark:text-neutral-400">Loading...</div>
       </div>
     )
   }
@@ -152,21 +152,21 @@ export default function AccountPage() {
         {/* Header */}
         <div className="p-6 mb-6">
           <h1 className="text-4xl font-light text-black dark:text-white mb-2">Account Dashboard</h1>
-          <p className="text-sm text-gray-600 dark:text-gray-400">{user.email}</p>
+          <p className="text-sm text-neutral-600 dark:text-neutral-400">{user.email}</p>
         </div>
 
         {/* Name Section */}
-        <div className="p-6 mb-6 border-b border-gray-300 dark:border-gray-700">
+        <div className="p-6 mb-6 border-b border-neutral-300 dark:border-neutral-700">
           <h2 className="text-xl font-light text-black dark:text-white mb-4">Display Name</h2>
           {!isEditingName ? (
             <div className="flex items-center justify-between">
               <div className="flex items-center">
-                <UserIcon className="h-6 w-6 text-gray-500 dark:text-gray-400 mr-3" />
+                <UserIcon className="h-6 w-6 text-neutral-500 dark:text-neutral-400 mr-3" />
                 <span className="text-lg text-black dark:text-white">{name || 'No name set'}</span>
               </div>
               <button 
                 onClick={() => setIsEditingName(true)} 
-                className="text-sm text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors duration-200"
+                className="text-sm text-neutral-600 dark:text-neutral-400 hover:text-black dark:hover:text-white transition-colors duration-200"
               >
                 Edit
               </button>
@@ -186,10 +186,10 @@ export default function AccountPage() {
                   placeholder="Enter your display name"
                   aria-label="Display name"
                 />
-                <button type="submit" aria-label="Save display name" className="ml-3 px-4 py-2 border border-gray-300 dark:border-gray-700 hover:border-black dark:hover:border-white transition-colors duration-200">
+                <button type="submit" aria-label="Save display name" className="ml-3 px-4 py-2 border border-neutral-300 dark:border-neutral-700 hover:border-black dark:hover:border-white transition-colors duration-200">
                   <Save className="h-5 w-5" />
                 </button>
-                <button type="button" onClick={() => setIsEditingName(false)} className="ml-2 px-4 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors duration-200">
+                <button type="button" onClick={() => setIsEditingName(false)} className="ml-2 px-4 py-2 text-sm text-neutral-600 dark:text-neutral-400 hover:text-black dark:hover:text-white transition-colors duration-200">
                   Cancel
                 </button>
               </div>
@@ -200,42 +200,42 @@ export default function AccountPage() {
 
         {/* Stats Overview */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-          <div className="p-6 border border-gray-300 dark:border-gray-700">
+          <div className="p-6 border border-neutral-300 dark:border-neutral-700">
             <div className="flex items-center justify-between mb-4">
               <div className="p-3">
-                <Target className="h-6 w-6 text-gray-600 dark:text-gray-400" />
+                <Target className="h-6 w-6 text-neutral-600 dark:text-neutral-400" />
               </div>
             </div>
             <h3 className="text-2xl font-light text-black dark:text-white">{stats.totalQuestions}</h3>
-            <p className="text-gray-600 dark:text-gray-400 text-sm">Total Questions Attempted</p>
+            <p className="text-neutral-600 dark:text-neutral-400 text-sm">Total Questions Attempted</p>
           </div>
 
-          <div className="p-6 border border-gray-300 dark:border-gray-700">
+          <div className="p-6 border border-neutral-300 dark:border-neutral-700">
             <div className="flex items-center justify-between mb-4">
               <div className="p-3">
-                <TrendingUp className="h-6 w-6 text-gray-600 dark:text-gray-400" />
+                <TrendingUp className="h-6 w-6 text-neutral-600 dark:text-neutral-400" />
               </div>
             </div>
             <h3 className="text-2xl font-light text-black dark:text-white">{stats.streak || 0}</h3>
-            <p className="text-gray-600 dark:text-gray-400 text-sm">Day Streak</p>
+            <p className="text-neutral-600 dark:text-neutral-400 text-sm">Day Streak</p>
           </div>
 
-          <div className="p-6 border border-gray-300 dark:border-gray-700">
+          <div className="p-6 border border-neutral-300 dark:border-neutral-700">
             <div className="flex items-center justify-between mb-4">
               <div className="p-3">
-                <Clock className="h-6 w-6 text-gray-600 dark:text-gray-400" />
+                <Clock className="h-6 w-6 text-neutral-600 dark:text-neutral-400" />
               </div>
             </div>
             <h3 className="text-lg font-light text-black dark:text-white">
               {stats.lastAttempt ? new Date(stats.lastAttempt).toLocaleDateString() : 'No attempts yet'}
             </h3>
-            <p className="text-gray-600 dark:text-gray-400 text-sm">Last Activity</p>
+            <p className="text-neutral-600 dark:text-neutral-400 text-sm">Last Activity</p>
           </div>
           </div>
 
-        <section aria-labelledby="privacy-controls-heading" className="mt-10 border-t border-gray-300 p-6 dark:border-gray-700">
+        <section aria-labelledby="privacy-controls-heading" className="mt-10 border-t border-neutral-300 p-6 dark:border-neutral-700">
           <h2 id="privacy-controls-heading" className="mb-2 text-xl font-light text-black dark:text-white">Your data</h2>
-          <p className="mb-6 text-sm leading-6 text-gray-600 dark:text-gray-400">
+          <p className="mb-6 text-sm leading-6 text-neutral-600 dark:text-neutral-400">
             Download a copy of your server-stored information, or permanently delete your account, profile, and roleplay history.
           </p>
 
@@ -250,7 +250,7 @@ export default function AccountPage() {
               onChange={(event) => handleLeaderboardVisibility(event.target.checked)}
               className="mt-1 h-5 w-5"
             />
-            <label htmlFor="leaderboard-visible" className="text-sm leading-6 text-gray-700 dark:text-gray-300">
+            <label htmlFor="leaderboard-visible" className="text-sm leading-6 text-neutral-700 dark:text-neutral-300">
               Show my display name and problems-completed total on the student leaderboard. This is off by default.
             </label>
           </div>
@@ -259,7 +259,7 @@ export default function AccountPage() {
             type="button"
             onClick={handleExport}
             disabled={isExporting}
-            className="mb-8 inline-flex min-h-11 items-center border border-gray-400 px-4 py-2 text-sm disabled:opacity-50 dark:border-gray-600"
+            className="mb-8 inline-flex min-h-11 items-center border border-neutral-400 px-4 py-2 text-sm disabled:opacity-50 dark:border-neutral-600"
           >
             <Download aria-hidden="true" className="mr-2 h-4 w-4" />
             {isExporting ? 'Preparing download…' : 'Download my data'}
@@ -267,7 +267,7 @@ export default function AccountPage() {
 
           <div className="border border-red-300 p-5 dark:border-red-900">
             <h3 className="mb-2 text-lg font-medium text-red-800 dark:text-red-300">Delete account permanently</h3>
-            <p className="mb-4 text-sm leading-6 text-gray-700 dark:text-gray-300">
+            <p className="mb-4 text-sm leading-6 text-neutral-700 dark:text-neutral-300">
               This cannot be undone. Type <strong>DELETE</strong> to confirm.
             </p>
             <label htmlFor="delete-confirmation" className="mb-2 block text-sm font-medium">Confirmation</label>

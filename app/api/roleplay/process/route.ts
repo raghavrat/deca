@@ -5,6 +5,7 @@ import { saveRoleplayForUser } from '../../../utils/roleplayStore'
 import { RateLimiter } from '../../../utils/rateLimiter'
 import { FORMAT_RULES, getRoleplayProfile } from '../../../data/roleplayProfiles'
 import { getSolutionCriteria } from '../../../utils/roleplayPromptBuilder'
+import { parseAudioDataUrl } from '../../../utils/audioDataUrl'
 
 const MAX_REQUEST_CHARS = 18_000_000
 const MAX_AUDIO_BASE64_CHARS = 16_000_000
@@ -32,8 +33,6 @@ export async function POST(request: NextRequest) {
         { status: 429 },
       )
     }
-    submissionRateLimiter.recordIdentifier(rateLimitKey)
-
     const contentLength = Number(request.headers.get('content-length') || 0)
     if (contentLength > MAX_REQUEST_CHARS) {
       return NextResponse.json({ error: 'Audio upload is too large' }, { status: 413 })
@@ -110,12 +109,14 @@ Return ONLY a JSON object with this format:
   "totalDuration": "MM:SS"
 }`
 
-    const audioMatch = audio.match(/^data:audio\/(webm|wav|x-wav)(?:;codecs=[^;,]+)?;base64,([A-Za-z0-9+/=]+)$/)
-    if (!audioMatch) {
+    const parsedAudio = parseAudioDataUrl(audio)
+    if (!parsedAudio) {
       return NextResponse.json({ error: 'Unsupported audio format' }, { status: 415 })
     }
-    const audioFormat = audioMatch[1] === 'webm' ? 'webm' : 'wav'
-    const audioBase64 = audioMatch[2]
+    const audioFormat = parsedAudio.format
+    const audioBase64 = parsedAudio.base64
+
+    submissionRateLimiter.recordIdentifier(rateLimitKey)
     
     // STEP 1: Transcribe audio with Gemini 2.0 Flash
     let transcript

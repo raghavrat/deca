@@ -2,7 +2,7 @@ import Link from 'next/link'
 
 export default function Footer() {
   return (
-    <footer className="border-t border-gray-200 px-4 py-8 text-sm text-gray-700 dark:border-gray-800 dark:text-gray-300">
+    <footer className="border-t border-neutral-200 px-4 py-8 text-sm text-neutral-700 dark:border-neutral-800 dark:text-neutral-300">
       <div className="mx-auto flex max-w-6xl flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
         <div className="max-w-xl">
           <p className="font-medium text-black dark:text-white">Deca Pal</p>

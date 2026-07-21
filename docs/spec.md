@@ -62,7 +62,7 @@ We provide DECA students with a modern, comprehensive, and engaging platform tha
 #### 2. Practice Test System
 **Description**: Interactive quiz platform with immediate feedback
 **Specifications**:
-- Randomized multiple-choice selections from a committed, fixed 5,000-item first-party bank based on original business concept blueprints
+- Blueprint-weighted multiple-choice selections from a committed, fixed 7,000-item first-party bank: 1,000 items in each of seven written-exam families
 - Immediate feedback with explanations
 - Pre-commit originality checks, randomized answer order, and signed answer verification for authenticated progress
 - Progress tracking via local storage

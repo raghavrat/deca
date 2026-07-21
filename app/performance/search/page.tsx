@@ -119,15 +119,15 @@ function SearchContent() {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             onKeyDown={handleKeyPress}
-            className="input-minimal w-full px-4 py-3 pl-12 text-black dark:text-white bg-transparent border-0 border-b border-gray-300 dark:border-gray-700 focus:outline-none focus:border-black dark:focus:border-white placeholder-gray-500 dark:placeholder-gray-400 transition-colors duration-200"
+            className="input-minimal w-full px-4 py-3 pl-12 text-black dark:text-white bg-transparent border-0 border-b border-neutral-300 dark:border-neutral-700 focus:outline-none focus:border-black dark:focus:border-white placeholder-neutral-500 dark:placeholder-neutral-400 transition-colors duration-200"
           />
-          <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 h-5 w-5" />
+          <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-neutral-400 dark:text-neutral-500 h-5 w-5" />
         </div>
         <button 
           type="button"
           onClick={handleSearch}
           aria-label="Search performance indicators"
-          className="min-h-11 min-w-11 p-3 border border-gray-300 dark:border-gray-700 hover:border-black dark:hover:border-white text-gray-700 dark:text-gray-300 hover:text-black dark:hover:text-white transition-colors duration-200"
+          className="min-h-11 min-w-11 p-3 border border-neutral-300 dark:border-neutral-700 hover:border-black dark:hover:border-white text-neutral-700 dark:text-neutral-300 hover:text-black dark:hover:text-white transition-colors duration-200"
         >
           <Search className="h-5 w-5" />
         </button>
@@ -136,7 +136,7 @@ function SearchContent() {
       {showResults && currentQuery && (
         <div className="mb-6">
           <div className="flex items-center justify-between mb-3">
-            <p className="text-gray-600 dark:text-gray-400">
+            <p className="text-neutral-600 dark:text-neutral-400">
               {filteredPIs.length} result{filteredPIs.length !== 1 ? 's' : ''} found
             </p>
           </div>
@@ -146,31 +146,31 @@ function SearchContent() {
             <div className="relative" ref={clusterDropdownRef}>
               <button
                 onClick={() => setIsClusterDropdownOpen(!isClusterDropdownOpen)}
-                className="flex items-center space-x-2 px-4 py-2.5 bg-white dark:bg-black border border-gray-300 dark:border-gray-700 hover:border-black dark:hover:border-white transition-colors duration-200"
+                className="flex items-center space-x-2 px-4 py-2.5 bg-white dark:bg-black border border-neutral-300 dark:border-neutral-700 hover:border-black dark:hover:border-white transition-colors duration-200"
               >
                 <span className="text-black dark:text-white text-sm font-medium">
                   {selectedCluster === 'all' ? 'All Clusters' : selectedCluster}
                 </span>
-                <ChevronDown className={`h-4 w-4 text-gray-600 dark:text-gray-400 transition-transform ${isClusterDropdownOpen ? 'rotate-180' : ''}`} />
+                <ChevronDown className={`h-4 w-4 text-neutral-600 dark:text-neutral-400 transition-transform ${isClusterDropdownOpen ? 'rotate-180' : ''}`} />
               </button>
               
               {isClusterDropdownOpen && (
-                <div className="absolute right-0 mt-2 w-64 bg-white dark:bg-black border border-gray-300 dark:border-gray-700 z-10 max-h-96 overflow-y-auto">
+                <div className="absolute right-0 mt-2 w-64 bg-white dark:bg-black border border-neutral-300 dark:border-neutral-700 z-10 max-h-96 overflow-y-auto">
                   <div className="py-2">
                     <button
                       onClick={() => {
                         setSelectedCluster('all')
                         setIsClusterDropdownOpen(false)
                       }}
-                      className={`w-full text-left px-4 py-3 text-sm hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors ${
+                      className={`w-full text-left px-4 py-3 text-sm hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors ${
                         selectedCluster === 'all' 
-                          ? 'bg-gray-100 dark:bg-gray-800 text-black dark:text-white font-medium' 
-                          : 'text-gray-700 dark:text-gray-300'
+                          ? 'bg-neutral-100 dark:bg-neutral-800 text-black dark:text-white font-medium'
+                          : 'text-neutral-700 dark:text-neutral-300'
                       }`}
                     >
                       All Clusters
                     </button>
-                    <div className="border-t border-gray-300 dark:border-gray-700 my-1"></div>
+                    <div className="border-t border-neutral-300 dark:border-neutral-700 my-1"></div>
                     {availableFilters.clusters.map(cluster => (
                       <button
                         key={cluster}
@@ -178,10 +178,10 @@ function SearchContent() {
                           setSelectedCluster(cluster)
                           setIsClusterDropdownOpen(false)
                         }}
-                        className={`w-full text-left px-4 py-3 text-sm hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors ${
+                        className={`w-full text-left px-4 py-3 text-sm hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors ${
                           selectedCluster === cluster 
-                            ? 'bg-gray-100 dark:bg-gray-800 text-black dark:text-white font-medium' 
-                            : 'text-gray-700 dark:text-gray-300'
+                            ? 'bg-neutral-100 dark:bg-neutral-800 text-black dark:text-white font-medium'
+                            : 'text-neutral-700 dark:text-neutral-300'
                         }`}
                       >
                         {cluster}
@@ -196,31 +196,31 @@ function SearchContent() {
             <div className="relative" ref={areaDropdownRef}>
               <button
                 onClick={() => setIsAreaDropdownOpen(!isAreaDropdownOpen)}
-                className="flex items-center space-x-2 px-4 py-2.5 bg-white dark:bg-black border border-gray-300 dark:border-gray-700 hover:border-black dark:hover:border-white transition-colors duration-200"
+                className="flex items-center space-x-2 px-4 py-2.5 bg-white dark:bg-black border border-neutral-300 dark:border-neutral-700 hover:border-black dark:hover:border-white transition-colors duration-200"
               >
                 <span className="text-black dark:text-white text-sm font-medium">
                   {selectedInstructionalArea === 'all' ? 'All Areas' : selectedInstructionalArea}
                 </span>
-                <ChevronDown className={`h-4 w-4 text-gray-600 dark:text-gray-400 transition-transform ${isAreaDropdownOpen ? 'rotate-180' : ''}`} />
+                <ChevronDown className={`h-4 w-4 text-neutral-600 dark:text-neutral-400 transition-transform ${isAreaDropdownOpen ? 'rotate-180' : ''}`} />
               </button>
               
               {isAreaDropdownOpen && (
-                <div className="absolute right-0 mt-2 w-80 bg-white dark:bg-black border border-gray-300 dark:border-gray-700 z-10 max-h-96 overflow-y-auto">
+                <div className="absolute right-0 mt-2 w-80 bg-white dark:bg-black border border-neutral-300 dark:border-neutral-700 z-10 max-h-96 overflow-y-auto">
                   <div className="py-2">
                     <button
                       onClick={() => {
                         setSelectedInstructionalArea('all')
                         setIsAreaDropdownOpen(false)
                       }}
-                      className={`w-full text-left px-4 py-3 text-sm hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors ${
+                      className={`w-full text-left px-4 py-3 text-sm hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors ${
                         selectedInstructionalArea === 'all' 
-                          ? 'bg-gray-100 dark:bg-gray-800 text-black dark:text-white font-medium' 
-                          : 'text-gray-700 dark:text-gray-300'
+                          ? 'bg-neutral-100 dark:bg-neutral-800 text-black dark:text-white font-medium'
+                          : 'text-neutral-700 dark:text-neutral-300'
                       }`}
                     >
                       All Areas
                     </button>
-                    <div className="border-t border-gray-300 dark:border-gray-700 my-1"></div>
+                    <div className="border-t border-neutral-300 dark:border-neutral-700 my-1"></div>
                     {availableFilters.areas.map(area => (
                       <button
                         key={area}
@@ -228,10 +228,10 @@ function SearchContent() {
                           setSelectedInstructionalArea(area)
                           setIsAreaDropdownOpen(false)
                         }}
-                        className={`w-full text-left px-4 py-3 text-sm hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors ${
+                        className={`w-full text-left px-4 py-3 text-sm hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors ${
                           selectedInstructionalArea === area 
-                            ? 'bg-gray-100 dark:bg-gray-800 text-black dark:text-white font-medium' 
-                            : 'text-gray-700 dark:text-gray-300'
+                            ? 'bg-neutral-100 dark:bg-neutral-800 text-black dark:text-white font-medium'
+                            : 'text-neutral-700 dark:text-neutral-300'
                         }`}
                       >
                         {area}
@@ -255,9 +255,9 @@ function SearchContent() {
                 const anchor = getIndicatorAnchorId(pi.indicator)
                 
                 return (
-                  <div key={index} className="p-4 sm:p-6 bg-white dark:bg-black border border-gray-300 dark:border-gray-700">
+                  <div key={index} className="p-4 sm:p-6 bg-white dark:bg-black border border-neutral-300 dark:border-neutral-700">
                     <h4 className="font-light text-black dark:text-white mb-2 break-words">{pi.indicator}</h4>
-                    <p className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap mb-2 text-sm sm:text-base">{pi.text}</p>
+                    <p className="text-neutral-700 dark:text-neutral-300 whitespace-pre-wrap mb-2 text-sm sm:text-base">{pi.text}</p>
                     <Link 
                       href={`/performance/${pi.category[0].toLowerCase()}/${urlSlug}#${anchor}`}
                       className="text-sm font-medium nav-link inline-block"
@@ -268,12 +268,12 @@ function SearchContent() {
                 )
               })
             ) : (
-              <div className="text-center text-gray-500 py-4">
+              <div className="text-center text-neutral-500 py-4">
                 No performance indicators found
               </div>
             )
           ) : (
-            <div className="text-center text-gray-500 py-4">
+            <div className="text-center text-neutral-500 py-4">
               Start typing to search performance indicators
             </div>
           )

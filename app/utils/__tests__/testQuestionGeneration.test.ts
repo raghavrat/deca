@@ -1,18 +1,23 @@
-import { TEST_BLUEPRINTS, getTestBlueprints, type TestCategory } from '../../data/testBlueprints'
+import {
+  TEST_BLUEPRINTS,
+  TEST_CATEGORIES,
+  getTestBlueprints,
+  type TestCategory,
+} from '../../data/testBlueprints'
 import {
   hasBlockedBankStyleOpening,
   hasProhibitedSourceSignal,
   questionSimilarity,
 } from '../testQuestionGeneration'
 
-const categories: TestCategory[] = ['MANAGEMENT', 'MARKETING', 'FINANCE', 'HOSPITALITY', 'ENTREPRENEURSHIP']
+const categories: readonly TestCategory[] = TEST_CATEGORIES
 
 describe('practice-question safeguards', () => {
   test('uses first-party blueprints across every practice category', () => {
     expect(new Set(TEST_BLUEPRINTS.map(item => item.id)).size).toBe(TEST_BLUEPRINTS.length)
     for (const category of categories) {
       const blueprints = getTestBlueprints(category)
-      expect(blueprints.length).toBeGreaterThanOrEqual(6)
+      expect(blueprints.length).toBeGreaterThanOrEqual(24)
       expect(blueprints.every(item => item.category === category)).toBe(true)
     }
   })

@@ -1,7 +1,7 @@
 import 'server-only'
 
 import { cookies } from 'next/headers'
-import { adminAuth } from '../firebase/admin'
+import { adminAuth, developmentIdTokenSessionsEnabled } from '../firebase/admin'
 import { isAccountEmailValid } from '../config/accountEmail'
 
 export interface SessionUser {
@@ -23,7 +23,9 @@ export async function getOptionalSession(): Promise<SessionUser | null> {
   if (!sessionCookie || !adminAuth) return null
 
   try {
-    const claims = await adminAuth.verifySessionCookie(sessionCookie, true)
+    const claims = developmentIdTokenSessionsEnabled
+      ? await adminAuth.verifyIdToken(sessionCookie)
+      : await adminAuth.verifySessionCookie(sessionCookie, true)
     if (!claims.email || !claims.email_verified || !isAccountEmailValid(claims.email)) return null
     return { uid: claims.uid, email: claims.email.toLowerCase() }
   } catch {
@@ -43,7 +45,9 @@ export async function requireSession(): Promise<SessionUser> {
   }
 
   try {
-    const claims = await adminAuth.verifySessionCookie(sessionCookie, true)
+    const claims = developmentIdTokenSessionsEnabled
+      ? await adminAuth.verifyIdToken(sessionCookie)
+      : await adminAuth.verifySessionCookie(sessionCookie, true)
     if (!claims.email || !claims.email_verified || !isAccountEmailValid(claims.email)) {
       throw new RequestError(403, 'A valid, verified email is required')
     }

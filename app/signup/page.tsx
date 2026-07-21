@@ -91,7 +91,7 @@ export default function Signup() {
           <div className="space-y-4">
             <div><label htmlFor="signup-name" className="mb-1 block text-sm font-medium">Display name</label><input id="signup-name" type="text" required autoComplete="name" maxLength={80} className="input-minimal" value={name} onChange={(e) => setName(e.target.value)} /></div>
             <div><label htmlFor="signup-email" className="mb-1 block text-sm font-medium">Email address</label><input id="signup-email" type="email" required autoComplete="email" maxLength={254} className="input-minimal" value={email} onChange={(e) => setEmail(e.target.value)} /></div>
-            <div><label htmlFor="signup-password" className="mb-1 block text-sm font-medium">Password</label><input id="signup-password" type="password" required autoComplete="new-password" minLength={12} aria-describedby="password-help" className="input-minimal" value={password} onChange={(e) => setPassword(e.target.value)} /><p id="password-help" className="mt-2 text-xs text-gray-600 dark:text-gray-400">Use at least 12 characters. Password managers and paste are supported.</p></div>
+            <div><label htmlFor="signup-password" className="mb-1 block text-sm font-medium">Password</label><input id="signup-password" type="password" required autoComplete="new-password" minLength={12} aria-describedby="password-help" className="input-minimal" value={password} onChange={(e) => setPassword(e.target.value)} /><p id="password-help" className="mt-2 text-xs text-neutral-600 dark:text-neutral-400">Use at least 12 characters. Password managers and paste are supported.</p></div>
             <div><label htmlFor="signup-confirm-password" className="mb-1 block text-sm font-medium">Confirm password</label><input id="signup-confirm-password" type="password" required autoComplete="new-password" minLength={12} className="input-minimal" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} /></div>
           </div>
 
@@ -103,7 +103,7 @@ export default function Signup() {
           <button
             type="submit"
             disabled={isLoading || success !== '' || !ageConfirmed || !termsAccepted}
-            className="w-full py-3 text-sm font-medium border border-gray-300 dark:border-gray-700 hover:border-black dark:hover:border-white transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full py-3 text-sm font-medium border border-neutral-300 dark:border-neutral-700 hover:border-black dark:hover:border-white transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isLoading ? 'Creating account...' : 'Sign up'}
           </button>
@@ -111,7 +111,7 @@ export default function Signup() {
         <div className="text-center">
           <Link 
             href="/login" 
-            className="text-sm text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors duration-200"
+            className="text-sm text-neutral-600 dark:text-neutral-400 hover:text-black dark:hover:text-white transition-colors duration-200"
           >
             Already have an account? Sign in
           </Link>

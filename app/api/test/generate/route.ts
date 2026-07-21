@@ -1,15 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { type TestCategory } from '../../../data/testBlueprints'
+import {
+  TEST_CATEGORIES,
+  TEST_CATEGORY_LABELS,
+  isTestCategory,
+  type TestCategory,
+} from '../../../data/testBlueprints'
 import {
   getAuthoredPracticeQuestions,
   getPracticeQuestionBlueprint,
+  PRACTICE_QUESTION_BANK_VERSION,
+  selectAuthoredPracticeQuestions,
   type AuthoredPracticeQuestion,
 } from '../../../data/practiceQuestionBank'
-import { RequestError, getOptionalSession, requireSameOrigin } from '../../../utils/serverAuth'
+import { RequestError, requireSameOrigin, requireSession } from '../../../utils/serverAuth'
 import { getQuestionSigningSecret, issueQuestionToken } from '../../../utils/testQuestionToken'
 
-const categories = new Set<TestCategory>(['MANAGEMENT', 'MARKETING', 'FINANCE', 'HOSPITALITY', 'ENTREPRENEURSHIP'])
-const QUESTION_BANK_VERSION = '2026-07-20'
+const categories = new Set<TestCategory>(TEST_CATEGORIES)
 
 function shuffled<T>(items: readonly T[]): T[] {
   const copy = [...items]
@@ -31,7 +37,7 @@ function shuffledAnswers(question: AuthoredPracticeQuestion) {
 export async function POST(request: NextRequest) {
   try {
     requireSameOrigin(request)
-    const user = await getOptionalSession()
+    const user = await requireSession()
 
     const body: unknown = await request.json()
     if (typeof body !== 'object' || body === null || Array.isArray(body)) {
@@ -39,9 +45,12 @@ export async function POST(request: NextRequest) {
     }
 
     const { category: rawCategory, count: rawCount } = body as Record<string, unknown>
-    const category = typeof rawCategory === 'string' ? rawCategory.toUpperCase() as TestCategory : null
-    const count = typeof rawCount === 'number' && Number.isInteger(rawCount) ? rawCount : 8
-    if (!category || !categories.has(category) || count < 4 || count > 10) {
+    const normalizedCategory = typeof rawCategory === 'string'
+      ? rawCategory.trim().toUpperCase().replaceAll('-', '_')
+      : ''
+    const category = isTestCategory(normalizedCategory) ? normalizedCategory : null
+    const count = typeof rawCount === 'number' && Number.isInteger(rawCount) ? rawCount : 10
+    if (!category || !categories.has(category) || count < 4 || count > 100) {
       return NextResponse.json({ error: 'Invalid category or question count' }, { status: 400 })
     }
 
@@ -54,10 +63,10 @@ export async function POST(request: NextRequest) {
 
     const available = getAuthoredPracticeQuestions(category)
     if (available.length < count) {
-      return NextResponse.json({ error: 'This practice category does not have enough reviewed questions' }, { status: 500 })
+      return NextResponse.json({ error: 'This practice category does not have enough validated questions' }, { status: 500 })
     }
 
-    const questions = shuffled(available).slice(0, count).map(question => {
+    const questions = selectAuthoredPracticeQuestions(category, count).map(question => {
       const blueprint = getPracticeQuestionBlueprint(question.blueprintId)
       if (!blueprint) throw new Error(`Unknown practice-question blueprint: ${question.blueprintId}`)
 
@@ -69,9 +78,13 @@ export async function POST(request: NextRequest) {
         explanation: question.explanation,
         answerType: answerSet.answerType,
         category,
+        categoryLabel: TEST_CATEGORY_LABELS[category],
+        examFamily: question.examFamily,
+        instructionalArea: question.instructionalArea,
+        stemForm: question.stemForm,
         learningObjective: blueprint.learningObjective,
         difficulty: question.difficulty,
-        questionToken: user && signingSecret
+        questionToken: signingSecret
           ? issueQuestionToken({
               uid: user.uid,
               question: question.text,
@@ -80,7 +93,7 @@ export async function POST(request: NextRequest) {
           : null,
         provenance: {
           kind: 'first-party-authored',
-          bankVersion: QUESTION_BANK_VERSION,
+          bankVersion: PRACTICE_QUESTION_BANK_VERSION,
           blueprintId: question.blueprintId,
         },
       }
@@ -88,9 +101,9 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       questions,
-      bankSize: 5_000,
+      bankSize: 7_000,
       categoryBankSize: available.length,
-      notice: 'Selected from a fixed Deca Pal-authored bank; not copied from or endorsed by DECA Inc.',
+      notice: 'Selected from a fixed, independently authored practice bank; not an official exam or endorsed by DECA Inc. or MBA Research.',
     }, { headers: { 'Cache-Control': 'no-store' } })
   } catch (error) {
     if (error instanceof RequestError) return NextResponse.json({ error: error.message }, { status: error.status })

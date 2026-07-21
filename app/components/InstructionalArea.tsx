@@ -16,4 +16,3 @@ export default function InstructionalArea({ area, indicators }: InstructionalAre
     </div>
   )
 }
-

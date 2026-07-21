@@ -76,6 +76,11 @@ export class RateLimiter {
     this.store.set(identifier, Date.now())
   }
 
+  /** Release a reservation when the protected operation fails before completion. */
+  removeIdentifier(identifier: string): void {
+    this.store.delete(identifier)
+  }
+
   /**
    * Manually clean up expired entries
    */

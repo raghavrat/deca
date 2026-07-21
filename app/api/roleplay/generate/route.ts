@@ -16,7 +16,11 @@ import {
   PERSONAL_FINANCE_AREAS,
   getPersonalFinanceIndicators,
 } from '../../../data/personalFinanceIndicators'
-import { getPerformanceIndicatorsByAreas, getInstructionalAreasByCategory } from '../../../utils/instructionalAreas'
+import {
+  getEligibleInstructionalAreas,
+  getPerformanceIndicatorsByAreas,
+  getInstructionalAreasByCategory,
+} from '../../../utils/instructionalAreas'
 import {
   buildEventSystemPrompt,
   buildParticipantInstructions,
@@ -26,6 +30,7 @@ import { RateLimiter } from '../../../utils/rateLimiter'
 import { RequestError, requireSameOrigin, requireSession } from '../../../utils/serverAuth'
 
 const OPENROUTER_API_URL = 'https://openrouter.ai/api/v1/chat/completions'
+const OPENROUTER_TIMEOUT_MS = 50_000
 const rateLimiter = new RateLimiter(5 * 60 * 1000)
 
 const GENERAL_RULES: FormatRules = FORMAT_RULES['individual-series']
@@ -141,6 +146,8 @@ function isShortText(value: unknown, max = 4000): value is string {
 }
 
 export async function POST(request: NextRequest) {
+  let reservedRateLimitKey: string | null = null
+
   try {
     requireSameOrigin(request)
     const user = await requireSession()
@@ -152,8 +159,6 @@ export async function POST(request: NextRequest) {
         timeRemaining: rateLimitResult.timeRemaining,
       }, { status: 429 })
     }
-    rateLimiter.recordIdentifier(rateLimitKey)
-
     const payload = await request.json()
     const { category, eventId, selectedInstructionalArea } = payload as Record<string, unknown>
     if (typeof category !== 'string' || !CATEGORY_MAP[category]) {
@@ -180,11 +185,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'This event does not have a role-play profile' }, { status: 400 })
     }
     const rules = profile ? FORMAT_RULES[profile.format] : GENERAL_RULES
-    const availableAreas = profile?.format === 'personal-financial-literacy'
+    const allAreas = profile?.format === 'personal-financial-literacy'
       ? PERSONAL_FINANCE_AREAS
       : getInstructionalAreasByCategory(category)
+    const availableAreas = getEligibleInstructionalAreas(allAreas, rules.performanceIndicatorCount)
     if (!availableAreas.length) {
-      return NextResponse.json({ error: 'No instructional areas found for this category' }, { status: 400 })
+      return NextResponse.json({ error: 'No instructional areas can supply the required performance indicators' }, { status: 400 })
     }
 
     let actualInstructionalArea: string
@@ -217,6 +223,11 @@ export async function POST(request: NextRequest) {
       })
       : generalSystemPrompt(category, actualInstructionalArea, selectedIndicators)
 
+    // Reserve immediately before the paid operation so invalid requests do not
+    // consume the customer's generation window. Release it on upstream failure.
+    rateLimiter.recordIdentifier(rateLimitKey)
+    reservedRateLimitKey = rateLimitKey
+
     const response = await fetch(OPENROUTER_API_URL, {
       method: 'POST',
       headers: {
@@ -235,6 +246,7 @@ export async function POST(request: NextRequest) {
         max_tokens: 4200,
         provider: { order: ['Fireworks'], data_collection: 'deny', zdr: true },
       }),
+      signal: AbortSignal.timeout(OPENROUTER_TIMEOUT_MS),
     })
     if (!response.ok) throw new Error(`OpenRouter request failed with status ${response.status}`)
 
@@ -295,10 +307,18 @@ export async function POST(request: NextRequest) {
       createdAt: new Date(),
     }
 
+    reservedRateLimitKey = null
     return NextResponse.json({ scenario })
   } catch (error) {
+    if (reservedRateLimitKey) rateLimiter.removeIdentifier(reservedRateLimitKey)
     if (error instanceof RequestError) return NextResponse.json({ error: error.message }, { status: error.status })
     console.error('Error generating roleplay scenario', error instanceof Error ? error.message : 'unknown error')
-    return NextResponse.json({ error: 'Failed to generate roleplay scenario' }, { status: 500 })
+    return NextResponse.json(
+      { error: 'Scenario generation is temporarily unavailable. Please try again.' },
+      { status: 503 },
+    )
   }
 }
+
+export const runtime = 'nodejs'
+export const maxDuration = 60

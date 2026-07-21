@@ -45,4 +45,13 @@ describe('RateLimiter', () => {
     expect(limiter.checkIdentifier('user:another-user').allowed).toBe(true)
     limiter.destroy()
   })
+
+  test('releases a failed reserved request', () => {
+    const limiter = new RateLimiter(60_000)
+    limiter.recordIdentifier('user:test-user')
+    limiter.removeIdentifier('user:test-user')
+
+    expect(limiter.checkIdentifier('user:test-user').allowed).toBe(true)
+    limiter.destroy()
+  })
 })

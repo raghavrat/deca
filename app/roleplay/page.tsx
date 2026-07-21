@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { ChevronRight, Users, Trophy, History, Calendar, Award, Clock } from 'lucide-react'
 import { getEventsByCategory } from '../data/decaEvents'
 import { useAuth } from '../context/AuthContext'
+import { getApiErrorMessage, readApiPayload } from '../utils/apiResponse'
 
 const clusters = [
   {
@@ -43,10 +44,11 @@ interface RoleplaySession {
   sessionId: string
   category: string
   eventCode?: string
-  scores: {
+  scores?: {
     total: number
   }
   createdAt: string
+  evaluationMode?: 'self-score'
   scenario?: {
     eventCode: string
     careerCluster: string
@@ -60,6 +62,8 @@ export default function RoleplayPage() {
   const [activeTab, setActiveTab] = useState<'practice' | 'history'>('practice')
   const [roleplayHistory, setRoleplayHistory] = useState<RoleplaySession[]>([])
   const [loadingHistory, setLoadingHistory] = useState(false)
+  const [historyError, setHistoryError] = useState<string | null>(null)
+  const [historyRequestKey, setHistoryRequestKey] = useState(0)
 
   const handleCategoryClick = (categoryName: string) => {
     setSelectedCategory(categoryName)
@@ -77,21 +81,24 @@ export default function RoleplayPage() {
       if (!user || activeTab !== 'history') return
       
       setLoadingHistory(true)
+      setHistoryError(null)
       try {
         const response = await fetch('/api/roleplay/history')
-        if (response.ok) {
-          const data = await response.json()
-          setRoleplayHistory(data.sessions || [])
-        }
+        const data = await readApiPayload<{ sessions?: RoleplaySession[]; error?: string; message?: string }>(
+          response,
+          'Practice history is temporarily unavailable.',
+        )
+        if (!response.ok) throw new Error(getApiErrorMessage(data, 'Practice history is temporarily unavailable.'))
+        setRoleplayHistory(Array.isArray(data.sessions) ? data.sessions : [])
       } catch (error) {
-        console.error('Error fetching history:', error)
+        setHistoryError(error instanceof Error ? error.message : 'Practice history is temporarily unavailable.')
       } finally {
         setLoadingHistory(false)
       }
     }
 
     fetchHistory()
-  }, [activeTab, user])
+  }, [activeTab, historyRequestKey, user])
 
   const selectedCategoryData = clusters.find(c => c.name === selectedCategory)
   const availableEvents = selectedCategory ? getEventsByCategory(selectedCategory) : []
@@ -103,7 +110,7 @@ export default function RoleplayPage() {
           <div className="flex items-center mb-6">
             <button
               onClick={handleBackToCategories}
-              className="flex items-center text-black dark:text-white hover:text-gray-600 dark:hover:text-gray-400 transition-colors mr-4"
+              className="flex items-center text-black dark:text-white hover:text-neutral-600 dark:hover:text-neutral-400 transition-colors mr-4"
             >
               <ChevronRight className="h-5 w-5 mr-1 rotate-180" />
               Back to Categories
@@ -113,9 +120,9 @@ export default function RoleplayPage() {
             </h1>
           </div>
 
-          <div className="mb-8 bg-white dark:bg-black border border-gray-300 dark:border-gray-700 p-6">
-            <p className="text-gray-600 dark:text-gray-400 mb-4">{selectedCategoryData?.description}</p>
-            <p className="text-sm text-gray-500 dark:text-gray-400">
+          <div className="mb-8 bg-white dark:bg-black border border-neutral-300 dark:border-neutral-700 p-6">
+            <p className="text-neutral-600 dark:text-neutral-400 mb-4">{selectedCategoryData?.description}</p>
+            <p className="text-sm text-neutral-500 dark:text-neutral-400">
               Choose a specific DECA event below for a more targeted roleplay experience, or select "General Category Practice" for broader scenarios.
             </p>
           </div>
@@ -124,7 +131,7 @@ export default function RoleplayPage() {
             {/* General Category Option */}
             <Link
               href={`/roleplay/${selectedCategory.toLowerCase()}`}
-              className="group block bg-white dark:bg-black border border-gray-300 dark:border-gray-700 hover:border-black dark:hover:border-white transition-colors duration-200 focus:outline-none overflow-hidden click-animation"
+              className="group block bg-white dark:bg-black border border-neutral-300 dark:border-neutral-700 hover:border-black dark:hover:border-white transition-colors duration-200 focus:outline-none overflow-hidden click-animation"
             >
               <div className="p-6">
                 <div className="flex items-center justify-between mb-3">
@@ -132,9 +139,9 @@ export default function RoleplayPage() {
                     <Users className="h-5 w-5 mr-2" />
                     General Category Practice
                   </h3>
-                  <ChevronRight className="h-5 w-5 text-gray-400 group-hover:text-black dark:group-hover:text-white transition-colors" />
+                  <ChevronRight className="h-5 w-5 text-neutral-400 group-hover:text-black dark:group-hover:text-white transition-colors" />
                 </div>
-                <p className="text-gray-600 dark:text-gray-400 text-sm font-medium leading-relaxed">
+                <p className="text-neutral-600 dark:text-neutral-400 text-sm font-medium leading-relaxed">
                   Practice with general {selectedCategoryData?.displayName.toLowerCase()} scenarios covering various business situations and challenges.
                 </p>
               </div>
@@ -145,7 +152,7 @@ export default function RoleplayPage() {
               <Link
                 key={event.id}
                 href={`/roleplay/${selectedCategory.toLowerCase()}?event=${event.id}`}
-                className="group block bg-white dark:bg-black border border-gray-300 dark:border-gray-700 hover:border-black dark:hover:border-white transition-colors duration-200 focus:outline-none overflow-hidden click-animation"
+                className="group block bg-white dark:bg-black border border-neutral-300 dark:border-neutral-700 hover:border-black dark:hover:border-white transition-colors duration-200 focus:outline-none overflow-hidden click-animation"
               >
                 <div className="p-6">
                   <div className="flex items-center justify-between mb-3">
@@ -153,12 +160,12 @@ export default function RoleplayPage() {
                       <Trophy className="h-4 w-4 mr-2" />
                       {event.name}
                     </h3>
-                    <ChevronRight className="h-5 w-5 text-gray-400 group-hover:text-black dark:group-hover:text-white transition-colors" />
+                    <ChevronRight className="h-5 w-5 text-neutral-400 group-hover:text-black dark:group-hover:text-white transition-colors" />
                   </div>
-                  <p className="text-gray-600 dark:text-gray-400 text-sm font-medium leading-relaxed mb-3">
+                  <p className="text-neutral-600 dark:text-neutral-400 text-sm font-medium leading-relaxed mb-3">
                     {event.description}
                   </p>
-                  <div className="text-xs text-gray-500 dark:text-gray-400">
+                  <div className="text-xs text-neutral-500 dark:text-neutral-400">
                     <span className="font-medium">Event ID:</span> {event.id}
                   </div>
                 </div>
@@ -175,21 +182,21 @@ export default function RoleplayPage() {
       <div className="w-full max-w-4xl">
         <div className="text-center mb-8">
           <h1 className="text-4xl font-light mb-4 text-black dark:text-white">Practice Roleplays</h1>
-          <p className="text-sm text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+          <p className="text-sm text-neutral-600 dark:text-neutral-400 max-w-2xl mx-auto">
             Practice DECA competition scenarios with AI-powered roleplay simulations. 
             Choose a category to see available events and generate realistic business scenarios.
           </p>
         </div>
 
         {/* Tab Navigation */}
-        <div className="bg-white dark:bg-black border border-gray-300 dark:border-gray-700 mb-6">
-          <div className="flex border-b border-gray-300 dark:border-gray-700">
+        <div className="bg-white dark:bg-black border border-neutral-300 dark:border-neutral-700 mb-6">
+          <div className="flex border-b border-neutral-300 dark:border-neutral-700">
             <button
               onClick={() => setActiveTab('practice')}
               className={`flex-1 px-6 py-3 text-sm font-medium transition-colors flex items-center justify-center ${
                 activeTab === 'practice'
                   ? 'text-black dark:text-white border-b-2 border-black dark:border-white'
-                  : 'text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white'
+                  : 'text-neutral-600 dark:text-neutral-400 hover:text-black dark:hover:text-white'
               }`}
             >
               <Trophy className="w-5 h-5 mr-2" />
@@ -200,7 +207,7 @@ export default function RoleplayPage() {
               className={`flex-1 px-6 py-3 text-sm font-medium transition-colors flex items-center justify-center ${
                 activeTab === 'history'
                   ? 'text-black dark:text-white border-b-2 border-black dark:border-white'
-                  : 'text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white'
+                  : 'text-neutral-600 dark:text-neutral-400 hover:text-black dark:hover:text-white'
               }`}
             >
               <History className="w-5 h-5 mr-2" />
@@ -216,16 +223,16 @@ export default function RoleplayPage() {
               <button
                 key={cluster.name}
                 onClick={() => handleCategoryClick(cluster.name)}
-                className="group block bg-white dark:bg-black border border-gray-300 dark:border-gray-700 hover:border-black dark:hover:border-white transition-colors duration-200 focus:outline-none overflow-hidden w-full text-left click-animation"
+                className="group block bg-white dark:bg-black border border-neutral-300 dark:border-neutral-700 hover:border-black dark:hover:border-white transition-colors duration-200 focus:outline-none overflow-hidden w-full text-left click-animation"
               >
                 <div className="p-6">
                   <div className="flex items-center justify-between mb-3">
                     <h3 className="text-xl font-light text-black dark:text-white">
                       {cluster.displayName}
                     </h3>
-                    <ChevronRight className="h-5 w-5 text-gray-400 group-hover:text-black dark:group-hover:text-white transition-colors" />
+                    <ChevronRight className="h-5 w-5 text-neutral-400 group-hover:text-black dark:group-hover:text-white transition-colors" />
                   </div>
-                  <p className="text-gray-600 dark:text-gray-400 text-sm font-medium leading-relaxed mb-3">
+                  <p className="text-neutral-600 dark:text-neutral-400 text-sm font-medium leading-relaxed mb-3">
                     {cluster.description}
                   </p>
                   <div className="text-xs text-black dark:text-white font-medium">
@@ -243,18 +250,30 @@ export default function RoleplayPage() {
             {loadingHistory ? (
               <div className="text-center py-8">
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-black dark:border-white mx-auto mb-4"></div>
-                <p className="text-gray-600 dark:text-gray-400">Loading history...</p>
+                <p className="text-neutral-600 dark:text-neutral-400">Loading history...</p>
+              </div>
+            ) : historyError ? (
+              <div className="border border-red-300 bg-red-50 p-8 text-center dark:border-red-700 dark:bg-red-950/20">
+                <h3 className="text-lg font-light text-black dark:text-white">Could not load practice history</h3>
+                <p className="mt-2 text-sm text-red-700 dark:text-red-300">{historyError}</p>
+                <button
+                  type="button"
+                  onClick={() => setHistoryRequestKey(value => value + 1)}
+                  className="mt-5 border border-neutral-300 bg-white px-4 py-2 text-sm font-medium text-black transition-colors hover:border-black dark:border-neutral-700 dark:bg-black dark:text-white dark:hover:border-white"
+                >
+                  Try again
+                </button>
               </div>
             ) : roleplayHistory.length === 0 ? (
-              <div className="bg-white dark:bg-black border border-gray-300 dark:border-gray-700 p-8 text-center">
-                <History className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+              <div className="bg-white dark:bg-black border border-neutral-300 dark:border-neutral-700 p-8 text-center">
+                <History className="w-12 h-12 text-neutral-400 mx-auto mb-4" />
                 <h3 className="text-lg font-light text-black dark:text-white mb-2">No Practice Sessions Yet</h3>
-                <p className="text-gray-600 dark:text-gray-400 mb-4">
+                <p className="text-neutral-600 dark:text-neutral-400 mb-4">
                   Start practicing roleplays to see your history here
                 </p>
                 <button
                   onClick={() => setActiveTab('practice')}
-                  className="px-4 py-2 border border-gray-300 dark:border-gray-700 hover:border-black dark:hover:border-white text-black dark:text-white text-sm font-medium bg-white dark:bg-black transition-colors"
+                  className="px-4 py-2 border border-neutral-300 dark:border-neutral-700 hover:border-black dark:hover:border-white text-black dark:text-white text-sm font-medium bg-white dark:bg-black transition-colors"
                 >
                   Start Practicing
                 </button>
@@ -265,7 +284,7 @@ export default function RoleplayPage() {
                   <Link
                     key={session.sessionId}
                     href={`/roleplay/review?id=${session.sessionId}`}
-                    className="block bg-white dark:bg-black border border-gray-300 dark:border-gray-700 hover:border-black dark:hover:border-white transition-colors p-4"
+                    className="block bg-white dark:bg-black border border-neutral-300 dark:border-neutral-700 hover:border-black dark:hover:border-white transition-colors p-4"
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex-1">
@@ -274,11 +293,16 @@ export default function RoleplayPage() {
                           <h3 className="font-light text-black dark:text-white">
                             {session.scenario?.eventCode || session.eventCode || 'Practice Session'}
                           </h3>
-                          <span className="ml-3 px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 text-xs">
+                          <span className="ml-3 px-2 py-1 bg-neutral-100 dark:bg-neutral-700 text-neutral-600 dark:text-neutral-400 text-xs">
                             {session.scenario?.careerCluster || session.category}
                           </span>
+                          {session.evaluationMode === 'self-score' && (
+                            <span className="ml-2 border border-neutral-300 px-2 py-1 text-xs text-neutral-600 dark:border-neutral-700 dark:text-neutral-400">
+                              Self-scored
+                            </span>
+                          )}
                         </div>
-                        <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
+                        <div className="flex items-center text-sm text-neutral-600 dark:text-neutral-400">
                           <Calendar className="w-4 h-4 mr-1" />
                           <span>{new Date(session.createdAt).toLocaleDateString()}</span>
                           <Clock className="w-4 h-4 ml-4 mr-1" />
@@ -287,14 +311,14 @@ export default function RoleplayPage() {
                       </div>
                       <div className="text-right">
                         <div className={`text-2xl font-light ${
-                          session.scores.total >= 85 ? 'text-black dark:text-white' :
-                          session.scores.total >= 70 ? 'text-black dark:text-white' :
-                          session.scores.total >= 50 ? 'text-black dark:text-white' :
+                          (session.scores?.total || 0) >= 85 ? 'text-black dark:text-white' :
+                          (session.scores?.total || 0) >= 70 ? 'text-black dark:text-white' :
+                          (session.scores?.total || 0) >= 50 ? 'text-black dark:text-white' :
                           'text-black dark:text-white'
                         }`}>
-                          {session.scores.total}/100
+                          {session.scores?.total || 0}/100
                         </div>
-                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Total Score</p>
+                        <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1">Total Score</p>
                       </div>
                     </div>
                   </Link>
