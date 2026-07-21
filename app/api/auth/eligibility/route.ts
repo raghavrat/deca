@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { isEmailAllowed } from '../../../config/allowedEmails'
+import { isAccountEmailValid } from '../../../config/accountEmail'
 import { RequestError, requireSameOrigin } from '../../../utils/serverAuth'
 
 export async function POST(request: Request) {
@@ -10,10 +10,10 @@ export async function POST(request: Request) {
       ? (body as { email?: unknown }).email
       : null
 
-    if (typeof email !== 'string' || email.length > 254 || !isEmailAllowed(email)) {
+    if (typeof email !== 'string' || email.length > 254 || !isAccountEmailValid(email)) {
       return NextResponse.json(
-        { error: 'This email is not eligible to register' },
-        { status: 403, headers: { 'Cache-Control': 'no-store' } },
+        { error: 'Enter a valid email address' },
+        { status: 400, headers: { 'Cache-Control': 'no-store' } },
       )
     }
 

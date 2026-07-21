@@ -14,7 +14,7 @@ interface PracticeQuestion {
   category: string
   learningObjective: string
   difficulty: 'foundational' | 'intermediate' | 'advanced'
-  questionToken: string
+  questionToken: string | null
   provenance: {
     kind: 'first-party-authored'
     bankVersion: string
@@ -26,7 +26,7 @@ type PageProps = {
 }
 
 export default function TestPage({ params }: PageProps) {
-  const { user, loading: authLoading } = useAuth()
+  const { user } = useAuth()
   const [category, setCategory] = useState('')
   const [questions, setQuestions] = useState<PracticeQuestion[]>([])
   const [currentIndex, setCurrentIndex] = useState(0)
@@ -35,7 +35,7 @@ export default function TestPage({ params }: PageProps) {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  const generateSet = async (requestedCategory: string) => {
+  const loadSet = async (requestedCategory: string) => {
     setLoading(true)
     setError(null)
     setQuestions([])
@@ -64,32 +64,25 @@ export default function TestPage({ params }: PageProps) {
         throw new Error('No original questions were returned')
       }
       setQuestions(payload.questions as PracticeQuestion[])
-    } catch (generationError) {
-      setError(generationError instanceof Error ? generationError.message : 'Unable to generate a practice set')
+    } catch (loadError) {
+      setError(loadError instanceof Error ? loadError.message : 'Unable to load a practice set')
     } finally {
       setLoading(false)
     }
   }
 
   useEffect(() => {
-    if (authLoading) return
-
     const initialize = async () => {
       const resolved = await params
       const requestedCategory = resolved.category.toUpperCase()
       setCategory(requestedCategory)
-      if (user) {
-        await generateSet(requestedCategory)
-      } else {
-        setLoading(false)
-        setError('Please sign in to start a practice set')
-      }
+      await loadSet(requestedCategory)
     }
     void initialize()
-  }, [authLoading, params, user])
+  }, [params])
 
   const recordAttempt = async (question: PracticeQuestion, selected: number) => {
-    if (!user) return
+    if (!user || !question.questionToken) return
     const statsKey = `questionStats_${user.uid}`
     const existingStats = localStorage.getItem(statsKey)
     const stats = existingStats ? JSON.parse(existingStats) : {
@@ -148,7 +141,7 @@ export default function TestPage({ params }: PageProps) {
       <main className="min-h-screen flex items-center justify-center p-6">
         <div className="text-center" role="status">
           <RefreshCw className="h-8 w-8 animate-spin mx-auto mb-4" aria-hidden="true" />
-          <p className="text-gray-600 dark:text-gray-400">Creating an original {category.toLowerCase()} practice set…</p>
+          <p className="text-gray-600 dark:text-gray-400">Loading {category.toLowerCase()} questions from the fixed bank…</p>
         </div>
       </main>
     )
@@ -166,10 +159,10 @@ export default function TestPage({ params }: PageProps) {
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <button
               type="button"
-              onClick={() => void generateSet(category)}
+              onClick={() => void loadSet(category)}
               className="px-6 py-3 border border-black dark:border-white bg-black dark:bg-white text-white dark:text-black"
             >
-              Generate another set
+              Load another selection
             </button>
             <Link href="/test" className="px-6 py-3 border border-gray-300 dark:border-gray-700">Choose another category</Link>
           </div>

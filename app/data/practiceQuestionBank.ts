@@ -1,3 +1,4 @@
+import FIXED_PRACTICE_QUESTION_BANK from './practiceQuestionBank.generated.json'
 import { TEST_BLUEPRINTS, type TestCategory } from './testBlueprints'
 
 export type PracticeQuestionDifficulty = 'foundational' | 'intermediate' | 'advanced'
@@ -1406,21 +1407,27 @@ function buildQuestionVariant(blueprintId: string, index: number): AuthoredPract
 const categoryList: TestCategory[] = ['MANAGEMENT', 'MARKETING', 'FINANCE', 'HOSPITALITY', 'ENTREPRENEURSHIP']
 const questionsPerCategory = 1_000
 
-const generatedPracticeQuestions = categoryList.flatMap(category => {
-  const categoryBlueprints = TEST_BLUEPRINTS.filter(blueprint => blueprint.category === category)
-  const coreCount = CORE_PRACTICE_QUESTIONS.filter(
-    question => categoryBlueprints.some(blueprint => blueprint.id === question.blueprintId),
-  ).length
-  return Array.from({ length: questionsPerCategory - coreCount }, (_, index) => {
-    const blueprint = categoryBlueprints[index % categoryBlueprints.length]
-    return buildQuestionVariant(blueprint.id, Math.floor(index / categoryBlueprints.length))
+export function materializePracticeQuestionBank(): AuthoredPracticeQuestion[] {
+  const generatedPracticeQuestions = categoryList.flatMap(category => {
+    const categoryBlueprints = TEST_BLUEPRINTS.filter(blueprint => blueprint.category === category)
+    const coreCount = CORE_PRACTICE_QUESTIONS.filter(
+      question => categoryBlueprints.some(blueprint => blueprint.id === question.blueprintId),
+    ).length
+    return Array.from({ length: questionsPerCategory - coreCount }, (_, index) => {
+      const blueprint = categoryBlueprints[index % categoryBlueprints.length]
+      return buildQuestionVariant(blueprint.id, Math.floor(index / categoryBlueprints.length))
+    })
   })
-})
 
-export const PRACTICE_QUESTION_BANK: AuthoredPracticeQuestion[] = [
-  ...CORE_PRACTICE_QUESTIONS,
-  ...generatedPracticeQuestions,
-]
+  return [
+    ...CORE_PRACTICE_QUESTIONS,
+    ...generatedPracticeQuestions,
+  ]
+}
+
+// Production reads the committed records below. The materializer remains only
+// as a maintainer tool for deliberately rebuilding that file after review.
+export const PRACTICE_QUESTION_BANK = FIXED_PRACTICE_QUESTION_BANK as unknown as AuthoredPracticeQuestion[]
 
 const blueprintById = new Map(TEST_BLUEPRINTS.map(blueprint => [blueprint.id, blueprint]))
 

@@ -10,7 +10,7 @@ export default function TestPage() {
     <div className="min-h-screen flex flex-col items-center justify-center p-4">
       <h1 className="text-4xl font-light tracking-tight mb-8 text-center text-black dark:text-white">Practice Tests</h1>
       <p className="text-sm text-gray-600 dark:text-gray-400 text-center mb-8 max-w-2xl">
-        Choose a category for a randomized set of original, Deca Pal-authored business questions. They are not copied from official DECA exams.
+        Choose from a fixed bank of 5,000 original Deca Pal-authored business questions—1,000 in each category. Each practice set selects questions from that bank and never generates new question text.
       </p>
       <div className="w-full max-w-md space-y-4">
         {clusters.map((cluster) => (

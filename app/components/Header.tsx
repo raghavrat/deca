@@ -97,6 +97,13 @@ export default function Header() {
                 </>
               ) : (
                 <>
+                  <Link
+                    href="/test"
+                    className={`nav-link ${isActive('/test') ? 'nav-link-active' : ''}`}
+                    aria-current={isActive('/test') ? 'page' : undefined}
+                  >
+                    Tests
+                  </Link>
                   <Link 
                     href="/pricing" 
                     className={`nav-link ${isActive('/pricing') ? 'nav-link-active' : ''}`}
@@ -231,6 +238,14 @@ export default function Header() {
                   </>
                 ) : (
                   <>
+                    <Link
+                      href="/test"
+                      className={`nav-link ${isActive('/test') ? 'nav-link-active' : ''}`}
+                      onClick={() => setIsMenuOpen(false)}
+                      aria-current={isActive('/test') ? 'page' : undefined}
+                    >
+                      Tests
+                    </Link>
                     <Link 
                       href="/pricing" 
                       className={`nav-link ${isActive('/pricing') ? 'nav-link-active' : ''}`}

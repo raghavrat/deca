@@ -62,9 +62,9 @@ We provide DECA students with a modern, comprehensive, and engaging platform tha
 #### 2. Practice Test System
 **Description**: Interactive quiz platform with immediate feedback
 **Specifications**:
-- Randomized multiple-choice practice from a deterministic 5,000-item first-party bank based on original business concept blueprints
+- Randomized multiple-choice selections from a committed, fixed 5,000-item first-party bank based on original business concept blueprints
 - Immediate feedback with explanations
-- Server-side originality checks, randomized answer order, and signed answer verification
+- Pre-commit originality checks, randomized answer order, and signed answer verification for authenticated progress
 - Progress tracking via local storage
 - Category-specific tests
 
@@ -96,13 +96,13 @@ We provide DECA students with a modern, comprehensive, and engaging platform tha
 - Email verification required
 - Session-based authentication
 - Password reset functionality
-- Email whitelist for access control
+- Open registration for valid, verified email addresses
 
 **User Benefits**:
 - Secure personal data
 - Persistent progress tracking
 - Multi-device access
-- School-controlled access
+- Optional accounts for persistent progress and roleplay history
 
 ### Planned Features (Roadmap)
 

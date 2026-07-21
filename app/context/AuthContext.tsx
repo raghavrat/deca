@@ -99,7 +99,7 @@ export function AuthContextProvider({ children }: { children: React.ReactNode })
       body: JSON.stringify({ email }),
     })
     if (!eligibilityResponse.ok) {
-      throw new Error('This email is not eligible to register')
+      throw new Error('Enter a valid email address')
     }
     
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);

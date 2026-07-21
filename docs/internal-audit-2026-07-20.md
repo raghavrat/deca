@@ -16,7 +16,7 @@ The audit found critical authorization and privacy defects in the original appli
 | Critical | Vulnerable framework/dependency versions, including high/critical advisories | Next.js, React, Firebase, and tooling upgraded; high/critical audit findings removed at audit time |
 | High | Session cookies/tokens and user identifiers were logged | Credential and personal-data logging removed or minimized; generic errors returned |
 | High | Audio/transcripts were sent to AI services without an explicit user disclosure or restrictive provider routing | Pre-submit disclosure/consent added; OpenRouter requests deny provider data collection and require zero-data-retention routing |
-| High | The static practice bank contained 310 questions traceable to published DECA/MBA Research exams | Copied bank removed; test generation now uses first-party concept blueprints, originality rules, output screening, legacy-stem fingerprints, provenance labels, and signed answer verification |
+| High | The static practice bank contained 310 questions traceable to published DECA/MBA Research exams | Copied bank removed; a fixed 5,000-question first-party bank now uses original concept blueprints, originality checks, legacy-stem fingerprints, provenance labels, and signed answer verification |
 | High | Unbounded AI payloads/responses created cost, denial-of-service, and stored-data risks | Request/audio/transcript limits, schema checks, score clamping, response length checks, and per-account limits added |
 | High | Firestore clients could read broad leaderboard data and directly access roleplay collections | Owner-scoped rules added; roleplays are server-only; leaderboard is authenticated, minimized, and opt-in |
 | High | Account data had no user export/deletion path | Authenticated export and deletion endpoint plus account controls added |
@@ -53,6 +53,7 @@ This does not establish full conformance. Test the deployed application at 200% 
 9. Obtain a manual accessibility audit and a remediation/retest record before claiming WCAG conformance or ADA compliance.
 10. Add production monitoring, a distributed rate limiter/WAF, backups with a restore test, incident response owners, breach-notification analysis, retention automation, and periodic access review.
 11. Run an independent penetration test before a broad or paid launch and after material authentication/data-flow changes.
+12. Because registration and public practice are open, enforce production WAF/rate limits, Firebase abuse protections, spend alerts, and capacity monitoring before broad promotion.
 
 ## Verification commands
 

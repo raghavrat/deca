@@ -21,7 +21,7 @@ export async function middleware(request: NextRequest) {
   ]
   
   // Allow public paths and API routes
-  if (publicPaths.includes(currentPath) || currentPath.startsWith('/api/')) {
+  if (publicPaths.includes(currentPath) || currentPath.startsWith('/test/') || currentPath.startsWith('/api/')) {
     return NextResponse.next()
   }
 

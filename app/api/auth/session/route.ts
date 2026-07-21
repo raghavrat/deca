@@ -1,7 +1,7 @@
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
 import { adminAuth } from '../../../firebase/admin'
-import { isEmailAllowed } from '../../../config/allowedEmails'
+import { isAccountEmailValid } from '../../../config/accountEmail'
 import { getErrorCode } from '../../../utils/errorHandling'
 import { logger } from '../../../utils/logger'
 import { RequestError, requireSameOrigin } from '../../../utils/serverAuth'
@@ -28,9 +28,9 @@ export async function GET() {
       const decodedClaims = await adminAuth.verifySessionCookie(sessionCookie.value, true)
       
       // Validate email against whitelist
-      if (!decodedClaims.email || !isEmailAllowed(decodedClaims.email)) {
-        logger.log('Session account is not authorized');
-        return NextResponse.json({ error: 'This account is not allowed to access the system' }, { status: 403, headers: noStoreHeaders })
+      if (!decodedClaims.email || !isAccountEmailValid(decodedClaims.email)) {
+        logger.log('Session account email is invalid');
+        return NextResponse.json({ error: 'A valid email address is required' }, { status: 403, headers: noStoreHeaders })
       }
 
       logger.log('Session validated successfully');
@@ -87,9 +87,9 @@ export async function POST(request: Request) {
       }
 
       // Validate email against whitelist
-      if (!decodedToken.email || !isEmailAllowed(decodedToken.email)) {
-        logger.log('Token account is not authorized');
-        return NextResponse.json({ error: 'This account is not allowed to access the system' }, { status: 403, headers: noStoreHeaders })
+      if (!decodedToken.email || !isAccountEmailValid(decodedToken.email)) {
+        logger.log('Token account email is invalid');
+        return NextResponse.json({ error: 'A valid email address is required' }, { status: 403, headers: noStoreHeaders })
       }
 
       // Create session cookie

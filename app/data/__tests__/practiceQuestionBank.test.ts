@@ -3,6 +3,7 @@ import {
   getAuthoredPracticeQuestions,
   getPracticeQuestionBlueprint,
 } from '../practiceQuestionBank'
+import FIXED_PRACTICE_QUESTION_BANK from '../practiceQuestionBank.generated.json'
 import { TEST_BLUEPRINTS, type TestCategory } from '../testBlueprints'
 import {
   hasBlockedBankStyleOpening,
@@ -13,6 +14,13 @@ import {
 const categories: TestCategory[] = ['MANAGEMENT', 'MARKETING', 'FINANCE', 'HOSPITALITY', 'ENTREPRENEURSHIP']
 
 describe('first-party practice question bank', () => {
+  test('loads all questions from the committed fixed bank', () => {
+    expect(FIXED_PRACTICE_QUESTION_BANK).toHaveLength(5_000)
+    expect(PRACTICE_QUESTION_BANK.map(question => question.id)).toEqual(
+      FIXED_PRACTICE_QUESTION_BANK.map(question => question.id),
+    )
+  })
+
   test('contains exactly one thousand questions for every category', () => {
     categories.forEach(category => {
       expect(getAuthoredPracticeQuestions(category)).toHaveLength(1_000)
