@@ -29,7 +29,7 @@ export default function Navigation() {
   }
 
   return (
-    <nav className="w-64 bg-gray-800 text-white p-4 h-screen overflow-y-auto">
+    <nav className="w-64 bg-black text-white p-4 h-screen overflow-y-auto">
       <Link href="/" className="block mb-6 text-2xl font-bold">Home</Link>
       
       {/* Main Navigation Links */}
@@ -38,8 +38,8 @@ export default function Navigation() {
           href="/performance"
           className={`flex items-center px-4 py-2 rounded-md transition-colors ${
             pathname.startsWith('/performance')
-              ? 'bg-blue-600'
-              : 'hover:bg-gray-700'
+              ? 'bg-white text-black'
+              : 'hover:bg-neutral-700'
           }`}
         >
           <BookOpen className="h-4 w-4 mr-3" />
@@ -50,8 +50,8 @@ export default function Navigation() {
           href="/test"
           className={`flex items-center px-4 py-2 rounded-md transition-colors ${
             pathname.startsWith('/test')
-              ? 'bg-blue-600'
-              : 'hover:bg-gray-700'
+              ? 'bg-white text-black'
+              : 'hover:bg-neutral-700'
           }`}
         >
           <BarChart3 className="h-4 w-4 mr-3" />
@@ -62,8 +62,8 @@ export default function Navigation() {
           href="/roleplay"
           className={`flex items-center px-4 py-2 rounded-md transition-colors ${
             pathname.startsWith('/roleplay')
-              ? 'bg-blue-600'
-              : 'hover:bg-gray-700'
+              ? 'bg-white text-black'
+              : 'hover:bg-neutral-700'
           }`}
         >
           <Users className="h-4 w-4 mr-3" />
@@ -72,8 +72,8 @@ export default function Navigation() {
       </div>
 
       {/* Categories Section */}
-      <div className="border-t border-gray-700 pt-4">
-        <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wide mb-3">Categories</h3>
+      <div className="border-t border-neutral-700 pt-4">
+        <h3 className="text-sm font-semibold text-neutral-400 uppercase tracking-wide mb-3">Categories</h3>
         <ul className="space-y-2">
           {clusters.map((cluster) => (
           <li key={cluster}>
@@ -82,8 +82,8 @@ export default function Navigation() {
               aria-expanded={openCluster === cluster}
               className={`w-full text-left px-4 py-2 rounded-md flex items-center justify-between ${
                 pathname.startsWith(`/${cluster.toLowerCase()}`)
-                  ? 'bg-blue-600'
-                  : 'hover:bg-gray-700'
+                  ? 'bg-white text-black'
+                  : 'hover:bg-neutral-700'
               }`}
             >
               {cluster}
@@ -99,7 +99,7 @@ export default function Navigation() {
                   <li key={ia}>
                     <Link
                       href={`/${cluster.toLowerCase()}/${ia.toLowerCase().replace(/\s+/g, '-')}`}
-                      className="block px-4 py-2 text-sm hover:bg-gray-700 rounded-md"
+                      className="block px-4 py-2 text-sm hover:bg-neutral-700 rounded-md"
                     >
                       {ia}
                     </Link>

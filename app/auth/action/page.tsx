@@ -140,7 +140,7 @@ function AuthActionContent() {
     return (
       <div className="min-h-screen flex items-center justify-center p-4">
         <div className="text-center">
-          <p className="text-gray-600 dark:text-gray-400">Processing your request...</p>
+          <p className="text-neutral-600 dark:text-neutral-400">Processing your request...</p>
         </div>
       </div>
     );
@@ -151,13 +151,13 @@ function AuthActionContent() {
     return (
       <div className="min-h-screen flex items-center justify-center p-4">
         <div className="w-full max-w-md space-y-6 text-center">
-          <h1 className="text-4xl font-light text-gray-800 dark:text-white">Email Verified!</h1>
+          <h1 className="text-4xl font-light text-neutral-800 dark:text-white">Email Verified!</h1>
           <div role="status" className="text-sm text-green-700 dark:text-green-400 my-4">
             {success}
           </div>
           <Link 
             href="/login" 
-            className="inline-block text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors duration-300"
+            className="inline-block text-neutral-600 dark:text-neutral-400 hover:text-black dark:hover:text-white transition-colors duration-300"
           >
             Go to Login
           </Link>
@@ -172,11 +172,11 @@ function AuthActionContent() {
       <div className="min-h-screen flex items-center justify-center p-4">
         <div className="w-full max-w-md space-y-8">
           <div>
-            <h1 className="text-4xl font-light mb-4 text-center text-gray-800 dark:text-white">
+            <h1 className="text-4xl font-light mb-4 text-center text-neutral-800 dark:text-white">
               Set new password
             </h1>
             {userEmail && (
-              <p className="text-center text-gray-600 dark:text-gray-400 mb-4">
+              <p className="text-center text-neutral-600 dark:text-neutral-400 mb-4">
                 Reset password for: <strong>{userEmail}</strong>
               </p>
             )}
@@ -193,14 +193,14 @@ function AuthActionContent() {
               </div>
             )}
             <div className="space-y-4">
-              <div><label htmlFor="new-password" className="mb-1 block text-sm font-medium">New password</label><input id="new-password" type="password" required autoComplete="new-password" className="input-minimal" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} disabled={isLoading || !!success} minLength={12} aria-describedby="new-password-help" /><p id="new-password-help" className="mt-2 text-xs text-gray-600 dark:text-gray-400">Use at least 12 characters. Password managers and paste are supported.</p></div>
+              <div><label htmlFor="new-password" className="mb-1 block text-sm font-medium">New password</label><input id="new-password" type="password" required autoComplete="new-password" className="input-minimal" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} disabled={isLoading || !!success} minLength={12} aria-describedby="new-password-help" /><p id="new-password-help" className="mt-2 text-xs text-neutral-600 dark:text-neutral-400">Use at least 12 characters. Password managers and paste are supported.</p></div>
               <div><label htmlFor="confirm-new-password" className="mb-1 block text-sm font-medium">Confirm new password</label><input id="confirm-new-password" type="password" required autoComplete="new-password" className="input-minimal" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} disabled={isLoading || !!success} minLength={12} /></div>
             </div>
 
             <button
               type="submit"
               disabled={isLoading || !!success}
-              className="w-full py-3 text-sm font-medium border border-gray-300 dark:border-gray-700 hover:border-black dark:hover:border-white transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full py-3 text-sm font-medium border border-neutral-300 dark:border-neutral-700 hover:border-black dark:hover:border-white transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isLoading ? 'Resetting...' : 'Reset password'}
             </button>
@@ -209,7 +209,7 @@ function AuthActionContent() {
             <div className="text-center">
               <Link 
                 href="/login" 
-                className="text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors duration-300"
+                className="text-neutral-600 dark:text-neutral-400 hover:text-black dark:hover:text-white transition-colors duration-300"
               >
                 Back to sign in
               </Link>
@@ -224,7 +224,7 @@ function AuthActionContent() {
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
       <div className="w-full max-w-md space-y-6 text-center">
-        <h1 className="text-4xl font-light text-gray-800 dark:text-white">Action Required</h1>
+        <h1 className="text-4xl font-light text-neutral-800 dark:text-white">Action Required</h1>
         {error && (
           <div role="alert" className="text-sm text-red-700 dark:text-red-400 mb-4">
             {error}
@@ -239,14 +239,14 @@ function AuthActionContent() {
           {mode === 'resetPassword' && (
             <Link 
               href="/forgot-password" 
-              className="block text-[#0066cc] dark:text-[#4d94ff] hover:text-[#0052a3] dark:hover:text-[#6ba3ff] font-semibold transition-colors duration-300"
+              className="block font-semibold text-black underline underline-offset-4 transition-opacity duration-300 hover:opacity-65 dark:text-white"
             >
               Request a new password reset
             </Link>
           )}
           <Link 
             href="/login" 
-            className="block text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors duration-300"
+            className="block text-neutral-600 dark:text-neutral-400 hover:text-black dark:hover:text-white transition-colors duration-300"
           >
             Go to Login
           </Link>
@@ -261,7 +261,7 @@ export default function AuthAction() {
     <Suspense fallback={
       <div className="min-h-screen flex items-center justify-center p-4">
         <div className="text-center">
-          <p className="text-gray-600 dark:text-gray-400">Loading...</p>
+          <p className="text-neutral-600 dark:text-neutral-400">Loading...</p>
         </div>
       </div>
     }>

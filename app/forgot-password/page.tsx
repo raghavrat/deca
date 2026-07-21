@@ -50,10 +50,10 @@ export default function ForgotPassword() {
     <div className="min-h-screen flex items-center justify-center p-4">
       <div className="w-full max-w-md space-y-8">
         <div>
-          <h1 className="text-4xl font-light mb-4 text-center text-gray-800 dark:text-white">
+          <h1 className="text-4xl font-light mb-4 text-center text-neutral-800 dark:text-white">
             Reset your password
           </h1>
-          <p className="text-sm text-center text-gray-600 dark:text-gray-400">
+          <p className="text-sm text-center text-neutral-600 dark:text-neutral-400">
             Enter your email address and we'll send you a link to reset your password.
           </p>
         </div>
@@ -87,7 +87,7 @@ export default function ForgotPassword() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full py-3 text-sm font-medium border border-gray-300 dark:border-gray-700 hover:border-black dark:hover:border-white transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full py-3 text-sm font-medium border border-neutral-300 dark:border-neutral-700 hover:border-black dark:hover:border-white transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isLoading ? 'Sending...' : 'Send reset email'}
             </button>
@@ -97,11 +97,11 @@ export default function ForgotPassword() {
                 type="button"
                 onClick={handleResend}
                 disabled={isLoading}
-                className="w-full py-3 text-sm font-medium border border-gray-300 dark:border-gray-700 hover:border-black dark:hover:border-white transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full py-3 text-sm font-medium border border-neutral-300 dark:border-neutral-700 hover:border-black dark:hover:border-white transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isLoading ? 'Resending...' : 'Resend email'}
               </button>
-              <p className="text-sm text-center text-gray-600 dark:text-gray-400">
+              <p className="text-sm text-center text-neutral-600 dark:text-neutral-400">
                 Didn't receive the email? Check your spam folder or click resend.
               </p>
             </div>
@@ -110,7 +110,7 @@ export default function ForgotPassword() {
         <div className="text-center">
           <Link 
             href="/login" 
-            className="text-sm text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors duration-200"
+            className="text-sm text-neutral-600 dark:text-neutral-400 hover:text-black dark:hover:text-white transition-colors duration-200"
           >
             Back to sign in
           </Link>

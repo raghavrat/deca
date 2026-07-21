@@ -5,9 +5,9 @@ const contactEmail = process.env.PRIVACY_CONTACT_EMAIL || 'privacy@decapal.org'
 
 export default function AccessibilityPage() {
   return (
-    <article className="mx-auto max-w-4xl px-5 py-14 text-gray-800 dark:text-gray-200">
-      <header className="mb-12 border-b border-gray-200 pb-8 dark:border-gray-800">
-        <p className="mb-3 text-sm text-gray-600 dark:text-gray-400">Last updated July 20, 2026</p>
+    <article className="mx-auto max-w-4xl px-5 py-14 text-neutral-800 dark:text-neutral-200">
+      <header className="mb-12 border-b border-neutral-200 pb-8 dark:border-neutral-800">
+        <p className="mb-3 text-sm text-neutral-600 dark:text-neutral-400">Last updated July 20, 2026</p>
         <h1 className="text-4xl font-light tracking-tight text-black dark:text-white">Accessibility Statement</h1>
       </header>
       <div className="legal-copy space-y-10">

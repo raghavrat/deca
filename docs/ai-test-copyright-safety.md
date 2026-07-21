@@ -8,7 +8,9 @@ Status: engineering risk reduction, not legal advice or a non-infringement opini
 
 The previous `app/questions.tsx` bank was unsafe to publish. Repository history identified it as imported exam material, and exact-phrase checks found verbatim matches to published DECA/MBA Research exam items. Rewording those items with AI would not solve the problem: it would still use protected source expression to prepare substitutes or derivative versions.
 
-The file—310 questions, answer sets, and explanations—was removed. The replacement combines 60 separately written anchor questions with first-party scenario and calculation templates to create a deterministic universe of 5,000 stable items—1,000 per category. It is built from general business concepts without using official questions, DECA+ content, released exams, role-plays, or third-party question banks as source material. Runtime test delivery no longer calls an AI model.
+The file—310 questions, answer sets, and explanations—was removed. The current replacement is a committed bank of 7,000 stable items—1,000 in each of seven written-exam families—built from a first-party concept catalog and deterministic scenario, classification, application, diagnosis, comparison, and calculation builders. It uses general business and personal-finance concepts without using official questions, DECA+ content, released exams, role-plays, or third-party question banks as source material. Runtime test delivery never calls an AI model.
+
+The research-backed requirements for the next independently authored bank are defined in [`practice-question-generation-master-framework.md`](./practice-question-generation-master-framework.md). That framework separates all seven written-exam families, applies the current 2026-2027 allocation facts, and keeps official sample wording out of model context.
 
 ## Governing risk principles
 
@@ -34,11 +36,11 @@ The removed bank is not available to the application. A non-readable Bloom filte
 
 ### 2. First-party concept blueprints
 
-`app/data/testBlueprints.ts` contains 30 Deca Pal-authored blueprints across management, marketing, finance, hospitality, and entrepreneurship. Each blueprint includes only a general topic, learning goal, elementary concept notes, and permitted assessment forms. It contains no official exam facts, names, distractors, answer sets, test identifiers, or explanations.
+`app/data/testBlueprints.ts` contains 690 Deca Pal-authored concept blueprints across Business Administration Core, Management, Entrepreneurship, Finance, Hospitality and Tourism, Marketing, and Personal Financial Literacy. Each blueprint includes only a general topic, learning goal, concept notes, an original example, application guidance, a common error, and permitted assessment forms. It contains no official question wording, fictional facts, distractor sets, answer keys, test identifiers, or published explanations.
 
 ### 3. Separately authored question bank
 
-`app/data/practiceQuestionBank.ts` contains 60 independently written anchors and deterministic variant builders for all 30 concept blueprints. At initialization it creates exactly 1,000 stable questions in each of five categories, with approximately 166–167 items per blueprint. Each rendered item has a persistent ID, scenario, answer set, explanation, difficulty, and documented blueprint relationship. The bank does not describe its content as official or previously used. Templates and anchor items require human review; automated tests additionally inspect every rendered variant.
+`app/data/practiceQuestionBank.ts` contains deterministic item builders for all 690 concept blueprints, and `app/data/practiceQuestionBank.generated.json` stores the resulting fixed records. The bank has exactly 1,000 items in each of seven exam families, distributed at ten times the current 100-question district/association instructional-area allocation. Each item has a persistent ID, exam family, instructional area, objective ID, cognitive operation, stem form, answer set, explanation, difficulty, and `automated-validated` review status. The bank does not describe its content as official or previously used. Automated tests inspect every record; human editorial review remains required before treating the bank as release-reviewed.
 
 ### 4. Automated bank screening
 
@@ -48,7 +50,7 @@ The test suite fails when an authored item:
 - uses a deliberately blocked bank-style opening;
 - contains too little context to support an independently expressed scenario;
 - contains duplicate answers, invalid scoring, unsupported blueprint IDs, or malformed text;
-- has a duplicate identifier or leaves a blueprint/category without the required coverage; or
+- has a duplicate identifier or stem, leaves an objective without coverage, or misses an instructional-area quota; or
 - matches two or more hashed eight-word fingerprints from the removed legacy bank.
 
 New and revised items must pass these checks before release. Human review is still required because automated checks cannot determine authorship, permission, or educational accuracy by themselves.
@@ -86,7 +88,7 @@ Before a paid or broad public launch:
 
 ## Verification
 
-Automated tests cover category and blueprint completeness, unique item IDs, schema constraints, prohibited source signals, legacy-bank phrase overlap, answer-token tampering, token/user/question binding, and expiration. Run:
+Automated tests cover all seven family totals, district/association quota assembly, objective completeness, unique IDs and stems, schema constraints, prohibited source signals, legacy-bank phrase overlap, answer-token tampering, token/user/question binding, and expiration. Run:
 
 ```sh
 npm run typecheck

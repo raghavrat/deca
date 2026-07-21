@@ -10,7 +10,7 @@ import dynamic from 'next/dynamic'
 const InstructionalArea = dynamic(
   () => import('../../../components/InstructionalArea'),
   {
-    loading: () => <div className="animate-pulse bg-gray-200 dark:bg-gray-800 h-96"></div>,
+    loading: () => <div className="animate-pulse bg-neutral-200 dark:bg-neutral-800 h-96"></div>,
     ssr: false
   }
 )
@@ -101,13 +101,13 @@ export default function IAPage({ params: paramsPromise, searchParams: searchPara
         Back to Clusters
       </Link>
       <h2 className="text-3xl font-light mb-6 text-black dark:text-white">{category} - {ia}</h2>
-      <Suspense fallback={<div className="animate-pulse bg-gray-200 dark:bg-gray-800 h-96"></div>}>
+      <Suspense fallback={<div className="animate-pulse bg-neutral-200 dark:bg-neutral-800 h-96"></div>}>
         {isLoading ? (
-          <div className="animate-pulse bg-gray-200 dark:bg-gray-800 h-96"></div>
+          <div className="animate-pulse bg-neutral-200 dark:bg-neutral-800 h-96"></div>
         ) : filteredData.length > 0 ? (
           <InstructionalArea area={ia} indicators={filteredData} />
         ) : (
-          <p className="text-gray-600 dark:text-gray-400">No performance indicators found for this instructional area.</p>
+          <p className="text-neutral-600 dark:text-neutral-400">No performance indicators found for this instructional area.</p>
         )}
       </Suspense>
     </div>

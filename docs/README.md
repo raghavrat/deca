@@ -4,7 +4,7 @@
 
 ## Executive Summary
 
-DECA Pal is an educational technology platform designed to help DECA (Distributive Education Clubs of America) students prepare for competitive business events. The platform provides comprehensive study materials, practice tests, and gamified learning experiences across five key business categories.
+DECA Pal is an independent educational technology platform designed to help students prepare for DECA competitive business events. The platform provides study materials, practice tests across seven written-exam families, and gamified learning experiences. It is not affiliated with or endorsed by DECA Inc. or MBA Research.
 
 **Key Business Metrics:**
 - Target Market: 225,000+ DECA members nationwide
@@ -33,6 +33,10 @@ This documentation is organized to provide both high-level business insights and
 - **[ai-test-copyright-safety.md](./ai-test-copyright-safety.md)** - Copyright research and independent AI-test generation controls
   - Removal of the copied legacy question bank
   - First-party blueprint, screening, provenance, and complaint workflow
+
+- **[practice-question-generation-master-framework.md](./practice-question-generation-master-framework.md)** - Research-backed practice-question authoring specification
+  - All seven written-exam families and current 2026-2027 blueprint quotas
+  - Clean-room system prompt, family modules, distractor rules, validation, and review gates
 
 - **[roleplay-prompt-research.md](./roleplay-prompt-research.md)** - 2026–2027 format research and all-event case-frequency analysis
   - Official event-family timing, PI counts and rubric structure

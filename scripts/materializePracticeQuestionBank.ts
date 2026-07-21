@@ -1,6 +1,6 @@
 import { writeFileSync } from 'node:fs'
 import { resolve } from 'node:path'
-import { materializePracticeQuestionBank } from '../app/data/practiceQuestionBank'
+import { materializePracticeQuestionBank } from '../app/data/practiceQuestionBank.ts'
 
 const outputPath = resolve(process.cwd(), 'app/data/practiceQuestionBank.generated.json')
 const questions = materializePracticeQuestionBank()

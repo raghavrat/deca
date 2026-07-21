@@ -28,6 +28,12 @@ export function getQuestionSigningSecret(): string {
       .digest('base64url')
   }
 
+  if (process.env.NODE_ENV === 'development' && process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID) {
+    return createHash('sha256')
+      .update(`deca-pal-local-question-token:${process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID}`)
+      .digest('base64url')
+  }
+
   throw new Error('Question token signing is not configured')
 }
 

@@ -168,7 +168,7 @@ export default function PerformancePage() {
             type="button"
             onClick={handleSearch}
             aria-label="Search performance indicators"
-            className="absolute right-0 top-1/2 min-h-11 min-w-11 transform -translate-y-1/2 p-2 text-gray-700 dark:text-gray-300 hover:text-black dark:hover:text-white transition-colors"
+            className="absolute right-0 top-1/2 min-h-11 min-w-11 transform -translate-y-1/2 p-2 text-neutral-700 dark:text-neutral-300 hover:text-black dark:hover:text-white transition-colors"
           >
             <Search className="h-5 w-5" />
           </button>
@@ -181,7 +181,7 @@ export default function PerformancePage() {
             <button
               onClick={() => handleClusterClick(cluster)}
               aria-expanded={selectedCluster === cluster && isOpen}
-              className={`w-full py-4 px-6 border border-gray-300 dark:border-gray-700 hover:border-black dark:hover:border-white text-black dark:text-white font-light text-center transition-all duration-200 flex justify-between items-center ${
+              className={`w-full py-4 px-6 border border-neutral-300 dark:border-neutral-700 hover:border-black dark:hover:border-white text-black dark:text-white font-light text-center transition-all duration-200 flex justify-between items-center ${
                 selectedCluster === cluster && isOpen ? 'border-black dark:border-white' : ''
               }`}
             >
@@ -199,7 +199,7 @@ export default function PerformancePage() {
                 <Link
                   key={ia}
                   href={`/performance/${cluster.toLowerCase()}/${formatUrlSlug(ia)}`}
-                  className="block w-full py-3 px-6 border border-gray-300 dark:border-gray-700 hover:border-black dark:hover:border-white text-black dark:text-white text-sm text-center transition-colors duration-200"
+                  className="block w-full py-3 px-6 border border-neutral-300 dark:border-neutral-700 hover:border-black dark:hover:border-white text-black dark:text-white text-sm text-center transition-colors duration-200"
                 >
                   {ia}
                 </Link>

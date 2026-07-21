@@ -19,7 +19,7 @@ export default function About() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 dark:border-white"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-neutral-900 dark:border-white"></div>
       </div>
     )
   }
@@ -32,81 +32,83 @@ export default function About() {
   return (
     <div className="min-h-screen flex flex-col">
       {/* Hero Section */}
-      <div className="py-16 lg:py-24 px-4 text-center relative bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-950">
-        {/* Background Pattern */}
-        <div 
-          className="absolute inset-0 opacity-10 dark:opacity-5"
-          style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23000000' fill-opacity='0.4'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3Ccircle cx='10' cy='10' r='2'/%3E%3Ccircle cx='50' cy='10' r='2'/%3E%3Ccircle cx='10' cy='50' r='2'/%3E%3Ccircle cx='50' cy='50' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-            backgroundSize: '60px 60px'
-          }}
-        />
+      <section className="deca-hero relative overflow-hidden bg-black px-4 py-16 text-white lg:py-24">
+        <div className="deca-hero-grid" aria-hidden="true" />
+        <div className="deca-hero-light" aria-hidden="true" />
         
-        <div className="max-w-4xl mx-auto relative z-10">
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-light tracking-tight mb-6 text-black dark:text-white">
-            About Deca Pal 👋
+        <div className="deca-hero-copy relative z-10 mx-auto max-w-4xl">
+          <h1 className="max-w-3xl text-4xl font-light leading-[1.05] tracking-tight text-white md:text-5xl lg:text-6xl">
+            Built because good practice was hard to find.
           </h1>
-          <p className="text-xl lg:text-2xl mb-12 text-gray-600 dark:text-gray-400 max-w-3xl mx-auto leading-relaxed">
-            Learn about the story behind Deca Pal and why it was created to help DECA students succeed.
+          <p className="mt-6 max-w-2xl text-lg leading-8 text-neutral-400">
+            Deca Pal is the focused study space I wanted when I was preparing to compete.
           </p>
         </div>
-      </div>
+      </section>
 
       {/* Main Content Section */}
-      <div className="py-20 px-4">
-        <div className="max-w-4xl mx-auto">
-          {/* Personal Message Box */}
-          <div className="bg-white dark:bg-black border border-gray-300 dark:border-gray-700 p-8 mb-8">
-            <h2 className="text-2xl md:text-3xl font-light tracking-tight mb-6 text-black dark:text-white text-left">
-              A Personal Message from Raghav 👋
+      <main className="px-4 py-16 lg:py-20">
+        <div className="mx-auto max-w-4xl">
+          <section className="grid gap-8 border-b border-neutral-300 pb-14 dark:border-neutral-700 md:grid-cols-[0.7fr_1.3fr] md:gap-12">
+            <h2 className="text-2xl font-light tracking-tight text-black dark:text-white md:text-3xl">
+              Why I built it
             </h2>
-            <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed text-left mb-8">
-              Hi, my name is Raghav and I built this app to help people study for their DECA roleplays because I knew it was hard for me when I was studying and it was very difficult without proper resources. 📚 My hope is that you can win Glass due to my website! 🏆✨
-            </p>
-            
-            {/* CTA Button Section */}
-            <div className="text-center">
-              <Link
-                href="/signup"
-                className="btn-primary"
-              >
-                Start Your Journey to Glass 🥇
+            <div className="space-y-5 text-base leading-7 text-neutral-600 dark:text-neutral-400">
+              <p>
+                I&apos;m Raghav. While preparing for DECA, I could learn the concepts, but finding enough realistic practice was much harder.
+              </p>
+              <p>
+                I built Deca Pal to bring original practice tests, event-specific roleplays, and useful feedback into one place. The goal is simple: help students practice more often and learn something from every attempt.
+              </p>
+            </div>
+          </section>
+
+          <section className="py-14">
+            <h2 className="text-2xl font-light tracking-tight text-black dark:text-white md:text-3xl">
+              What students can expect
+            </h2>
+            <div className="mt-8 grid border border-neutral-300 dark:border-neutral-700 md:grid-cols-3">
+              <div className="p-6 md:border-r md:border-neutral-300 md:dark:border-neutral-700">
+                <h3 className="text-base font-medium text-black dark:text-white">Original material</h3>
+                <p className="mt-3 text-sm leading-6 text-neutral-600 dark:text-neutral-400">
+                  Practice questions and scenarios written for learning, not copied from official tests.
+                </p>
+              </div>
+              <div className="border-t border-neutral-300 p-6 dark:border-neutral-700 md:border-r md:border-t-0 md:dark:border-neutral-700">
+                <h3 className="text-base font-medium text-black dark:text-white">Event-specific practice</h3>
+                <p className="mt-3 text-sm leading-6 text-neutral-600 dark:text-neutral-400">
+                  Tests, roleplays, and performance indicators organized around the event being studied.
+                </p>
+              </div>
+              <div className="border-t border-neutral-300 p-6 dark:border-neutral-700 md:border-t-0">
+                <h3 className="text-base font-medium text-black dark:text-white">Feedback that teaches</h3>
+                <p className="mt-3 text-sm leading-6 text-neutral-600 dark:text-neutral-400">
+                  Explanations and roleplay feedback that make the next attempt more useful.
+                </p>
+              </div>
+            </div>
+          </section>
+
+          <section className="border border-neutral-300 p-8 dark:border-neutral-700 md:flex md:items-end md:justify-between md:gap-12">
+            <div className="max-w-xl">
+              <h2 className="text-2xl font-light tracking-tight text-black dark:text-white md:text-3xl">
+                Independent by design
+              </h2>
+              <p className="mt-4 text-sm leading-6 text-neutral-600 dark:text-neutral-400">
+                Deca Pal is an independent study tool and is not affiliated with or endorsed by DECA Inc. Practice scores are not official competition results.
+              </p>
+            </div>
+            <div className="mt-8 shrink-0 md:mt-0">
+              <Link href="/signup" className="btn-primary">
+                Start practicing
               </Link>
-              <p className="mt-4 text-xs text-gray-500 dark:text-gray-400">
-                No credit card required • Built with ❤️ for DECA students
+              <p className="mt-3 text-xs text-neutral-500 dark:text-neutral-400">
+                Free to start.
               </p>
             </div>
-          </div>
-
-          {/* Additional Story Section */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="bg-white dark:bg-black border border-gray-300 dark:border-gray-700 hover:border-black dark:hover:border-white transition-all duration-200 p-6">
-              <div className="text-center mb-4">
-                <span className="text-3xl">🤔</span>
-              </div>
-              <h3 className="text-lg font-light mb-4 text-black dark:text-white text-center">
-                The Problem
-              </h3>
-              <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed text-center">
-                When I was preparing for DECA competitions, I struggled to find quality practice resources for roleplays. Most materials were outdated or didn't provide the realistic feedback needed to improve.
-              </p>
-            </div>
-            
-            <div className="bg-white dark:bg-black border border-gray-300 dark:border-gray-700 hover:border-black dark:hover:border-white transition-all duration-200 p-6">
-              <div className="text-center mb-4">
-                <span className="text-3xl">💡</span>
-              </div>
-              <h3 className="text-lg font-light mb-4 text-black dark:text-white text-center">
-                The Solution
-              </h3>
-              <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed text-center">
-                Deca Pal uses AI to create realistic roleplay scenarios and provide detailed feedback, giving students the practice they need to excel in DECA competitions.
-              </p>
-            </div>
-          </div>
-
+          </section>
         </div>
-      </div>
+      </main>
     </div>
   )
 }

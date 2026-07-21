@@ -7,6 +7,14 @@ export interface InstructionalArea {
   piCount: number
 }
 
+/** Only expose areas that can supply the complete event-family PI set. */
+export function getEligibleInstructionalAreas(
+  areas: InstructionalArea[],
+  requiredIndicatorCount: number,
+): InstructionalArea[] {
+  return areas.filter(area => area.piCount >= requiredIndicatorCount)
+}
+
 /**
  * Get all unique instructional areas for a given category
  */

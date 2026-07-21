@@ -49,10 +49,10 @@ export default function LeaderboardDisplay() {
 
       {!loading && !error && (
         leaderboard.length === 0 ? (
-          <p className="text-sm text-gray-700 dark:text-gray-300">No students have opted in to the leaderboard yet.</p>
-        ) : <ol className="divide-y divide-gray-200 dark:divide-gray-800" aria-label="Leaderboard rankings">
+          <p className="text-sm text-neutral-700 dark:text-neutral-300">No students have opted in to the leaderboard yet.</p>
+        ) : <ol className="divide-y divide-neutral-200 dark:divide-neutral-800" aria-label="Leaderboard rankings">
           {leaderboard.map((user, index) => (
-            <li key={user.id} className="py-3 flex items-center justify-between border-b border-gray-200 dark:border-gray-800 last:border-b-0">
+            <li key={user.id} className="py-3 flex items-center justify-between border-b border-neutral-200 dark:border-neutral-800 last:border-b-0">
               <div className="flex items-center">
                 <div className="text-sm font-light text-black dark:text-white w-8 text-center">
                   {index + 1}

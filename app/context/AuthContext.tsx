@@ -33,6 +33,10 @@ export function AuthContextProvider({ children }: { children: React.ReactNode })
 
   useEffect(() => {
     let unsubscribe: (() => void) | undefined;
+    let isActive = true;
+    const loadingFallback = window.setTimeout(() => {
+      if (isActive) setLoading(false);
+    }, 2500);
 
     const initializeAuth = async () => {
       // First check if we have a valid session
@@ -76,13 +80,28 @@ export function AuthContextProvider({ children }: { children: React.ReactNode })
         } else {
           setUser(null);
         }
+        window.clearTimeout(loadingFallback);
         setLoading(false);
+      }, () => {
+        window.clearTimeout(loadingFallback);
+        if (isActive) {
+          setUser(null);
+          setLoading(false);
+        }
       });
     };
 
-    initializeAuth();
+    void initializeAuth().catch(() => {
+      window.clearTimeout(loadingFallback);
+      if (isActive) {
+        setUser(null);
+        setLoading(false);
+      }
+    });
 
     return () => {
+      isActive = false;
+      window.clearTimeout(loadingFallback);
       if (unsubscribe) {
         unsubscribe();
       }

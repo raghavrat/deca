@@ -64,7 +64,7 @@ export default function Login() {
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full py-3 text-sm font-medium border border-gray-300 dark:border-gray-700 hover:border-black dark:hover:border-white transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full py-3 text-sm font-medium border border-neutral-300 dark:border-neutral-700 hover:border-black dark:hover:border-white transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isLoading ? 'Signing in...' : 'Sign in'}
           </button>
@@ -72,13 +72,13 @@ export default function Login() {
         <div className="text-center space-y-2">
           <Link 
             href="/forgot-password" 
-            className="text-sm text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors duration-200 block"
+            className="text-sm text-neutral-600 dark:text-neutral-400 hover:text-black dark:hover:text-white transition-colors duration-200 block"
           >
             Forgot your password?
           </Link>
           <Link 
             href="/signup" 
-            className="text-sm text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors duration-200 block"
+            className="text-sm text-neutral-600 dark:text-neutral-400 hover:text-black dark:hover:text-white transition-colors duration-200 block"
           >
             Don't have an account? Sign up
           </Link>

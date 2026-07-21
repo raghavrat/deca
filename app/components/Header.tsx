@@ -51,7 +51,7 @@ export default function Header() {
   const isActive = (path: string) => pathname.startsWith(path)
 
   return (
-    <header className="fixed top-4 left-1/2 transform -translate-x-1/2 w-full max-w-6xl z-50 bg-white dark:bg-black backdrop-blur-md border border-gray-300 dark:border-gray-700 shadow-lg">
+    <header className="fixed top-4 left-1/2 transform -translate-x-1/2 w-full max-w-6xl z-50 bg-white dark:bg-black backdrop-blur-md border border-neutral-300 dark:border-neutral-700 shadow-lg">
       <div className="w-full">
         <div className="px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
@@ -67,9 +67,9 @@ export default function Header() {
               {loading ? (
                 /* Loading placeholder - maintain layout */
                 <div className="flex items-center space-x-8">
-                  <div className="w-24 h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
-                  <div className="w-16 h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
-                  <div className="w-20 h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                  <div className="w-24 h-4 bg-neutral-200 dark:bg-neutral-700 rounded animate-pulse"></div>
+                  <div className="w-16 h-4 bg-neutral-200 dark:bg-neutral-700 rounded animate-pulse"></div>
+                  <div className="w-20 h-4 bg-neutral-200 dark:bg-neutral-700 rounded animate-pulse"></div>
                 </div>
               ) : user ? (
                 <>
@@ -97,13 +97,6 @@ export default function Header() {
                 </>
               ) : (
                 <>
-                  <Link
-                    href="/test"
-                    className={`nav-link ${isActive('/test') ? 'nav-link-active' : ''}`}
-                    aria-current={isActive('/test') ? 'page' : undefined}
-                  >
-                    Tests
-                  </Link>
                   <Link 
                     href="/pricing" 
                     className={`nav-link ${isActive('/pricing') ? 'nav-link-active' : ''}`}
@@ -126,7 +119,7 @@ export default function Header() {
             <div className="hidden md:flex items-center space-x-6">
               <button 
                 onClick={toggleDarkMode}
-                className="inline-flex min-h-11 min-w-11 items-center justify-center text-gray-700 dark:text-gray-300 hover:text-black dark:hover:text-white transition-colors"
+                className="inline-flex min-h-11 min-w-11 items-center justify-center text-neutral-700 dark:text-neutral-300 hover:text-black dark:hover:text-white transition-colors"
                 aria-label={darkMode ? 'Switch to light mode' : 'Switch to dark mode'}
               >
                 {/* Use isHydrated to prevent hydration mismatch */}
@@ -141,12 +134,12 @@ export default function Header() {
               <div ref={dropdownRef} className="relative">
                 {loading ? (
                   /* Loading placeholder for user area */
-                  <div className="w-16 h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                  <div className="w-16 h-4 bg-neutral-200 dark:bg-neutral-700 rounded animate-pulse"></div>
                 ) : user ? (
                   <>
                     <button 
                       onClick={() => setIsProfileOpen(!isProfileOpen)}
-                      className="min-h-11 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-black dark:hover:text-white transition-colors"
+                      className="min-h-11 text-sm font-medium text-neutral-700 dark:text-neutral-300 hover:text-black dark:hover:text-white transition-colors"
                       aria-expanded={isProfileOpen}
                       aria-controls="profile-menu"
                       aria-haspopup="true"
@@ -156,17 +149,17 @@ export default function Header() {
 
                     {/* Profile Dropdown */}
                     {isProfileOpen && (
-                      <div id="profile-menu" className="absolute right-0 top-11 w-48 py-2 bg-white dark:bg-black border border-gray-200 dark:border-gray-800 fade-in">
+                      <div id="profile-menu" className="absolute right-0 top-11 w-48 py-2 bg-white dark:bg-black border border-neutral-200 dark:border-neutral-800 fade-in">
                         <Link
                           href="/account"
                           onClick={() => setIsProfileOpen(false)}
-                          className="block px-4 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors"
+                          className="block px-4 py-2 text-sm text-neutral-600 dark:text-neutral-400 hover:text-black dark:hover:text-white hover:bg-neutral-50 dark:hover:bg-neutral-900 transition-colors"
                         >
                           Account
                         </Link>
                         <button
                           onClick={handleLogout}
-                          className="w-full text-left px-4 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors"
+                          className="w-full text-left px-4 py-2 text-sm text-neutral-600 dark:text-neutral-400 hover:text-black dark:hover:text-white hover:bg-neutral-50 dark:hover:bg-neutral-900 transition-colors"
                         >
                           Sign Out
                         </button>
@@ -201,13 +194,13 @@ export default function Header() {
           {/* Mobile Navigation */}
           {isMenuOpen && (
             <nav id="mobile-navigation" aria-label="Mobile primary" className="md:hidden pb-4 fade-in">
-              <div className="flex flex-col space-y-4 pt-4 border-t border-gray-200 dark:border-gray-800">
+              <div className="flex flex-col space-y-4 pt-4 border-t border-neutral-200 dark:border-neutral-800">
                 {loading ? (
                   /* Loading placeholder for mobile nav */
                   <div className="flex flex-col space-y-4">
-                    <div className="w-32 h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
-                    <div className="w-24 h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
-                    <div className="w-28 h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                    <div className="w-32 h-4 bg-neutral-200 dark:bg-neutral-700 rounded animate-pulse"></div>
+                    <div className="w-24 h-4 bg-neutral-200 dark:bg-neutral-700 rounded animate-pulse"></div>
+                    <div className="w-28 h-4 bg-neutral-200 dark:bg-neutral-700 rounded animate-pulse"></div>
                   </div>
                 ) : user ? (
                   <>
@@ -238,14 +231,6 @@ export default function Header() {
                   </>
                 ) : (
                   <>
-                    <Link
-                      href="/test"
-                      className={`nav-link ${isActive('/test') ? 'nav-link-active' : ''}`}
-                      onClick={() => setIsMenuOpen(false)}
-                      aria-current={isActive('/test') ? 'page' : undefined}
-                    >
-                      Tests
-                    </Link>
                     <Link 
                       href="/pricing" 
                       className={`nav-link ${isActive('/pricing') ? 'nav-link-active' : ''}`}
@@ -265,10 +250,10 @@ export default function Header() {
                   </>
                 )}
                 
-                <div className="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-gray-800">
+                <div className="flex items-center justify-between pt-4 border-t border-neutral-200 dark:border-neutral-800">
                   <button
                     onClick={toggleDarkMode}
-                    className="flex min-h-11 items-center text-sm font-medium text-gray-700 dark:text-gray-300"
+                    className="flex min-h-11 items-center text-sm font-medium text-neutral-700 dark:text-neutral-300"
                   >
                     {/* Prevent hydration mismatch by checking DOM state during hydration */}
                     {isHydrated ? (
@@ -294,14 +279,14 @@ export default function Header() {
                   
                   {loading ? (
                     /* Loading placeholder for mobile user area */
-                    <div className="w-16 h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                    <div className="w-16 h-4 bg-neutral-200 dark:bg-neutral-700 rounded animate-pulse"></div>
                   ) : user ? (
                     <div className="flex items-center space-x-4">
-                      <span className="text-sm text-gray-600 dark:text-gray-400">
+                      <span className="text-sm text-neutral-600 dark:text-neutral-400">
                         {user.email?.split('@')[0]}
                       </span>
                       <button 
-                        className="text-sm font-medium text-gray-600 dark:text-gray-400"
+                        className="text-sm font-medium text-neutral-600 dark:text-neutral-400"
                         onClick={handleLogout}
                       >
                         Sign Out

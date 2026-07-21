@@ -1,6 +1,6 @@
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
-import { adminAuth } from '../../../firebase/admin'
+import { adminAuth, developmentIdTokenSessionsEnabled } from '../../../firebase/admin'
 import { isAccountEmailValid } from '../../../config/accountEmail'
 import { getErrorCode } from '../../../utils/errorHandling'
 import { logger } from '../../../utils/logger'
@@ -25,7 +25,9 @@ export async function GET() {
     }
 
     try {
-      const decodedClaims = await adminAuth.verifySessionCookie(sessionCookie.value, true)
+      const decodedClaims = developmentIdTokenSessionsEnabled
+        ? await adminAuth.verifyIdToken(sessionCookie.value)
+        : await adminAuth.verifySessionCookie(sessionCookie.value, true)
       
       // Validate email against whitelist
       if (!decodedClaims.email || !isAccountEmailValid(decodedClaims.email)) {
@@ -93,8 +95,12 @@ export async function POST(request: Request) {
       }
 
       // Create session cookie
-      const expiresIn = 60 * 60 * 24 * 5 * 1000 // 5 days
-      const sessionCookie = await adminAuth.createSessionCookie(idToken, { expiresIn })
+      const expiresIn = developmentIdTokenSessionsEnabled
+        ? 55 * 60 * 1000
+        : 60 * 60 * 24 * 5 * 1000
+      const sessionCookie = developmentIdTokenSessionsEnabled
+        ? idToken
+        : await adminAuth.createSessionCookie(idToken, { expiresIn })
       
       // Get cookies instance
       const cookieStore = await cookies()

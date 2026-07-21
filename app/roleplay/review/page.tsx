@@ -8,6 +8,7 @@ import { useAuth } from '../../context/AuthContext'
 
 interface SessionData {
   userId: string
+  evaluationMode?: 'self-score'
   scenario: any
   category: string
   duration: number
@@ -138,7 +139,7 @@ function RoleplayReviewContent() {
       <div className="min-h-screen bg-white dark:bg-black flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin h-12 w-12 border-b-2 border-black dark:border-white mx-auto mb-4"></div>
-          <p className="text-gray-600 dark:text-gray-400">Loading results...</p>
+          <p className="text-neutral-600 dark:text-neutral-400">Loading results...</p>
         </div>
       </div>
     )
@@ -177,28 +178,30 @@ function RoleplayReviewContent() {
           <div className="flex items-center">
             <Link
               href="/roleplay"
-              className="flex items-center text-black dark:text-white hover:text-gray-600 dark:hover:text-gray-400 transition-colors mr-4"
+              className="flex items-center text-black dark:text-white hover:text-neutral-600 dark:hover:text-neutral-400 transition-colors mr-4"
             >
               <ArrowLeft className="h-5 w-5 mr-1" />
               Back to Roleplay
             </Link>
             <div>
-              <h1 className="text-3xl font-light text-black dark:text-white">AI Performance Review</h1>
-              <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+              <h1 className="text-3xl font-light text-black dark:text-white">
+                {sessionData.evaluationMode === 'self-score' ? 'Self-scored Review' : 'AI Performance Review'}
+              </h1>
+              <p className="text-sm text-neutral-600 dark:text-neutral-400 mt-1">
                 {sessionData.category} • {Math.floor(sessionData.duration / 60)}:{(sessionData.duration % 60).toString().padStart(2, '0')} duration
               </p>
             </div>
           </div>
           <Link
             href={`/roleplay/${sessionData.category.toLowerCase()}`}
-            className="px-4 py-2 border border-gray-300 dark:border-gray-700 hover:border-black dark:hover:border-white text-black dark:text-white text-sm font-medium bg-white dark:bg-black transition-colors"
+            className="px-4 py-2 border border-neutral-300 dark:border-neutral-700 hover:border-black dark:hover:border-white text-black dark:text-white text-sm font-medium bg-white dark:bg-black transition-colors"
           >
             Practice Another
           </Link>
         </div>
 
         {/* Score Overview */}
-        <div className="bg-white dark:bg-black border border-gray-300 dark:border-gray-700 p-6 mb-6">
+        <div className="bg-white dark:bg-black border border-neutral-300 dark:border-neutral-700 p-6 mb-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-2xl font-light text-black dark:text-white">Overall Score</h2>
             <Trophy className="w-8 h-8 text-yellow-500" />
@@ -213,7 +216,7 @@ function RoleplayReviewContent() {
             </p>
           </div>
 
-          <div className="w-full border border-gray-300 dark:border-gray-700 h-4 mb-6">
+          <div className="w-full border border-neutral-300 dark:border-neutral-700 h-4 mb-6">
             <div
               className={`h-4 transition-all duration-500 ${
                 getScoreBg((sessionData.scores?.total || 0), 100)
@@ -229,14 +232,14 @@ function RoleplayReviewContent() {
                 {sessionData.scores?.performanceIndicators?.reduce((sum, pi) => sum + (pi.score || 0), 0) || 0}/
                 {performanceIndicatorMaximumTotal}
               </div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Performance Indicators</p>
+              <p className="text-sm text-neutral-600 dark:text-neutral-400">Performance Indicators</p>
             </div>
             {sessionData.scores?.solution?.length ? (
               <div className="text-center">
                 <div className="text-2xl font-light text-black dark:text-white">
                   {sessionData.scores.solution.reduce((sum, criterion) => sum + (criterion.score || 0), 0)}/{solutionMaximumTotal}
                 </div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Solution</p>
+                <p className="text-sm text-neutral-600 dark:text-neutral-400">Solution</p>
               </div>
             ) : null}
             <div className="text-center">
@@ -244,20 +247,20 @@ function RoleplayReviewContent() {
                 {sessionData.scores?.centurySkills?.reduce((sum, skill) => sum + (skill.score || 0), 0) || 0}/
                 {(sessionData.scores?.centurySkills?.length || 0) * 6}
               </div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Career Competencies</p>
+              <p className="text-sm text-neutral-600 dark:text-neutral-400">Career Competencies</p>
             </div>
             <div className="text-center">
               <div className="text-2xl font-light text-black dark:text-white">
                 {sessionData.scores?.overallImpression?.score || 0}/{overallMaximum}
               </div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Overall Impression</p>
+              <p className="text-sm text-neutral-600 dark:text-neutral-400">Overall Impression</p>
             </div>
           </div>
         </div>
 
         {/* Tab Navigation */}
-        <div className="bg-white dark:bg-black border border-gray-300 dark:border-gray-700 mb-6">
-          <div className="border-b border-gray-200 dark:border-gray-700">
+        <div className="bg-white dark:bg-black border border-neutral-300 dark:border-neutral-700 mb-6">
+          <div className="border-b border-neutral-200 dark:border-neutral-700">
             <div className="flex flex-wrap" aria-label="Review sections">
               <button
                 onClick={() => setActiveTab('scores')}
@@ -265,7 +268,7 @@ function RoleplayReviewContent() {
                 className={`px-6 py-3 text-sm font-medium transition-colors ${
                   activeTab === 'scores'
                     ? 'text-black dark:text-white border-b-2 border-black dark:border-white'
-                    : 'text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white'
+                    : 'text-neutral-600 dark:text-neutral-400 hover:text-black dark:hover:text-white'
                 }`}
               >
                 <Target className="w-4 h-4 inline mr-2" />
@@ -277,7 +280,7 @@ function RoleplayReviewContent() {
                 className={`px-6 py-3 text-sm font-medium transition-colors ${
                   activeTab === 'transcript'
                     ? 'text-black dark:text-white border-b-2 border-black dark:border-white'
-                    : 'text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white'
+                    : 'text-neutral-600 dark:text-neutral-400 hover:text-black dark:hover:text-white'
                 }`}
               >
                 <MessageSquare className="w-4 h-4 inline mr-2" />
@@ -289,7 +292,7 @@ function RoleplayReviewContent() {
                 className={`px-6 py-3 text-sm font-medium transition-colors ${
                   activeTab === 'feedback'
                     ? 'text-black dark:text-white border-b-2 border-black dark:border-white'
-                    : 'text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white'
+                    : 'text-neutral-600 dark:text-neutral-400 hover:text-black dark:hover:text-white'
                 }`}
               >
                 <TrendingUp className="w-4 h-4 inline mr-2" />
@@ -301,7 +304,7 @@ function RoleplayReviewContent() {
                 className={`px-6 py-3 text-sm font-medium transition-colors ${
                   activeTab === 'scenario'
                     ? 'text-black dark:text-white border-b-2 border-black dark:border-white'
-                    : 'text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white'
+                    : 'text-neutral-600 dark:text-neutral-400 hover:text-black dark:hover:text-white'
                 }`}
               >
                 <FileText className="w-4 h-4 inline mr-2" />
@@ -323,7 +326,7 @@ function RoleplayReviewContent() {
                           (pi: any) => pi.indicator === piName
                         )
                         return (
-                          <div key={index} className="border border-gray-200 dark:border-gray-700 p-4">
+                          <div key={index} className="border border-neutral-200 dark:border-neutral-700 p-4">
                             <button
                               type="button"
                               onClick={async () => {
@@ -342,21 +345,21 @@ function RoleplayReviewContent() {
                                   <span className={`font-light text-black dark:text-white`}>
                                     {piScore?.score || 0}/{piMaximum(index)}
                                   </span>
-                                  <ChevronDown className={`h-5 w-5 text-gray-500 transition-transform ${expandedIndicator === piName ? 'rotate-180' : ''}`} />
+                                  <ChevronDown className={`h-5 w-5 text-neutral-500 transition-transform ${expandedIndicator === piName ? 'rotate-180' : ''}`} />
                                 </div>
                               </div>
-                              <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
+                              <p className="text-sm text-neutral-600 dark:text-neutral-400 mt-2">
                                 {piScore?.feedback || 'Not graded yet'}
                               </p>
                             </button>
                             {expandedIndicator === piName && (
-                              <div className="mt-3 border-t border-gray-200 dark:border-gray-700 pt-3">
+                              <div className="mt-3 border-t border-neutral-200 dark:border-neutral-700 pt-3">
                                 {loadingExplanation[piName] ? (
-                                  <p className="text-sm text-gray-500 dark:text-gray-400">Loading explanation...</p>
+                                  <p className="text-sm text-neutral-500 dark:text-neutral-400">Loading explanation...</p>
                                 ) : indicatorExplanationMap[piName] ? (
-                                  <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap">{indicatorExplanationMap[piName]}</p>
+                                  <p className="text-sm text-neutral-700 dark:text-neutral-300 whitespace-pre-wrap">{indicatorExplanationMap[piName]}</p>
                                 ) : (
-                                  <p className="text-sm text-gray-500 dark:text-gray-400">No explanation found.</p>
+                                  <p className="text-sm text-neutral-500 dark:text-neutral-400">No explanation found.</p>
                                 )}
                               </div>
                             )}
@@ -364,7 +367,7 @@ function RoleplayReviewContent() {
                         )
                       })
                     ) : (
-                      <p className="text-gray-500 dark:text-gray-400">No performance indicators available</p>
+                      <p className="text-neutral-500 dark:text-neutral-400">No performance indicators available</p>
                     )}
                   </div>
                 </div>
@@ -374,14 +377,14 @@ function RoleplayReviewContent() {
                     <h3 className="text-lg font-light text-black dark:text-white mb-4">Solution</h3>
                     <div className="space-y-3">
                       {sessionData.scores.solution.map((criterion, index) => (
-                        <div key={criterion.criterion} className="border border-gray-200 dark:border-gray-700 p-4">
+                        <div key={criterion.criterion} className="border border-neutral-200 dark:border-neutral-700 p-4">
                           <div className="flex justify-between items-start mb-2">
                             <p className="font-light text-black dark:text-white flex-1">{criterion.criterion}</p>
                             <span className="font-light ml-4 text-black dark:text-white">
                               {criterion.score || 0}/{solutionMaximum(index)}
                             </span>
                           </div>
-                          <p className="text-sm text-gray-600 dark:text-gray-400">{criterion.feedback || 'Not graded yet'}</p>
+                          <p className="text-sm text-neutral-600 dark:text-neutral-400">{criterion.feedback || 'Not graded yet'}</p>
                         </div>
                       ))}
                     </div>
@@ -397,35 +400,35 @@ function RoleplayReviewContent() {
                           (skill: any) => skill.skill === skillName
                         )
                         return (
-                          <div key={index} className="border border-gray-200 dark:border-gray-700  p-4">
+                          <div key={index} className="border border-neutral-200 dark:border-neutral-700  p-4">
                             <div className="flex justify-between items-start mb-2">
                               <p className="font-light text-black dark:text-white flex-1">{skillName}</p>
                               <span className={`font-light ml-4 text-black dark:text-white`}>
                                 {skillScore?.score || 0}/6
                               </span>
                             </div>
-                            <p className="text-sm text-gray-600 dark:text-gray-400">
+                            <p className="text-sm text-neutral-600 dark:text-neutral-400">
                               {skillScore?.feedback || 'Not graded yet'}
                             </p>
                           </div>
                         )
                       })
                     ) : (
-                      <p className="text-gray-500 dark:text-gray-400">No Career Competencies available</p>
+                      <p className="text-neutral-500 dark:text-neutral-400">No Career Competencies available</p>
                     )}
                   </div>
                 </div>
 
                 <div>
                   <h3 className="text-lg font-light text-black dark:text-white mb-4">Overall Impression</h3>
-                  <div className="border border-gray-200 dark:border-gray-700  p-4">
+                  <div className="border border-neutral-200 dark:border-neutral-700  p-4">
                     <div className="flex justify-between items-start mb-2">
                       <p className="font-light text-black dark:text-white">Judge's Overall Assessment</p>
                       <span className={`font-light text-black dark:text-white`}>
                         {sessionData.scores?.overallImpression?.score || 0}/{overallMaximum}
                       </span>
                     </div>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">{sessionData.scores?.overallImpression?.feedback || 'No feedback available'}</p>
+                    <p className="text-sm text-neutral-600 dark:text-neutral-400">{sessionData.scores?.overallImpression?.feedback || 'No feedback available'}</p>
                   </div>
                 </div>
               </div>
@@ -435,16 +438,22 @@ function RoleplayReviewContent() {
             {activeTab === 'transcript' && (
               <div className="space-y-4">
                 <h3 className="text-lg font-light text-black dark:text-white mb-4">Performance Transcript</h3>
+
+                {sessionData.evaluationMode === 'self-score' && (
+                  <p className="border border-neutral-300 p-4 text-sm text-neutral-600 dark:border-neutral-700 dark:text-neutral-400">
+                    This session was self-scored, so no recording or transcript was submitted.
+                  </p>
+                )}
                 
                 {/* Actions/Gestures */}
                 {sessionData.actions && sessionData.actions.length > 0 && (
                   <div className="mb-6">
-                    <h4 className="font-medium text-gray-700 dark:text-gray-300 mb-2">Presentation Elements</h4>
+                    <h4 className="font-medium text-neutral-700 dark:text-neutral-300 mb-2">Presentation Elements</h4>
                     <div className="space-y-2">
                       {(sessionData.actions || []).map((action, index) => (
                         <div key={index} className="flex items-start space-x-3 text-sm">
                           <span className="text-black dark:text-white font-mono">{action.timestamp}</span>
-                          <span className="text-gray-600 dark:text-gray-400 italic">{action.action}</span>
+                          <span className="text-neutral-600 dark:text-neutral-400 italic">{action.action}</span>
                         </div>
                       ))}
                     </div>
@@ -456,7 +465,7 @@ function RoleplayReviewContent() {
                   {(sessionData.transcript || []).map((entry, index) => (
                     <div key={index} className="flex items-start space-x-3">
                       <span className="text-black dark:text-white font-mono text-sm">{entry.timestamp}</span>
-                      <p className="text-gray-700 dark:text-gray-300 flex-1">{entry.text}</p>
+                      <p className="text-neutral-700 dark:text-neutral-300 flex-1">{entry.text}</p>
                     </div>
                   ))}
                 </div>
@@ -466,6 +475,11 @@ function RoleplayReviewContent() {
             {/* Feedback Tab */}
             {activeTab === 'feedback' && (
               <div className="space-y-6">
+                {sessionData.evaluationMode === 'self-score' && (
+                  <p className="border border-neutral-300 p-4 text-sm text-neutral-600 dark:border-neutral-700 dark:text-neutral-400">
+                    This session contains your scores only. AI feedback is available after submitting an audio recording for grading.
+                  </p>
+                )}
                 {/* Strengths */}
                 <div>
                   <h3 className="text-lg font-light text-black dark:text-white mb-4 flex items-center">
@@ -476,7 +490,7 @@ function RoleplayReviewContent() {
                     {(sessionData.strengths || []).map((strength, index) => (
                       <div key={index} className="flex items-start space-x-2">
                         <CheckCircle className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
-                        <p className="text-gray-700 dark:text-gray-300">{strength}</p>
+                        <p className="text-neutral-700 dark:text-neutral-300">{strength}</p>
                       </div>
                     ))}
                   </div>
@@ -492,7 +506,7 @@ function RoleplayReviewContent() {
                     {(sessionData.improvements || []).map((improvement, index) => (
                       <div key={index} className="flex items-start space-x-2">
                         <AlertCircle className="w-5 h-5 text-yellow-500 mt-0.5 flex-shrink-0" />
-                        <p className="text-gray-700 dark:text-gray-300">{improvement}</p>
+                        <p className="text-neutral-700 dark:text-neutral-300">{improvement}</p>
                       </div>
                     ))}
                   </div>
@@ -502,7 +516,7 @@ function RoleplayReviewContent() {
                 {sessionData.timestampedFeedback && sessionData.timestampedFeedback.length > 0 && (
                   <div>
                     <h3 className="text-lg font-light text-black dark:text-white mb-4 flex items-center">
-                      <Clock className="w-5 h-5 mr-2 text-blue-500" />
+                      <Clock className="w-5 h-5 mr-2 text-neutral-500" />
                       Moment-by-Moment Feedback
                     </h3>
                     <div className="space-y-3">
@@ -519,7 +533,7 @@ function RoleplayReviewContent() {
                             <span className="text-sm font-mono text-black dark:text-white">
                               {feedback.timestamp}
                             </span>
-                            <span className={`text-xs px-2 py-1 border border-gray-300 dark:border-gray-700 ${
+                            <span className={`text-xs px-2 py-1 border border-neutral-300 dark:border-neutral-700 ${
                               feedback.type === 'positive'
                                 ? 'text-green-600 dark:text-green-400'
                                 : 'text-yellow-600 dark:text-yellow-400'
@@ -527,7 +541,7 @@ function RoleplayReviewContent() {
                               {feedback.type === 'positive' ? 'Strength' : 'Suggestion'}
                             </span>
                           </div>
-                          <p className="text-gray-700 dark:text-gray-300 text-sm">{feedback.feedback}</p>
+                          <p className="text-neutral-700 dark:text-neutral-300 text-sm">{feedback.feedback}</p>
                         </div>
                       ))}
                     </div>
@@ -541,7 +555,7 @@ function RoleplayReviewContent() {
               <div className="space-y-6">
                 <div>
                   <h3 className="text-lg font-light text-black dark:text-white mb-4">Event Information</h3>
-                  <div className="border border-gray-300 dark:border-gray-700 p-4 space-y-2">
+                  <div className="border border-neutral-300 dark:border-neutral-700 p-4 space-y-2">
                     <p><strong>Event Code:</strong> {sessionData.scenario.eventCode}</p>
                     <p><strong>Career Cluster:</strong> {sessionData.scenario.careerCluster}</p>
                     <p><strong>Career Pathway:</strong> {sessionData.scenario.careerPathway || 'N/A'}</p>
@@ -553,35 +567,35 @@ function RoleplayReviewContent() {
                     <h3 className="text-lg font-light text-black dark:text-white mb-4">Event Situation</h3>
                     <div className="space-y-4">
                       <div>
-                        <h4 className="font-medium text-gray-700 dark:text-gray-300 mb-2">Your Role</h4>
-                        <p className="text-gray-600 dark:text-gray-400">{sessionData.scenario.eventSituation.roleDescription}</p>
+                        <h4 className="font-medium text-neutral-700 dark:text-neutral-300 mb-2">Your Role</h4>
+                        <p className="text-neutral-600 dark:text-neutral-400">{sessionData.scenario.eventSituation.roleDescription}</p>
                       </div>
                       
                       {sessionData.scenario.eventSituation.companyBackground && (
                         <div>
-                          <h4 className="font-medium text-gray-700 dark:text-gray-300 mb-2">Company Background</h4>
-                          <p className="text-gray-600 dark:text-gray-400">{sessionData.scenario.eventSituation.companyBackground}</p>
+                          <h4 className="font-medium text-neutral-700 dark:text-neutral-300 mb-2">Company Background</h4>
+                          <p className="text-neutral-600 dark:text-neutral-400">{sessionData.scenario.eventSituation.companyBackground}</p>
                         </div>
                       )}
                       
                       {sessionData.scenario.eventSituation.businessChallenge && (
                         <div>
-                          <h4 className="font-medium text-gray-700 dark:text-gray-300 mb-2">Business Challenge</h4>
-                          <p className="text-gray-600 dark:text-gray-400">{sessionData.scenario.eventSituation.businessChallenge}</p>
+                          <h4 className="font-medium text-neutral-700 dark:text-neutral-300 mb-2">Business Challenge</h4>
+                          <p className="text-neutral-600 dark:text-neutral-400">{sessionData.scenario.eventSituation.businessChallenge}</p>
                         </div>
                       )}
                       
                       {sessionData.scenario.eventSituation.taskDescription && (
                         <div>
-                          <h4 className="font-medium text-gray-700 dark:text-gray-300 mb-2">Your Task</h4>
-                          <p className="text-gray-600 dark:text-gray-400">{sessionData.scenario.eventSituation.taskDescription}</p>
+                          <h4 className="font-medium text-neutral-700 dark:text-neutral-300 mb-2">Your Task</h4>
+                          <p className="text-neutral-600 dark:text-neutral-400">{sessionData.scenario.eventSituation.taskDescription}</p>
                         </div>
                       )}
                       
                       {sessionData.scenario.eventSituation.presentationContext && (
                         <div>
-                          <h4 className="font-medium text-gray-700 dark:text-gray-300 mb-2">Presentation Context</h4>
-                          <p className="text-gray-600 dark:text-gray-400">{sessionData.scenario.eventSituation.presentationContext}</p>
+                          <h4 className="font-medium text-neutral-700 dark:text-neutral-300 mb-2">Presentation Context</h4>
+                          <p className="text-neutral-600 dark:text-neutral-400">{sessionData.scenario.eventSituation.presentationContext}</p>
                         </div>
                       )}
                     </div>
@@ -591,7 +605,7 @@ function RoleplayReviewContent() {
                 {sessionData.scenario.performanceIndicators && (
                   <div>
                     <h3 className="text-lg font-light text-black dark:text-white mb-4">Performance Indicators</h3>
-                    <ol className="list-decimal list-inside space-y-2 text-gray-600 dark:text-gray-400">
+                    <ol className="list-decimal list-inside space-y-2 text-neutral-600 dark:text-neutral-400">
                       {sessionData.scenario.performanceIndicators.map((pi: string, index: number) => (
                         <li key={index}>{pi}</li>
                       ))}
@@ -602,7 +616,7 @@ function RoleplayReviewContent() {
                 {sessionData.scenario.centurySkills && (
                   <div>
                     <h3 className="text-lg font-light text-black dark:text-white mb-4">Career Competencies</h3>
-                    <ol className="list-decimal list-inside space-y-2 text-gray-600 dark:text-gray-400">
+                    <ol className="list-decimal list-inside space-y-2 text-neutral-600 dark:text-neutral-400">
                       {sessionData.scenario.centurySkills.map((skill: string, index: number) => (
                         <li key={index}>{skill}</li>
                       ))}
@@ -616,15 +630,15 @@ function RoleplayReviewContent() {
                     <div className="space-y-4">
                       {sessionData.scenario.judgeInstructions.roleCharacterization && (
                         <div>
-                          <h4 className="font-medium text-gray-700 dark:text-gray-300 mb-2">Judge's Role</h4>
-                          <p className="text-gray-600 dark:text-gray-400">{sessionData.scenario.judgeInstructions.roleCharacterization}</p>
+                          <h4 className="font-medium text-neutral-700 dark:text-neutral-300 mb-2">Judge's Role</h4>
+                          <p className="text-neutral-600 dark:text-neutral-400">{sessionData.scenario.judgeInstructions.roleCharacterization}</p>
                         </div>
                       )}
                       
                       {sessionData.scenario.judgeInstructions.questionsToAsk && (
                         <div>
-                          <h4 className="font-medium text-gray-700 dark:text-gray-300 mb-2">Questions Judge May Ask</h4>
-                          <ol className="list-decimal list-inside space-y-1 text-gray-600 dark:text-gray-400">
+                          <h4 className="font-medium text-neutral-700 dark:text-neutral-300 mb-2">Questions Judge May Ask</h4>
+                          <ol className="list-decimal list-inside space-y-1 text-neutral-600 dark:text-neutral-400">
                             {sessionData.scenario.judgeInstructions.questionsToAsk.map((q: string, index: number) => (
                               <li key={index}>{q}</li>
                             ))}
@@ -638,7 +652,7 @@ function RoleplayReviewContent() {
                 {sessionData.scenario.participantInstructions && (
                   <div>
                     <h3 className="text-lg font-light text-black dark:text-white mb-4">Participant Instructions</h3>
-                    <ol className="list-decimal list-inside space-y-2 text-gray-600 dark:text-gray-400">
+                    <ol className="list-decimal list-inside space-y-2 text-neutral-600 dark:text-neutral-400">
                       {sessionData.scenario.participantInstructions.map((instruction: string, index: number) => (
                         <li key={index}>{instruction}</li>
                       ))}
@@ -660,7 +674,7 @@ export default function RoleplayReviewPage() {
       <div className="min-h-screen bg-white dark:bg-black flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin h-12 w-12 border-b-2 border-black dark:border-white mx-auto mb-4"></div>
-          <p className="text-gray-600 dark:text-gray-400">Loading...</p>
+          <p className="text-neutral-600 dark:text-neutral-400">Loading...</p>
         </div>
       </div>
     }>
