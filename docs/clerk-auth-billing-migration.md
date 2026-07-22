@@ -34,6 +34,8 @@ Create and validate a Clerk development instance first. Development and producti
 
 For production, connect a production Stripe account to the Clerk production instance. Do not create matching Stripe Billing products: Clerk plans and subscriptions are managed in Clerk and are not synchronized into Stripe Billing.
 
+The optional Elite Lifetime purchase is the only direct Stripe Checkout product. It uses a one-time Stripe Price, a signed webhook, and a Firestore entitlement. Configure the webhook for `checkout.session.completed`, `checkout.session.async_payment_succeeded`, `charge.refunded`, and `charge.dispute.created`. Refunds and disputes revoke lifetime access.
+
 ## Required environment variables
 
 Keep the migration off:
@@ -54,7 +56,14 @@ NEXT_PUBLIC_CLERK_SIGN_IN_FALLBACK_REDIRECT_URL=/performance
 NEXT_PUBLIC_CLERK_SIGN_UP_FALLBACK_REDIRECT_URL=/performance
 CLERK_CHAMPION_PLAN_SLUG=champion
 CLERK_ELITE_PLAN_SLUG=elite
+STRIPE_SECRET_KEY=sk_...
+STRIPE_WEBHOOK_SECRET=whsec_...
+STRIPE_LIFETIME_PRICE_ID=price_...
+NEXT_PUBLIC_STRIPE_LIFETIME_ENABLED=false
+NEXT_PUBLIC_STRIPE_LIFETIME_PRICE_USD=49.99
 ```
+
+Keep `NEXT_PUBLIC_STRIPE_LIFETIME_ENABLED=false` until the live Stripe account is activated, the live Price and webhook are configured, and a production Checkout smoke test succeeds. Set it to `true` in the deployment that makes the lifetime option public.
 
 Only after preview verification and the production user import, change both provider switches to `clerk` in the same deployment.
 

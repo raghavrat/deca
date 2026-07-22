@@ -6,6 +6,7 @@ import { useAuth } from '../context/AuthContext'
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
 import { isClerkClientEnabled } from '../config/authProvider'
+import LifetimePlanCard from '../components/LifetimePlanCard'
 
 export default function Pricing() {
   const { user, loading } = useAuth()
@@ -53,7 +54,14 @@ export default function Pricing() {
       <div className="py-20 px-4">
         <div className="max-w-4xl mx-auto">
           {clerkEnabled ? (
-            <PricingTable />
+            <>
+              <PricingTable
+                for="user"
+                highlightedPlan="champion"
+                newSubscriptionRedirectUrl="/account"
+              />
+              <LifetimePlanCard />
+            </>
           ) : (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Free Plan */}

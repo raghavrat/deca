@@ -4,6 +4,7 @@ import { auth } from '@clerk/nextjs/server'
 import { FieldValue } from 'firebase-admin/firestore'
 import { adminDb } from '../firebase/admin'
 import { RequestError, type SessionUser } from './serverAuth'
+import { hasLifetimeAccess } from './lifetimeEntitlements'
 
 type ClerkPlanTier = 'starter' | 'champion' | 'elite'
 
@@ -20,7 +21,9 @@ function currentMonthKey(): string {
   return new Date().toISOString().slice(0, 7)
 }
 
-async function getClerkPlanTier(): Promise<ClerkPlanTier> {
+async function getClerkPlanTier(user: SessionUser): Promise<ClerkPlanTier> {
+  if (await hasLifetimeAccess(user.uid)) return 'elite'
+
   const { has } = await auth()
   const elitePlan = process.env.CLERK_ELITE_PLAN_SLUG || 'elite'
   const championPlan = process.env.CLERK_CHAMPION_PLAN_SLUG || 'champion'
@@ -38,7 +41,7 @@ export async function reserveRoleplayGeneration(
   if (user.provider !== 'clerk') return null
   if (!adminDb) throw new RequestError(500, 'Server configuration error')
 
-  const tier = await getClerkPlanTier()
+  const tier = await getClerkPlanTier(user)
   if (tier === 'elite') return null
 
   const monthKey = currentMonthKey()
