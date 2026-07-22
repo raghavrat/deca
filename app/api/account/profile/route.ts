@@ -1,3 +1,4 @@
+import { clerkClient } from '@clerk/nextjs/server'
 import { FieldValue } from 'firebase-admin/firestore'
 import { NextResponse } from 'next/server'
 import { adminDb } from '../../../firebase/admin'
@@ -28,12 +29,16 @@ export async function GET() {
     } else {
       const currentProfile = profileSnapshot.data() || {}
       const fallbackName = user.displayName?.trim().slice(0, 80) || ''
+      const clerkUsernameFields = user.provider === 'clerk'
+        ? { name: fallbackName, displayName: fallbackName }
+        : {}
       await profileRef.set({
         email: user.email,
         authProvider: user.provider,
         authUid: user.authUid,
-        ...(typeof currentProfile.name === 'string' ? {} : { name: fallbackName }),
-        ...(typeof currentProfile.displayName === 'string' ? {} : { displayName: fallbackName }),
+        ...clerkUsernameFields,
+        ...(user.provider === 'clerk' || typeof currentProfile.name === 'string' ? {} : { name: fallbackName }),
+        ...(user.provider === 'clerk' || typeof currentProfile.displayName === 'string' ? {} : { displayName: fallbackName }),
         ...(typeof currentProfile.problemsCompleted === 'number' ? {} : { problemsCompleted: 0 }),
         ...(typeof currentProfile.leaderboardVisible === 'boolean' ? {} : { leaderboardVisible: false }),
         ...(currentProfile.createdAt ? {} : { createdAt: FieldValue.serverTimestamp() }),
@@ -43,7 +48,9 @@ export async function GET() {
 
     const profile = profileSnapshot.data() || {}
     return NextResponse.json({
-      name: typeof profile.name === 'string' ? profile.name : '',
+      name: user.provider === 'clerk'
+        ? user.displayName || ''
+        : typeof profile.name === 'string' ? profile.name : '',
       leaderboardVisible: profile.leaderboardVisible === true,
     }, { headers: noStoreHeaders })
   } catch (error) {
@@ -75,8 +82,16 @@ export async function PATCH(request: Request) {
 
     if ('name' in input) {
       const normalizedName = typeof input.name === 'string' ? input.name.trim() : ''
-      if (!normalizedName || normalizedName.length > 80) {
-        throw new RequestError(400, 'Display name must be between 1 and 80 characters')
+      if (!/^[a-zA-Z0-9_-]{4,64}$/.test(normalizedName)) {
+        throw new RequestError(400, 'Username must use 4-64 letters, numbers, underscores, or hyphens')
+      }
+      if (user.provider === 'clerk') {
+        try {
+          const client = await clerkClient()
+          await client.users.updateUser(user.authUid, { username: normalizedName })
+        } catch {
+          throw new RequestError(400, 'That username is unavailable or invalid')
+        }
       }
       update.name = normalizedName
       update.displayName = normalizedName

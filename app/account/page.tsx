@@ -22,8 +22,8 @@ export default function AccountPage() {
     totalQuestions: 0,
     byCategory: {}
   })
-  const [name, setName] = useState('')
-  const [isEditingName, setIsEditingName] = useState(false)
+  const [username, setUsername] = useState('')
+  const [isEditingUsername, setIsEditingUsername] = useState(false)
   const [feedback, setFeedback] = useState('')
   const [privacyError, setPrivacyError] = useState('')
   const [deleteConfirmation, setDeleteConfirmation] = useState('')
@@ -40,6 +40,8 @@ export default function AccountPage() {
 
   useEffect(() => {
     if (user) {
+      setUsername(user.displayName || '')
+
       const fetchUserData = async () => {
         // Load stats from localStorage
         const savedStats = localStorage.getItem(`questionStats_${user.uid}`)
@@ -51,7 +53,8 @@ export default function AccountPage() {
           const response = await fetch('/api/account/profile', { cache: 'no-store' })
           if (!response.ok) throw new Error('Profile request failed')
           const profile = await response.json()
-          setName(typeof profile.name === 'string' ? profile.name : '')
+          const storedUsername = typeof profile.name === 'string' ? profile.name.trim() : ''
+          setUsername(storedUsername || user.displayName || '')
           setLeaderboardVisible(profile.leaderboardVisible === true)
         } catch {
           setPrivacyError('We could not load your account preferences. Please refresh and try again.')
@@ -73,12 +76,12 @@ export default function AccountPage() {
     return null
   }
 
-  const handleNameChange = async (e: React.FormEvent) => {
+  const handleUsernameChange = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!user) return
-    const normalizedName = name.trim()
-    if (!normalizedName || normalizedName.length > 80) {
-      setFeedback('Display name must be between 1 and 80 characters.')
+    const normalizedUsername = username.trim()
+    if (!/^[a-zA-Z0-9_-]{4,64}$/.test(normalizedUsername)) {
+      setFeedback('Use 4-64 letters, numbers, underscores, or hyphens.')
       return
     }
 
@@ -86,16 +89,16 @@ export default function AccountPage() {
       const response = await fetch('/api/account/profile', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: normalizedName }),
+        body: JSON.stringify({ name: normalizedUsername }),
       })
       if (!response.ok) throw new Error('Profile update failed')
-      setName(normalizedName)
-      setFeedback('Name updated successfully!')
-      setIsEditingName(false)
+      setUsername(normalizedUsername)
+      setFeedback('Username updated.')
+      setIsEditingUsername(false)
       setTimeout(() => setFeedback(''), 3000)
     } catch (error) {
-      console.error('Error updating name:', error)
-      setFeedback('Failed to update name.')
+      console.error('Error updating username:', error)
+      setFeedback('That username is unavailable or invalid.')
     }
   }
 
@@ -179,41 +182,43 @@ export default function AccountPage() {
           </div>
         )}
 
-        {/* Name Section */}
+        {/* Username Section */}
         <div className="p-6 mb-6 border-b border-neutral-300 dark:border-neutral-700">
-          <h2 className="text-xl font-light text-black dark:text-white mb-4">Display Name</h2>
-          {!isEditingName ? (
+          <h2 className="text-xl font-light text-black dark:text-white mb-4">Username</h2>
+          {!isEditingUsername ? (
             <div className="flex items-center justify-between">
               <div className="flex items-center">
                 <UserIcon className="h-6 w-6 text-neutral-500 dark:text-neutral-400 mr-3" />
-                <span className="text-lg text-black dark:text-white">{name || 'No name set'}</span>
+                <span className="text-lg text-black dark:text-white">{username || 'No username set'}</span>
               </div>
               <button 
-                onClick={() => setIsEditingName(true)} 
+                onClick={() => setIsEditingUsername(true)}
                 className="text-sm text-neutral-600 dark:text-neutral-400 hover:text-black dark:hover:text-white transition-colors duration-200"
               >
                 Edit
               </button>
             </div>
           ) : (
-            <form onSubmit={handleNameChange}>
+            <form onSubmit={handleUsernameChange}>
               <div className="flex items-center">
                 <input 
-                  id="display-name"
+                  id="username"
                   type="text"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  maxLength={80}
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  minLength={4}
+                  maxLength={64}
+                  pattern="[A-Za-z0-9_-]+"
                   required
-                  autoComplete="name"
+                  autoComplete="username"
                   className="input-minimal"
-                  placeholder="Enter your display name"
-                  aria-label="Display name"
+                  placeholder="Enter your username"
+                  aria-label="Username"
                 />
-                <button type="submit" aria-label="Save display name" className="ml-3 px-4 py-2 border border-neutral-300 dark:border-neutral-700 hover:border-black dark:hover:border-white transition-colors duration-200">
+                <button type="submit" aria-label="Save username" className="ml-3 px-4 py-2 border border-neutral-300 dark:border-neutral-700 hover:border-black dark:hover:border-white transition-colors duration-200">
                   <Save className="h-5 w-5" />
                 </button>
-                <button type="button" onClick={() => setIsEditingName(false)} className="ml-2 px-4 py-2 text-sm text-neutral-600 dark:text-neutral-400 hover:text-black dark:hover:text-white transition-colors duration-200">
+                <button type="button" onClick={() => setIsEditingUsername(false)} className="ml-2 px-4 py-2 text-sm text-neutral-600 dark:text-neutral-400 hover:text-black dark:hover:text-white transition-colors duration-200">
                   Cancel
                 </button>
               </div>
@@ -275,7 +280,7 @@ export default function AccountPage() {
               className="mt-1 h-5 w-5"
             />
             <label htmlFor="leaderboard-visible" className="text-sm leading-6 text-neutral-700 dark:text-neutral-300">
-              Show my display name and problems-completed total on the student leaderboard. This is off by default.
+              Show my username and problems-completed total on the student leaderboard. This is off by default.
             </label>
           </div>
 

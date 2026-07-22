@@ -92,14 +92,11 @@ async function getClerkSession(optional: boolean): Promise<SessionUser | null> {
     }
 
     const legacyFirebaseUid = clerkUser.externalId || null
-    const metadataDisplayName = typeof clerkUser.unsafeMetadata.displayName === 'string'
-      ? clerkUser.unsafeMetadata.displayName.trim().slice(0, 80)
-      : null
     return {
       uid: resolveClerkDataUid(clerkUser.id, legacyFirebaseUid),
       authUid: clerkUser.id,
       email: primaryEmail.emailAddress.toLowerCase(),
-      displayName: clerkUser.fullName || metadataDisplayName,
+      displayName: clerkUser.username,
       provider: 'clerk',
       legacyFirebaseUid,
     }

@@ -152,6 +152,147 @@ input[type='range'] {
     @apply py-20 px-4;
   }
 
+  .auth-page {
+    @apply flex min-h-[calc(100dvh-6rem)] w-full items-center px-4 py-8 sm:px-6 lg:px-8;
+  }
+
+  .auth-shell {
+    @apply mx-auto w-full max-w-lg overflow-hidden border border-neutral-800 bg-[#080808];
+  }
+
+  .auth-form-panel {
+    @apply flex items-center px-6 py-10 sm:px-12 sm:py-12;
+  }
+
+  .auth-form-content,
+  .clerk-auth-root,
+  .clerk-auth-card-box {
+    @apply w-full;
+  }
+
+  .clerk-auth-card-box {
+    box-shadow: none !important;
+  }
+
+  .clerk-auth-card {
+    width: 100% !important;
+    padding: 0 !important;
+    border: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+
+  .clerk-auth-footer {
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+
+  .clerk-auth-header {
+    @apply items-start text-left;
+  }
+
+  .clerk-auth-title {
+    @apply text-3xl font-medium tracking-tight text-white;
+  }
+
+  .clerk-auth-subtitle {
+    @apply mt-2 text-sm leading-6 text-neutral-400;
+  }
+
+  .clerk-auth-social-button {
+    min-height: 3rem !important;
+    border: 1px solid #404040 !important;
+    background: #111111 !important;
+    color: #fafafa !important;
+    box-shadow: none !important;
+    transition: border-color 180ms ease, background-color 180ms ease, transform 180ms ease !important;
+  }
+
+  .clerk-auth-social-button:hover {
+    border-color: #737373 !important;
+    background: #171717 !important;
+  }
+
+  .clerk-auth-social-button:active,
+  .clerk-auth-primary-button:active {
+    transform: translateY(1px);
+  }
+
+  .clerk-auth-social-button-text,
+  .clerk-auth-label {
+    color: #fafafa !important;
+    font-weight: 600 !important;
+  }
+
+  .clerk-auth-divider-line {
+    background: #2b2b2b !important;
+  }
+
+  .clerk-auth-divider-text,
+  .clerk-auth-footer-text {
+    color: #a3a3a3 !important;
+  }
+
+  .clerk-auth-input {
+    min-height: 3rem !important;
+    border: 1px solid #404040 !important;
+    background: #111111 !important;
+    color: #fafafa !important;
+    box-shadow: none !important;
+  }
+
+  .clerk-auth-input:hover {
+    border-color: #737373 !important;
+  }
+
+  .clerk-auth-input:focus {
+    border-color: #fafafa !important;
+    box-shadow: 0 0 0 1px #fafafa !important;
+  }
+
+  .clerk-auth-primary-button {
+    min-height: 3rem !important;
+    border: 1px solid #fafafa !important;
+    background: #fafafa !important;
+    color: #0a0a0a !important;
+    font-weight: 700 !important;
+    box-shadow: none !important;
+    transition: background-color 180ms ease, border-color 180ms ease, transform 180ms ease !important;
+  }
+
+  .clerk-auth-primary-button:hover {
+    border-color: #d4d4d4 !important;
+    background: #d4d4d4 !important;
+  }
+
+  .clerk-auth-footer-link {
+    color: #fafafa !important;
+    font-weight: 600 !important;
+    text-decoration-color: #737373 !important;
+    text-underline-offset: 3px;
+  }
+
+  .clerk-auth-footer-link:hover {
+    text-decoration: underline;
+  }
+
+  .clerk-auth-provider-footer,
+  .clerk-auth-provider-footer * {
+    color: #737373 !important;
+    border-color: #262626 !important;
+  }
+
+  .clerk-auth-error {
+    color: #fca5a5 !important;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .clerk-auth-social-button,
+    .clerk-auth-primary-button {
+      transition: none !important;
+    }
+  }
+
   .deca-hero {
     isolation: isolate;
   }

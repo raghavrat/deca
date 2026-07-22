@@ -11,7 +11,7 @@ import {
   updateProfile,
   type User as FirebaseUser,
 } from 'firebase/auth'
-import { useRouter } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { createContext, useContext, useEffect, useState } from 'react'
 import { getClientAuthProvider, isClerkClientEnabled, type AuthProvider } from '../config/authProvider'
 import { auth } from '../firebase/config'
@@ -185,17 +185,25 @@ function FirebaseAuthProvider({ children }: { children: React.ReactNode }) {
 function ClerkAuthProvider({ children }: { children: React.ReactNode }) {
   const { isLoaded, isSignedIn, user: clerkUser } = useUser()
   const { signOut: clerkSignOut } = useClerk()
+  const pathname = usePathname()
+
+  useEffect(() => {
+    const hasCompletedConsent = clerkUser?.unsafeMetadata.age13Confirmed === true && clerkUser.legalAcceptedAt !== null
+    if (
+      isLoaded && isSignedIn && clerkUser && !hasCompletedConsent &&
+      !['/consent', '/privacy', '/terms', '/signup'].includes(pathname)
+    ) {
+      window.location.replace('/consent')
+    }
+  }, [clerkUser, isLoaded, isSignedIn, pathname])
 
   const primaryEmail = clerkUser?.primaryEmailAddress
-  const metadataDisplayName = typeof clerkUser?.unsafeMetadata.displayName === 'string'
-    ? clerkUser.unsafeMetadata.displayName.slice(0, 80)
-    : null
   const user: AppUser | null = isLoaded && isSignedIn && clerkUser
     ? {
         uid: resolveClerkDataUid(clerkUser.id, clerkUser.externalId),
         authUid: clerkUser.id,
         email: primaryEmail?.emailAddress || null,
-        displayName: clerkUser.fullName || metadataDisplayName,
+        displayName: clerkUser.username,
         emailVerified: primaryEmail?.verification.status === 'verified',
         provider: 'clerk',
       }
@@ -229,12 +237,60 @@ export function AuthContextProvider({ children }: { children: React.ReactNode })
         signUpUrl="/signup"
         signInFallbackRedirectUrl="/performance"
         signUpFallbackRedirectUrl="/performance"
+        localization={{
+          signIn: {
+            start: {
+              title: 'Welcome back',
+              titleCombined: 'Welcome back',
+              subtitle: 'Sign in to continue training.',
+              subtitleCombined: 'Sign in to continue training.',
+            },
+          },
+          signUp: {
+            start: {
+              title: 'Create your account',
+              titleCombined: 'Create your account',
+              subtitle: 'Start with tests, roleplays, and feedback.',
+              subtitleCombined: 'Start with tests, roleplays, and feedback.',
+            },
+          },
+        }}
         appearance={{
           variables: {
-            colorPrimary: '#ffffff',
-            colorBackground: '#000000',
-            colorForeground: '#ffffff',
+            colorPrimary: '#fafafa',
+            colorPrimaryForeground: '#0a0a0a',
+            colorBackground: '#080808',
+            colorForeground: '#fafafa',
+            colorMuted: '#171717',
+            colorMutedForeground: '#a3a3a3',
+            colorInput: '#111111',
+            colorInputForeground: '#fafafa',
+            colorNeutral: '#d4d4d4',
+            colorBorder: '#404040',
+            colorRing: '#fafafa',
+            colorDanger: '#f87171',
+            fontFamily: 'var(--font-manrope)',
             borderRadius: '0px',
+          },
+          elements: {
+            rootBox: 'clerk-auth-root',
+            cardBox: 'clerk-auth-card-box',
+            card: 'clerk-auth-card',
+            header: 'clerk-auth-header',
+            headerTitle: 'clerk-auth-title',
+            headerSubtitle: 'clerk-auth-subtitle',
+            footer: 'clerk-auth-footer',
+            socialButtonsBlockButton: 'clerk-auth-social-button',
+            socialButtonsBlockButtonText: 'clerk-auth-social-button-text',
+            dividerLine: 'clerk-auth-divider-line',
+            dividerText: 'clerk-auth-divider-text',
+            formFieldLabel: 'clerk-auth-label',
+            formFieldInput: 'clerk-auth-input',
+            formButtonPrimary: 'clerk-auth-primary-button',
+            footerActionText: 'clerk-auth-footer-text',
+            footerActionLink: 'clerk-auth-footer-link',
+            footerPages: 'clerk-auth-provider-footer',
+            formFieldErrorText: 'clerk-auth-error',
           },
         }}
       >

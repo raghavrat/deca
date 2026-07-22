@@ -23,7 +23,7 @@ export default function PrivacyPolicyPage() {
         <section>
           <h2>Information we collect</h2>
           <ul>
-            <li><strong>Account information:</strong> email address, display name, authentication-provider user ID, email-verification status, age and policy confirmations, and account creation time.</li>
+            <li><strong>Account information:</strong> email address, username, authentication-provider user ID, email-verification status, age and policy confirmations, and account creation time.</li>
             <li><strong>Learning information:</strong> problems-completed totals, optional leaderboard preference, roleplay scenarios, transcripts, AI feedback, scores, and timestamps.</li>
             <li><strong>Audio you choose to submit:</strong> roleplay audio is processed to create a transcript and feedback. Deca Pal does not save the audio file to its database.</li>
             <li><strong>Browser-only information:</strong> question practice statistics and theme preference are stored in local storage on your device.</li>
@@ -47,7 +47,7 @@ export default function PrivacyPolicyPage() {
 
         <section>
           <h2>How we disclose information</h2>
-          <p>We disclose information to service providers described above, when you direct us to do so, to protect users and the service, or when legally required. If you opt in to the leaderboard, your display name and problems-completed total are visible to other signed-in users. The leaderboard is off by default.</p>
+          <p>We disclose information to service providers described above, when you direct us to do so, to protect users and the service, or when legally required. If you opt in to the leaderboard, your username and problems-completed total are visible to other signed-in users. The leaderboard is off by default.</p>
           <p><strong>Deca Pal does not sell personal information or share it for cross-context behavioral advertising.</strong> We do not knowingly sell or share the personal information of users under 16.</p>
         </section>
 
@@ -63,7 +63,7 @@ export default function PrivacyPolicyPage() {
 
         <section>
           <h2>Your choices and privacy rights</h2>
-          <p>From the Account page, you can correct your display name, choose whether to appear on the leaderboard, download server-stored data, and permanently delete your account and roleplay history. Depending on where you live, you may also have rights to know, access, correct, delete, restrict, object, or appeal, and to receive equal service when exercising a privacy right.</p>
+          <p>From the Account page, you can correct your username, choose whether to appear on the leaderboard, download server-stored data, and permanently delete your account and roleplay history. Depending on where you live, you may also have rights to know, access, correct, delete, restrict, object, or appeal, and to receive equal service when exercising a privacy right.</p>
           <p>To exercise a right that is not available in the Account page, use an authorized agent, or ask a question, email <a href={`mailto:${contactEmail}`}>{contactEmail}</a>. We may need to verify your identity. We do not discriminate against users for exercising privacy rights.</p>
         </section>
 
