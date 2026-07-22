@@ -5,8 +5,19 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import AuthPageShell from '../components/AuthPageShell'
+import { isClerkClientEnabled } from '../config/authProvider'
 
-export default function MigrationConsentPage() {
+function FirebaseConsentRedirect() {
+  const router = useRouter()
+
+  useEffect(() => {
+    router.replace('/performance')
+  }, [router])
+
+  return null
+}
+
+function ClerkMigrationConsentPage() {
   const { isLoaded, isSignedIn, user } = useUser()
   const router = useRouter()
   const [ageConfirmed, setAgeConfirmed] = useState(false)
@@ -70,4 +81,9 @@ export default function MigrationConsentPage() {
       </form>
     </AuthPageShell>
   )
+}
+
+export default function MigrationConsentPage() {
+  if (!isClerkClientEnabled()) return <FirebaseConsentRedirect />
+  return <ClerkMigrationConsentPage />
 }
