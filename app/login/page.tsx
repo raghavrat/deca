@@ -1,9 +1,12 @@
 'use client'
 
+import { SignIn } from '@clerk/nextjs'
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import Link from 'next/link';
 import { getErrorMessage, getErrorCode } from '../utils/errorHandling';
+import { isClerkClientEnabled } from '../config/authProvider';
+import AuthPageShell from '../components/AuthPageShell';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -11,6 +14,18 @@ export default function Login() {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const { signIn } = useAuth();
+
+  if (isClerkClientEnabled()) {
+    return (
+      <AuthPageShell>
+        <SignIn
+          routing="hash"
+          signUpUrl="/signup"
+          fallbackRedirectUrl="/performance"
+        />
+      </AuthPageShell>
+    )
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,8 +52,8 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
-      <div className="w-full max-w-md space-y-8">
+    <AuthPageShell>
+      <div className="w-full space-y-8">
         <div>
           <h1 className="text-4xl font-light tracking-tight text-center text-black dark:text-white">
             Sign in to your account
@@ -84,6 +99,6 @@ export default function Login() {
           </Link>
         </div>
       </div>
-    </div>
+    </AuthPageShell>
   );
 }

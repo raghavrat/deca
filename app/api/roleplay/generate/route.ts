@@ -28,6 +28,11 @@ import {
 } from '../../../utils/roleplayPromptBuilder'
 import { RateLimiter } from '../../../utils/rateLimiter'
 import { RequestError, requireSameOrigin, requireSession } from '../../../utils/serverAuth'
+import {
+  releaseRoleplayGeneration,
+  reserveRoleplayGeneration,
+  type RoleplayGenerationReservation,
+} from '../../../utils/billingEntitlements'
 
 const OPENROUTER_API_URL = 'https://openrouter.ai/api/v1/chat/completions'
 const OPENROUTER_TIMEOUT_MS = 50_000
@@ -147,6 +152,7 @@ function isShortText(value: unknown, max = 4000): value is string {
 
 export async function POST(request: NextRequest) {
   let reservedRateLimitKey: string | null = null
+  let billingReservation: RoleplayGenerationReservation | null = null
 
   try {
     requireSameOrigin(request)
@@ -225,6 +231,7 @@ export async function POST(request: NextRequest) {
 
     // Reserve immediately before the paid operation so invalid requests do not
     // consume the customer's generation window. Release it on upstream failure.
+    billingReservation = await reserveRoleplayGeneration(user)
     rateLimiter.recordIdentifier(rateLimitKey)
     reservedRateLimitKey = rateLimitKey
 
@@ -308,9 +315,17 @@ export async function POST(request: NextRequest) {
     }
 
     reservedRateLimitKey = null
+    billingReservation = null
     return NextResponse.json({ scenario })
   } catch (error) {
     if (reservedRateLimitKey) rateLimiter.removeIdentifier(reservedRateLimitKey)
+    if (billingReservation) {
+      try {
+        await releaseRoleplayGeneration(billingReservation)
+      } catch {
+        console.error('Failed to release roleplay billing reservation')
+      }
+    }
     if (error instanceof RequestError) return NextResponse.json({ error: error.message }, { status: error.status })
     console.error('Error generating roleplay scenario', error instanceof Error ? error.message : 'unknown error')
     return NextResponse.json(

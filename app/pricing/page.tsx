@@ -1,20 +1,23 @@
 'use client'
 
+import { PricingTable } from '@clerk/nextjs'
 import Link from 'next/link'
 import { useAuth } from '../context/AuthContext'
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
+import { isClerkClientEnabled } from '../config/authProvider'
 
 export default function Pricing() {
   const { user, loading } = useAuth()
   const router = useRouter()
+  const clerkEnabled = isClerkClientEnabled()
 
   // Redirect logged-in users to the dashboard
   useEffect(() => {
-    if (user && !loading) {
+    if (user && !loading && !clerkEnabled) {
       router.push('/performance')
     }
-  }, [user, loading, router])
+  }, [user, loading, router, clerkEnabled])
 
   if (loading) {
     return (
@@ -25,7 +28,7 @@ export default function Pricing() {
   }
 
   // Only show pricing page for non-logged-in users
-  if (user) {
+  if (user && !clerkEnabled) {
     return null // Will redirect via useEffect
   }
 
@@ -49,6 +52,9 @@ export default function Pricing() {
       {/* Pricing Section */}
       <div className="py-20 px-4">
         <div className="max-w-4xl mx-auto">
+          {clerkEnabled ? (
+            <PricingTable />
+          ) : (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Free Plan */}
             <div className="bg-white dark:bg-black border border-neutral-300 dark:border-neutral-700 hover:border-black dark:hover:border-white transition-all duration-200 p-6">
@@ -159,6 +165,7 @@ export default function Pricing() {
               </Link>
             </div>
           </div>
+          )}
         </div>
       </div>
 

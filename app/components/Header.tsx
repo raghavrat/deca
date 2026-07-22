@@ -144,7 +144,7 @@ export default function Header() {
                       aria-controls="profile-menu"
                       aria-haspopup="true"
                     >
-                      {user.email?.split('@')[0]}
+                      {user.displayName || user.email?.split('@')[0]}
                     </button>
 
                     {/* Profile Dropdown */}

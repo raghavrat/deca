@@ -1,21 +1,79 @@
 'use client'
 
+import { SignUp } from '@clerk/nextjs'
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import Link from 'next/link';
 import { getErrorMessage, getErrorCode } from '../utils/errorHandling';
+import { isClerkClientEnabled } from '../config/authProvider';
+import AuthPageShell from '../components/AuthPageShell';
 
 export default function Signup() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [name, setName] = useState('');
+  const [username, setUsername] = useState('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [ageConfirmed, setAgeConfirmed] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
+  const [clerkConsentAt, setClerkConsentAt] = useState('');
   const { signUp } = useAuth();
+
+  if (isClerkClientEnabled()) {
+    if (clerkConsentAt) {
+      return (
+        <AuthPageShell>
+          <SignUp
+            routing="hash"
+            signInUrl="/login"
+            fallbackRedirectUrl="/performance"
+            unsafeMetadata={{
+              age13Confirmed: true,
+              termsAcceptedAt: clerkConsentAt,
+              privacyPolicyVersion: '2026-07-20',
+            }}
+          />
+        </AuthPageShell>
+      )
+    }
+
+    return (
+      <AuthPageShell>
+        <div className="w-full space-y-8">
+          <h1 className="text-3xl font-medium tracking-tight text-white">
+            Create your account
+          </h1>
+          <div className="space-y-6">
+            <div className="space-y-4">
+              <div className="flex items-start gap-3">
+                <input id="clerk-age-confirmation" type="checkbox" checked={ageConfirmed} onChange={event => setAgeConfirmed(event.target.checked)} className="mt-1 h-5 w-5" />
+                <label htmlFor="clerk-age-confirmation" className="text-sm leading-6">I am at least 13 years old. If I am under the age of legal majority, my parent or guardian has permitted me to use Deca Pal.</label>
+              </div>
+              <div className="flex items-start gap-3">
+                <input id="clerk-terms-confirmation" type="checkbox" checked={termsAccepted} onChange={event => setTermsAccepted(event.target.checked)} className="mt-1 h-5 w-5" />
+                <label htmlFor="clerk-terms-confirmation" className="text-sm leading-6">I agree to the <Link href="/terms" className="underline underline-offset-2">Terms of Use</Link> and acknowledge the <Link href="/privacy" className="underline underline-offset-2">Privacy Policy</Link>.</label>
+              </div>
+            </div>
+            <button
+              type="button"
+              disabled={!ageConfirmed || !termsAccepted}
+              onClick={() => setClerkConsentAt(new Date().toISOString())}
+              className="w-full border border-white bg-white px-5 py-3 text-sm font-semibold text-black transition-colors duration-200 hover:bg-neutral-200 disabled:cursor-not-allowed disabled:border-neutral-800 disabled:bg-neutral-900 disabled:text-neutral-500"
+            >
+              Continue
+            </button>
+          </div>
+          <div className="text-center">
+            <Link href="/login" className="text-sm text-neutral-600 dark:text-neutral-400 hover:text-black dark:hover:text-white transition-colors duration-200">
+              Already have an account? Sign in
+            </Link>
+          </div>
+        </div>
+      </AuthPageShell>
+    )
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -39,14 +97,14 @@ export default function Signup() {
 
     setIsLoading(true);
     try {
-      const emailSent = await signUp(email, password, name, ageConfirmed, termsAccepted);
+      const emailSent = await signUp(email, password, username, ageConfirmed, termsAccepted);
       if (emailSent) {
         setSuccess('Account created! Please check your email to verify your account.');
         // Clear form
         setEmail('');
         setPassword('');
         setConfirmPassword('');
-        setName('');
+        setUsername('');
         setAgeConfirmed(false);
         setTermsAccepted(false);
       }
@@ -70,8 +128,8 @@ export default function Signup() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
-      <div className="w-full max-w-md space-y-8">
+    <AuthPageShell>
+      <div className="w-full space-y-8">
         <div>
           <h1 className="text-4xl font-light tracking-tight text-center text-black dark:text-white">
             Create your account
@@ -89,7 +147,7 @@ export default function Signup() {
             </div>
           )}
           <div className="space-y-4">
-            <div><label htmlFor="signup-name" className="mb-1 block text-sm font-medium">Display name</label><input id="signup-name" type="text" required autoComplete="name" maxLength={80} className="input-minimal" value={name} onChange={(e) => setName(e.target.value)} /></div>
+            <div><label htmlFor="signup-username" className="mb-1 block text-sm font-medium">Username</label><input id="signup-username" type="text" required autoComplete="username" maxLength={64} className="input-minimal" value={username} onChange={(e) => setUsername(e.target.value)} /></div>
             <div><label htmlFor="signup-email" className="mb-1 block text-sm font-medium">Email address</label><input id="signup-email" type="email" required autoComplete="email" maxLength={254} className="input-minimal" value={email} onChange={(e) => setEmail(e.target.value)} /></div>
             <div><label htmlFor="signup-password" className="mb-1 block text-sm font-medium">Password</label><input id="signup-password" type="password" required autoComplete="new-password" minLength={12} aria-describedby="password-help" className="input-minimal" value={password} onChange={(e) => setPassword(e.target.value)} /><p id="password-help" className="mt-2 text-xs text-neutral-600 dark:text-neutral-400">Use at least 12 characters. Password managers and paste are supported.</p></div>
             <div><label htmlFor="signup-confirm-password" className="mb-1 block text-sm font-medium">Confirm password</label><input id="signup-confirm-password" type="password" required autoComplete="new-password" minLength={12} className="input-minimal" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} /></div>
@@ -117,6 +175,6 @@ export default function Signup() {
           </Link>
         </div>
       </div>
-    </div>
+    </AuthPageShell>
   );
 }
