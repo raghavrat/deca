@@ -59,8 +59,11 @@ CLERK_ELITE_PLAN_SLUG=elite
 STRIPE_SECRET_KEY=sk_...
 STRIPE_WEBHOOK_SECRET=whsec_...
 STRIPE_LIFETIME_PRICE_ID=price_...
+NEXT_PUBLIC_STRIPE_LIFETIME_ENABLED=false
 NEXT_PUBLIC_STRIPE_LIFETIME_PRICE_USD=49.99
 ```
+
+Keep `NEXT_PUBLIC_STRIPE_LIFETIME_ENABLED=false` until the live Stripe account is activated, the live Price and webhook are configured, and a production Checkout smoke test succeeds. Set it to `true` in the deployment that makes the lifetime option public.
 
 Only after preview verification and the production user import, change both provider switches to `clerk` in the same deployment.
 

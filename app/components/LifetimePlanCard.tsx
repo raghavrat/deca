@@ -10,6 +10,8 @@ export default function LifetimePlanCard() {
   const [error, setError] = useState('')
   const price = process.env.NEXT_PUBLIC_STRIPE_LIFETIME_PRICE_USD || '49.99'
 
+  if (process.env.NEXT_PUBLIC_STRIPE_LIFETIME_ENABLED !== 'true') return null
+
   const startCheckout = async () => {
     setError('')
     setCheckoutLoading(true)
@@ -58,4 +60,3 @@ export default function LifetimePlanCard() {
     </section>
   )
 }
-
