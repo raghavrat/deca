@@ -223,7 +223,8 @@ function ClerkAuthProvider({ children }: { children: React.ReactNode }) {
           })
           if (!response.ok) throw new Error('Unable to finish account setup')
           await clerkUser.reload()
-        } catch {
+        } catch (error) {
+          console.error('Unable to finalize signup consent:', error)
           consentFinalizationStarted.current = false
           if (!['/consent', '/privacy', '/terms', '/signup'].includes(pathname)) {
             window.location.replace('/consent')
