@@ -305,7 +305,7 @@ function PaidPlansFallback({ billingPeriod }: { billingPeriod: BillingPeriod }) 
 }
 
 export default function RecurringPlanSelector() {
-  const [billingPeriod, setBillingPeriod] = useState<BillingPeriod>('month')
+  const [billingPeriod, setBillingPeriod] = useState<BillingPeriod>('annual')
   const clerkEnabled = isClerkClientEnabled()
 
   return (
