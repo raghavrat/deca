@@ -23,6 +23,8 @@ export class RequestError extends Error {
     message: string,
   ) {
     super(message)
+    this.name = 'RequestError'
+    Object.setPrototypeOf(this, new.target.prototype)
   }
 }
 
