@@ -1,9 +1,12 @@
 import { auth, clerkClient, currentUser } from '@clerk/nextjs/server'
-import { FieldValue } from 'firebase-admin/firestore'
 import { NextResponse } from 'next/server'
 import { isAccountEmailValid } from '../../../config/accountEmail'
 import { adminDb } from '../../../firebase/admin'
-import { PRIVACY_POLICY_VERSION } from '../../../utils/clerkConsent'
+import {
+  getPendingClerkSignupConsent,
+  hasCompletedClerkConsent,
+  PRIVACY_POLICY_VERSION,
+} from '../../../utils/clerkConsent'
 import { RequestError, requireSameOrigin } from '../../../utils/serverAuth'
 
 const noStoreHeaders = { 'Cache-Control': 'no-store' }
@@ -11,15 +14,6 @@ const noStoreHeaders = { 'Cache-Control': 'no-store' }
 export async function POST(request: Request) {
   try {
     requireSameOrigin(request)
-    const body: unknown = await request.json()
-    if (typeof body !== 'object' || body === null || Array.isArray(body)) {
-      throw new RequestError(400, 'Invalid confirmation')
-    }
-
-    const { ageConfirmed, termsAccepted } = body as Record<string, unknown>
-    if (ageConfirmed !== true || termsAccepted !== true) {
-      throw new RequestError(400, 'Both confirmations are required')
-    }
 
     const { userId } = await auth()
     if (!userId) throw new RequestError(401, 'Authentication required')
@@ -34,14 +28,27 @@ export async function POST(request: Request) {
       throw new RequestError(403, 'A valid, verified email is required')
     }
 
-    const acceptedAt = new Date()
-    const acceptedAtIso = acceptedAt.toISOString()
+    if (hasCompletedClerkConsent(
+      user.unsafeMetadata,
+      user.legalAcceptedAt,
+    )) {
+      return NextResponse.json({ completed: true }, { headers: noStoreHeaders })
+    }
+
+    const acceptedAt = getPendingClerkSignupConsent(
+      user.unsafeMetadata,
+      user.legalAcceptedAt,
+    )
+    if (!acceptedAt) {
+      throw new RequestError(409, 'Signup confirmations are not available')
+    }
+
     const client = await clerkClient()
     await client.users.updateUser(userId, { legalAcceptedAt: acceptedAt })
     await client.users.updateUserMetadata(userId, {
       unsafeMetadata: {
         age13Confirmed: true,
-        termsAcceptedAt: acceptedAtIso,
+        termsAcceptedAt: acceptedAt.toISOString(),
         privacyPolicyVersion: PRIVACY_POLICY_VERSION,
         migrationRequiresConsent: null,
       },
@@ -51,7 +58,7 @@ export async function POST(request: Request) {
       await adminDb.collection('users').doc(user.externalId || userId).set({
         email: primaryEmail.emailAddress.toLowerCase(),
         age13Confirmed: true,
-        termsAcceptedAt: FieldValue.serverTimestamp(),
+        termsAcceptedAt: acceptedAt,
         privacyPolicyVersion: PRIVACY_POLICY_VERSION,
         authProvider: 'clerk',
       }, { merge: true })
@@ -60,8 +67,14 @@ export async function POST(request: Request) {
     return NextResponse.json({ completed: true }, { headers: noStoreHeaders })
   } catch (error) {
     if (error instanceof RequestError) {
-      return NextResponse.json({ error: error.message }, { status: error.status, headers: noStoreHeaders })
+      return NextResponse.json(
+        { error: error.message },
+        { status: error.status, headers: noStoreHeaders },
+      )
     }
-    return NextResponse.json({ error: 'Unable to save confirmations' }, { status: 500, headers: noStoreHeaders })
+    return NextResponse.json(
+      { error: 'Unable to finish account setup' },
+      { status: 500, headers: noStoreHeaders },
+    )
   }
 }

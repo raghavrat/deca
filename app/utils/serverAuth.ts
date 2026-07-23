@@ -5,6 +5,7 @@ import { cookies } from 'next/headers'
 import { isAccountEmailValid } from '../config/accountEmail'
 import { getServerAuthProvider } from '../config/authProvider.server'
 import { adminAuth, developmentIdTokenSessionsEnabled } from '../firebase/admin'
+import { hasCompletedClerkConsent } from './clerkConsent'
 import { resolveClerkDataUid } from './userIdentity'
 
 export interface SessionUser {
@@ -84,9 +85,10 @@ async function getClerkSession(optional: boolean): Promise<SessionUser | null> {
       throw new RequestError(403, 'A valid, verified email is required')
     }
 
-    const ageConfirmed = clerkUser.unsafeMetadata.age13Confirmed === true
-    const acceptedTerms = clerkUser.legalAcceptedAt !== null
-    if (!ageConfirmed || !acceptedTerms) {
+    if (!hasCompletedClerkConsent(
+      clerkUser.unsafeMetadata,
+      clerkUser.legalAcceptedAt,
+    )) {
       if (optional) return null
       throw new RequestError(403, 'Complete the age and policy confirmations before using training tools')
     }
