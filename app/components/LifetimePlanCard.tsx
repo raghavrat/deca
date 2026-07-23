@@ -9,8 +9,7 @@ export default function LifetimePlanCard() {
   const [checkoutLoading, setCheckoutLoading] = useState(false)
   const [error, setError] = useState('')
   const price = process.env.NEXT_PUBLIC_STRIPE_LIFETIME_PRICE_USD || '49.99'
-
-  if (process.env.NEXT_PUBLIC_STRIPE_LIFETIME_ENABLED !== 'true') return null
+  const lifetimeEnabled = process.env.NEXT_PUBLIC_STRIPE_LIFETIME_ENABLED === 'true'
 
   const startCheckout = async () => {
     setError('')
@@ -27,35 +26,62 @@ export default function LifetimePlanCard() {
   }
 
   return (
-    <section className="mt-8 border border-neutral-300 bg-white p-6 dark:border-neutral-700 dark:bg-black">
-      <div className="flex flex-col justify-between gap-6 md:flex-row md:items-center">
-        <div>
-          <p className="text-xs font-medium uppercase tracking-[0.2em] text-neutral-500">One payment</p>
-          <h2 className="mt-2 text-2xl font-light text-black dark:text-white">Elite Lifetime</h2>
-          <p className="mt-2 max-w-2xl text-sm text-neutral-600 dark:text-neutral-400">
-            Unlimited roleplay generations with scoring and feedback for the life of the Deca Pal service.
-            Fair-use and abuse limits still apply.
-          </p>
+    <section
+      aria-labelledby="lifetime-plan-heading"
+      className="flex h-full flex-col border border-neutral-300 bg-neutral-100 p-6 dark:border-neutral-700 dark:bg-neutral-900"
+    >
+      <div>
+        <h2 id="lifetime-plan-heading" className="text-2xl font-light tracking-tight text-neutral-950 dark:text-white">
+          Elite Lifetime
+        </h2>
+        <p className="mt-2 text-sm leading-5 text-neutral-600 dark:text-neutral-400">
+          Pay once for Elite access for as long as Deca Pal operates.
+        </p>
+      </div>
+
+      <div className="mt-8 text-neutral-950 dark:text-white">
+        <div className="flex items-baseline gap-2">
+          <span className="text-4xl font-light tracking-tight">${price}</span>
+          <span className="text-sm text-neutral-500">one time</span>
         </div>
-        <div className="min-w-44 text-left md:text-right">
-          <p className="text-3xl font-light text-black dark:text-white">${price}</p>
-          <p className="text-xs text-neutral-500">one time · USD</p>
-          {user ? (
-            <button
-              type="button"
-              onClick={startCheckout}
-              disabled={checkoutLoading || loading}
-              className="btn-primary mt-4 w-full disabled:cursor-not-allowed disabled:opacity-60"
-            >
-              {checkoutLoading ? 'Opening checkout…' : 'Buy lifetime access'}
-            </button>
-          ) : (
-            <Link href="/signup" className="btn-primary mt-4 block w-full text-center">
-              Sign up to purchase
-            </Link>
-          )}
-          {error && <p role="alert" className="mt-2 text-sm text-red-600 dark:text-red-400">{error}</p>}
-        </div>
+        <p className="mt-2 text-xs text-neutral-500">Single payment in USD.</p>
+      </div>
+
+      <ul className="mt-8 space-y-3 text-sm text-neutral-700 dark:text-neutral-300">
+        <li className="flex gap-3">
+          <span aria-hidden="true" className="text-neutral-400">✓</span>
+          <span>Unlimited roleplays under fair-use limits</span>
+        </li>
+        <li className="flex gap-3">
+          <span aria-hidden="true" className="text-neutral-400">✓</span>
+          <span>Scoring and detailed feedback</span>
+        </li>
+        <li className="flex gap-3">
+          <span aria-hidden="true" className="text-neutral-400">✓</span>
+          <span>No subscription renewal</span>
+        </li>
+      </ul>
+
+      <div className="mt-auto pt-8">
+        {!lifetimeEnabled ? (
+          <button type="button" disabled className="btn-primary w-full cursor-not-allowed opacity-60">
+            Temporarily unavailable
+          </button>
+        ) : user ? (
+          <button
+            type="button"
+            onClick={startCheckout}
+            disabled={checkoutLoading || loading}
+            className="btn-primary w-full disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {checkoutLoading ? 'Opening checkout...' : 'Choose lifetime'}
+          </button>
+        ) : (
+          <Link href="/signup" className="btn-primary block w-full text-center">
+            Choose lifetime
+          </Link>
+        )}
+        {error && <p role="alert" className="mt-3 text-sm text-red-700 dark:text-red-400">{error}</p>}
       </div>
     </section>
   )
