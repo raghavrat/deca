@@ -16,7 +16,7 @@ interface PaidPlan {
   name: string
   monthlyPrice: string
   yearlyPrice: string
-  yearlyMonthlyPrice: string
+  yearlySavingsPercent: string
   description: string
   features: string[]
   featured?: boolean
@@ -27,8 +27,8 @@ const PAID_PLANS: PaidPlan[] = [
     slug: 'champion',
     name: 'Champion',
     monthlyPrice: '4.99',
-    yearlyPrice: '39.96',
-    yearlyMonthlyPrice: '3.33',
+    yearlyPrice: '39.99',
+    yearlySavingsPercent: '33%',
     description: 'For competitors who practice every week.',
     features: [
       '100 roleplay generations each month',
@@ -41,8 +41,8 @@ const PAID_PLANS: PaidPlan[] = [
     slug: 'elite',
     name: 'Elite',
     monthlyPrice: '6.99',
-    yearlyPrice: '55.92',
-    yearlyMonthlyPrice: '4.66',
+    yearlyPrice: '60',
+    yearlySavingsPercent: '28%',
     description: 'For competitors who want more reps.',
     features: [
       'Unlimited roleplays under fair-use limits',
@@ -217,7 +217,7 @@ function getPlanPrice(plan: PaidPlan, billingPeriod: BillingPeriod) {
   return {
     price: plan.yearlyPrice,
     suffix: '/year',
-    detail: `$${plan.yearlyMonthlyPrice} per month, billed yearly.`,
+    detail: `Save ${plan.yearlySavingsPercent} compared with monthly.`,
   }
 }
 
@@ -342,7 +342,7 @@ export default function RecurringPlanSelector() {
           </button>
         </div>
         <p className="mt-3 text-sm text-neutral-500 dark:text-neutral-400">
-          Yearly plans include four months free.
+          Save up to 33% with yearly billing.
         </p>
       </div>
 
