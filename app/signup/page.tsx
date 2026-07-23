@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { getErrorMessage, getErrorCode } from '../utils/errorHandling';
 import { isClerkClientEnabled } from '../config/authProvider';
 import AuthPageShell from '../components/AuthPageShell';
+import { PRIVACY_POLICY_VERSION } from '../utils/clerkConsent';
 
 export default function Signup() {
   const [email, setEmail] = useState('');
@@ -32,7 +33,7 @@ export default function Signup() {
             unsafeMetadata={{
               age13Confirmed: true,
               termsAcceptedAt: clerkConsentAt,
-              privacyPolicyVersion: '2026-07-20',
+              privacyPolicyVersion: PRIVACY_POLICY_VERSION,
             }}
           />
         </AuthPageShell>

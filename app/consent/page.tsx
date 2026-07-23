@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import AuthPageShell from '../components/AuthPageShell'
 import { isClerkClientEnabled } from '../config/authProvider'
+import { hasCompletedClerkConsent } from '../utils/clerkConsent'
 
 function FirebaseConsentRedirect() {
   const router = useRouter()
@@ -26,7 +27,10 @@ function ClerkMigrationConsentPage() {
   const [error, setError] = useState('')
 
   useEffect(() => {
-    const hasCompletedConsent = user?.unsafeMetadata.age13Confirmed === true && user.legalAcceptedAt !== null
+    const hasCompletedConsent = hasCompletedClerkConsent(
+      user?.unsafeMetadata,
+      user?.legalAcceptedAt,
+    )
     if (isLoaded && isSignedIn && hasCompletedConsent) {
       router.replace('/performance')
     }

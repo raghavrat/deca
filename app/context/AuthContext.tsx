@@ -12,9 +12,13 @@ import {
   type User as FirebaseUser,
 } from 'firebase/auth'
 import { usePathname, useRouter } from 'next/navigation'
-import { createContext, useContext, useEffect, useState } from 'react'
+import { createContext, useContext, useEffect, useRef, useState } from 'react'
 import { getClientAuthProvider, isClerkClientEnabled, type AuthProvider } from '../config/authProvider'
 import { auth } from '../firebase/config'
+import {
+  getPendingClerkSignupConsent,
+  hasCompletedClerkConsent,
+} from '../utils/clerkConsent'
 import { resolveClerkDataUid } from '../utils/userIdentity'
 
 export interface AppUser {
@@ -186,16 +190,55 @@ function ClerkAuthProvider({ children }: { children: React.ReactNode }) {
   const { isLoaded, isSignedIn, user: clerkUser } = useUser()
   const { signOut: clerkSignOut } = useClerk()
   const pathname = usePathname()
+  const consentFinalizationStarted = useRef(false)
+  const hasCompletedConsent = hasCompletedClerkConsent(
+    clerkUser?.unsafeMetadata,
+    clerkUser?.legalAcceptedAt,
+  )
+  const hasPendingSignupConsent = getPendingClerkSignupConsent(
+    clerkUser?.unsafeMetadata,
+    clerkUser?.legalAcceptedAt,
+  ) !== null
 
   useEffect(() => {
-    const hasCompletedConsent = clerkUser?.unsafeMetadata.age13Confirmed === true && clerkUser.legalAcceptedAt !== null
-    if (
-      isLoaded && isSignedIn && clerkUser && !hasCompletedConsent &&
-      !['/consent', '/privacy', '/terms', '/signup'].includes(pathname)
-    ) {
+    if (!isLoaded || !isSignedIn || !clerkUser) return
+    if (hasCompletedConsent) {
+      consentFinalizationStarted.current = false
+      return
+    }
+
+    const pendingSignupConsent = getPendingClerkSignupConsent(
+      clerkUser.unsafeMetadata,
+      clerkUser.legalAcceptedAt,
+    )
+    if (pendingSignupConsent) {
+      if (consentFinalizationStarted.current) return
+      consentFinalizationStarted.current = true
+
+      const finalizeSignupConsent = async () => {
+        try {
+          const response = await fetch('/api/auth/finalize-signup-consent', {
+            method: 'POST',
+            credentials: 'same-origin',
+          })
+          if (!response.ok) throw new Error('Unable to finish account setup')
+          await clerkUser.reload()
+        } catch {
+          consentFinalizationStarted.current = false
+          if (!['/consent', '/privacy', '/terms', '/signup'].includes(pathname)) {
+            window.location.replace('/consent')
+          }
+        }
+      }
+
+      void finalizeSignupConsent()
+      return
+    }
+
+    if (!['/consent', '/privacy', '/terms', '/signup'].includes(pathname)) {
       window.location.replace('/consent')
     }
-  }, [clerkUser, isLoaded, isSignedIn, pathname])
+  }, [clerkUser, hasCompletedConsent, isLoaded, isSignedIn, pathname])
 
   const primaryEmail = clerkUser?.primaryEmailAddress
   const user: AppUser | null = isLoaded && isSignedIn && clerkUser
@@ -217,7 +260,7 @@ function ClerkAuthProvider({ children }: { children: React.ReactNode }) {
   return (
     <AuthContext.Provider value={{
       user,
-      loading: !isLoaded,
+      loading: !isLoaded || hasPendingSignupConsent,
       signUp: () => navigateToClerkPage('/signup'),
       signIn: () => navigateToClerkPage('/login'),
       logout: async () => clerkSignOut({ redirectUrl: '/login' }),
