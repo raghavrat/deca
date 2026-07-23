@@ -7,6 +7,7 @@ import type { ReactNode } from 'react'
 import { useState } from 'react'
 import { isClerkClientEnabled } from '../config/authProvider'
 import { useAuth } from '../context/AuthContext'
+import { ROLEPLAY_PLAN_LIMITS } from '../utils/roleplayUsagePolicy'
 
 type BillingPeriod = 'month' | 'annual'
 type PaidPlanSlug = 'champion' | 'elite'
@@ -31,7 +32,7 @@ const PAID_PLANS: PaidPlan[] = [
     yearlySavingsPercent: '33%',
     description: 'For competitors who practice every week.',
     features: [
-      '100 roleplay generations each month',
+      `${ROLEPLAY_PLAN_LIMITS.champion.limit} roleplay generations each month`,
       'Complete practice test access',
       'Roleplay scoring and feedback',
     ],
@@ -229,7 +230,7 @@ function StarterCard() {
       price="0"
       priceDetail="No payment information required."
       features={[
-        '2 roleplay generations',
+        `${ROLEPLAY_PLAN_LIMITS.starter.limit} roleplay generations`,
         'Complete practice test access',
         'Roleplay scoring and feedback',
       ]}
