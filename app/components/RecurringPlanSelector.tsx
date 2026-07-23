@@ -41,7 +41,7 @@ const PAID_PLANS: PaidPlan[] = [
     slug: 'elite',
     name: 'Elite',
     monthlyPrice: '6.99',
-    yearlyPrice: '60',
+    yearlyPrice: '59.99',
     yearlySavingsPercent: '28%',
     description: 'For competitors who want more reps.',
     features: [
