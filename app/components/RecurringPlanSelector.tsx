@@ -3,15 +3,16 @@
 import { Show } from '@clerk/nextjs'
 import { CheckoutButton, usePlans } from '@clerk/nextjs/experimental'
 import Link from 'next/link'
+import type { ReactNode } from 'react'
 import { useState } from 'react'
 import { isClerkClientEnabled } from '../config/authProvider'
 import { useAuth } from '../context/AuthContext'
 
 type BillingPeriod = 'month' | 'annual'
-type PlanSlug = 'champion' | 'elite'
+type PaidPlanSlug = 'champion' | 'elite'
 
-interface RecurringPlan {
-  slug: PlanSlug
+interface PaidPlan {
+  slug: PaidPlanSlug
   name: string
   monthlyPrice: string
   yearlyPrice: string
@@ -21,19 +22,20 @@ interface RecurringPlan {
   featured?: boolean
 }
 
-const RECURRING_PLANS: RecurringPlan[] = [
+const PAID_PLANS: PaidPlan[] = [
   {
     slug: 'champion',
     name: 'Champion',
     monthlyPrice: '4.99',
     yearlyPrice: '39.96',
     yearlyMonthlyPrice: '3.33',
-    description: 'Structured practice for consistent competitors.',
+    description: 'For competitors who practice every week.',
     features: [
       '100 roleplay generations each month',
-      'Full practice test access',
-      'Scoring and detailed feedback',
+      'Complete practice test access',
+      'Roleplay scoring and feedback',
     ],
+    featured: true,
   },
   {
     slug: 'elite',
@@ -41,31 +43,122 @@ const RECURRING_PLANS: RecurringPlan[] = [
     monthlyPrice: '6.99',
     yearlyPrice: '55.92',
     yearlyMonthlyPrice: '4.66',
-    description: 'More practice with no monthly roleplay cap.',
+    description: 'For competitors who want more reps.',
     features: [
       'Unlimited roleplays under fair-use limits',
-      'Everything in Champion',
-      'Extended history and analytics',
+      'Complete practice test access',
+      'Roleplay scoring and feedback',
     ],
-    featured: true,
   },
 ]
 
-interface PlanActionProps {
+interface PlanCardProps {
+  action: ReactNode
+  description: string
+  featured?: boolean
+  features: string[]
+  name: string
+  price: string
+  priceDetail: string
+  priceSuffix?: string
+}
+
+function PlanCard({
+  action,
+  description,
+  featured = false,
+  features,
+  name,
+  price,
+  priceDetail,
+  priceSuffix,
+}: PlanCardProps) {
+  return (
+    <article
+      className={`relative flex min-h-[30rem] flex-col rounded-xl border bg-white p-6 transition-[border-color,transform,box-shadow] duration-200 dark:bg-neutral-950 sm:p-7 ${
+        featured
+          ? 'border-2 border-neutral-950 shadow-[0_18px_50px_rgba(23,23,23,0.08)] dark:border-neutral-100 dark:shadow-[0_18px_50px_rgba(0,0,0,0.3)] lg:-translate-y-2'
+          : 'border-neutral-200 hover:border-neutral-400 dark:border-neutral-800 dark:hover:border-neutral-600'
+      }`}
+    >
+      {featured && (
+        <span className="absolute right-5 top-5 rounded-xl bg-neutral-950 px-3 py-1 text-xs font-medium text-white dark:bg-neutral-100 dark:text-neutral-950">
+          Most popular
+        </span>
+      )}
+
+      <div className={featured ? 'pr-24' : undefined}>
+        <h3 className="text-xl font-semibold tracking-tight text-neutral-950 dark:text-neutral-50">
+          {name}
+        </h3>
+        <p className="mt-2 min-h-10 text-sm leading-5 text-neutral-600 dark:text-neutral-400">
+          {description}
+        </p>
+      </div>
+
+      <div className="mt-8">
+        <div className="flex items-end gap-2 text-neutral-950 dark:text-neutral-50">
+          <span className="text-4xl font-semibold tracking-[-0.04em]">${price}</span>
+          {priceSuffix && (
+            <span className="pb-1 text-sm text-neutral-500 dark:text-neutral-400">
+              {priceSuffix}
+            </span>
+          )}
+        </div>
+        <p className="mt-2 min-h-5 text-xs leading-5 text-neutral-500 dark:text-neutral-400">
+          {priceDetail}
+        </p>
+      </div>
+
+      <ul className="mt-8 space-y-3 text-sm text-neutral-700 dark:text-neutral-300">
+        {features.map(feature => (
+          <li key={feature} className="flex gap-3">
+            <span
+              aria-hidden="true"
+              className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-xl bg-neutral-100 text-xs font-semibold text-neutral-950 dark:bg-neutral-800 dark:text-neutral-100"
+            >
+              ✓
+            </span>
+            <span className="leading-5">{feature}</span>
+          </li>
+        ))}
+      </ul>
+
+      <div className="mt-auto pt-8">{action}</div>
+    </article>
+  )
+}
+
+function StarterAction() {
+  const { user } = useAuth()
+
+  return (
+    <Link
+      href={user ? '/test' : '/signup'}
+      className="btn-ghost block min-h-12 w-full rounded-xl text-center active:translate-y-px"
+    >
+      {user ? 'Start practicing' : 'Start free'}
+    </Link>
+  )
+}
+
+interface PaidPlanActionProps {
   billingPeriod: BillingPeriod
   clerkPlanId?: string
   isLoading: boolean
-  plan: RecurringPlan
+  plan: PaidPlan
 }
 
-function PlanAction({
+function PaidPlanAction({
   billingPeriod,
   clerkPlanId,
   isLoading,
   plan,
-}: PlanActionProps) {
+}: PaidPlanActionProps) {
   const { user } = useAuth()
-  const buttonClass = plan.featured ? 'btn-primary w-full' : 'btn-ghost w-full'
+  const buttonClass = plan.featured
+    ? 'btn-primary min-h-12 w-full rounded-xl active:translate-y-px'
+    : 'btn-ghost min-h-12 w-full rounded-xl active:translate-y-px'
 
   if (!user) {
     return (
@@ -77,7 +170,12 @@ function PlanAction({
 
   if (isLoading) {
     return (
-      <button type="button" disabled aria-busy="true" className={`${buttonClass} cursor-wait opacity-60`}>
+      <button
+        type="button"
+        disabled
+        aria-busy="true"
+        className={`${buttonClass} cursor-wait opacity-60`}
+      >
         Loading plan
       </button>
     )
@@ -86,7 +184,7 @@ function PlanAction({
   if (!clerkPlanId) {
     return (
       <button type="button" disabled className={`${buttonClass} cursor-not-allowed opacity-60`}>
-        Temporarily unavailable
+        Unavailable
       </button>
     )
   }
@@ -107,114 +205,102 @@ function PlanAction({
   )
 }
 
-function ClerkRecurringPlans({ billingPeriod }: { billingPeriod: BillingPeriod }) {
+function getPlanPrice(plan: PaidPlan, billingPeriod: BillingPeriod) {
+  if (billingPeriod === 'month') {
+    return {
+      price: plan.monthlyPrice,
+      suffix: '/month',
+      detail: 'Billed monthly. Cancel anytime.',
+    }
+  }
+
+  return {
+    price: plan.yearlyPrice,
+    suffix: '/year',
+    detail: `$${plan.yearlyMonthlyPrice} per month, billed yearly.`,
+  }
+}
+
+function StarterCard() {
+  return (
+    <PlanCard
+      name="Starter"
+      description="Try the full practice experience for free."
+      price="0"
+      priceDetail="No payment information required."
+      features={[
+        '2 roleplay generations',
+        'Complete practice test access',
+        'Roleplay scoring and feedback',
+      ]}
+      action={<StarterAction />}
+    />
+  )
+}
+
+function ClerkPaidPlans({ billingPeriod }: { billingPeriod: BillingPeriod }) {
   const { data, isLoading } = usePlans({ for: 'user', pageSize: 10 })
   const clerkPlans = data || []
 
   return (
-    <div className="grid gap-px bg-neutral-300 dark:bg-neutral-700 md:grid-cols-2">
-      {RECURRING_PLANS.map(plan => {
+    <>
+      {PAID_PLANS.map(plan => {
         const clerkPlan = clerkPlans.find(candidate => candidate.slug === plan.slug)
-        const price = billingPeriod === 'month' ? plan.monthlyPrice : plan.yearlyPrice
+        const displayPrice = getPlanPrice(plan, billingPeriod)
 
         return (
-          <article
+          <PlanCard
             key={plan.slug}
-            className={`flex min-h-[28rem] flex-col bg-white p-6 dark:bg-neutral-950 ${
-              plan.featured ? 'outline outline-2 outline-neutral-950 dark:outline-white' : ''
-            }`}
-          >
-            <div>
-              <h3 className="text-2xl font-light tracking-tight text-neutral-950 dark:text-white">
-                {plan.name}
-              </h3>
-              <p className="mt-2 min-h-10 text-sm leading-5 text-neutral-600 dark:text-neutral-400">
-                {plan.description}
-              </p>
-            </div>
-
-            <div className="mt-8">
-              <div className="flex items-baseline gap-2 text-neutral-950 dark:text-white">
-                <span className="text-4xl font-light tracking-tight">${price}</span>
-                <span className="text-sm text-neutral-500">
-                  /{billingPeriod === 'month' ? 'month' : 'year'}
-                </span>
-              </div>
-              <p className="mt-2 text-xs text-neutral-500">
-                {billingPeriod === 'month'
-                  ? 'Billed monthly. Cancel before your next renewal.'
-                  : `$${plan.yearlyMonthlyPrice} per month when billed yearly.`}
-              </p>
-            </div>
-
-            <ul className="mt-8 space-y-3 text-sm text-neutral-700 dark:text-neutral-300">
-              {plan.features.map(feature => (
-                <li key={feature} className="flex gap-3">
-                  <span aria-hidden="true" className="text-neutral-400">✓</span>
-                  <span>{feature}</span>
-                </li>
-              ))}
-            </ul>
-
-            <div className="mt-auto pt-8">
-              <PlanAction
+            name={plan.name}
+            description={plan.description}
+            price={displayPrice.price}
+            priceSuffix={displayPrice.suffix}
+            priceDetail={displayPrice.detail}
+            features={plan.features}
+            featured={plan.featured}
+            action={(
+              <PaidPlanAction
                 billingPeriod={billingPeriod}
                 clerkPlanId={clerkPlan?.id}
                 isLoading={Boolean(isLoading)}
                 plan={plan}
               />
-            </div>
-          </article>
+            )}
+          />
         )
       })}
-    </div>
+    </>
   )
 }
 
-function RecurringPlansFallback({ billingPeriod }: { billingPeriod: BillingPeriod }) {
+function PaidPlansFallback({ billingPeriod }: { billingPeriod: BillingPeriod }) {
   return (
-    <div className="grid gap-px bg-neutral-300 dark:bg-neutral-700 md:grid-cols-2">
-      {RECURRING_PLANS.map(plan => {
-        const price = billingPeriod === 'month' ? plan.monthlyPrice : plan.yearlyPrice
+    <>
+      {PAID_PLANS.map(plan => {
+        const displayPrice = getPlanPrice(plan, billingPeriod)
 
         return (
-          <article key={plan.slug} className="flex min-h-[28rem] flex-col bg-white p-6 dark:bg-neutral-950">
-            <div>
-              <h3 className="text-2xl font-light tracking-tight text-neutral-950 dark:text-white">{plan.name}</h3>
-              <p className="mt-2 min-h-10 text-sm leading-5 text-neutral-600 dark:text-neutral-400">
-                {plan.description}
-              </p>
-            </div>
-            <div className="mt-8">
-              <div className="flex items-baseline gap-2 text-neutral-950 dark:text-white">
-                <span className="text-4xl font-light tracking-tight">${price}</span>
-                <span className="text-sm text-neutral-500">
-                  /{billingPeriod === 'month' ? 'month' : 'year'}
-                </span>
-              </div>
-              <p className="mt-2 text-xs text-neutral-500">
-                {billingPeriod === 'month'
-                  ? 'Billed monthly. Cancel before your next renewal.'
-                  : `$${plan.yearlyMonthlyPrice} per month when billed yearly.`}
-              </p>
-            </div>
-            <ul className="mt-8 space-y-3 text-sm text-neutral-700 dark:text-neutral-300">
-              {plan.features.map(feature => (
-                <li key={feature} className="flex gap-3">
-                  <span aria-hidden="true" className="text-neutral-400">✓</span>
-                  <span>{feature}</span>
-                </li>
-              ))}
-            </ul>
-            <div className="mt-auto pt-8">
-              <Link href="/signup" className="btn-ghost block w-full text-center">
+          <PlanCard
+            key={plan.slug}
+            name={plan.name}
+            description={plan.description}
+            price={displayPrice.price}
+            priceSuffix={displayPrice.suffix}
+            priceDetail={displayPrice.detail}
+            features={plan.features}
+            featured={plan.featured}
+            action={(
+              <Link
+                href="/signup"
+                className={`${plan.featured ? 'btn-primary' : 'btn-ghost'} block min-h-12 w-full rounded-xl text-center active:translate-y-px`}
+              >
                 Choose {plan.name}
               </Link>
-            </div>
-          </article>
+            )}
+          />
         )
       })}
-    </div>
+    </>
   )
 }
 
@@ -223,28 +309,20 @@ export default function RecurringPlanSelector() {
   const clerkEnabled = isClerkClientEnabled()
 
   return (
-    <section aria-labelledby="subscription-heading" className="border border-neutral-300 dark:border-neutral-700">
-      <div className="flex flex-col gap-5 border-b border-neutral-300 p-5 dark:border-neutral-700 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <h2 id="subscription-heading" className="text-xl font-light text-neutral-950 dark:text-white">
-            Monthly or yearly
-          </h2>
-          <p className="mt-1 text-sm text-neutral-600 dark:text-neutral-400">
-            Switch billing periods without changing plan features.
-          </p>
-        </div>
-
+    <section aria-labelledby="subscription-heading">
+      <div className="flex flex-col items-center">
+        <h2 id="subscription-heading" className="sr-only">Subscription plans</h2>
         <div
-          className="grid w-full grid-cols-2 border border-neutral-300 bg-neutral-100 p-1 dark:border-neutral-700 dark:bg-neutral-900 sm:w-auto"
+          className="grid grid-cols-2 rounded-xl border border-neutral-200 bg-neutral-100 p-1 dark:border-neutral-800 dark:bg-neutral-900"
           aria-label="Billing period"
         >
           <button
             type="button"
             aria-pressed={billingPeriod === 'month'}
             onClick={() => setBillingPeriod('month')}
-            className={`min-w-28 px-4 py-2 text-sm transition-colors duration-200 active:translate-y-px ${
+            className={`min-w-28 rounded-xl px-4 py-2.5 text-sm font-medium transition-[background-color,color,transform] duration-200 active:translate-y-px ${
               billingPeriod === 'month'
-                ? 'bg-neutral-950 text-white dark:bg-white dark:text-neutral-950'
+                ? 'bg-white text-neutral-950 shadow-sm dark:bg-neutral-700 dark:text-white'
                 : 'text-neutral-600 hover:text-neutral-950 dark:text-neutral-400 dark:hover:text-white'
             }`}
           >
@@ -254,20 +332,26 @@ export default function RecurringPlanSelector() {
             type="button"
             aria-pressed={billingPeriod === 'annual'}
             onClick={() => setBillingPeriod('annual')}
-            className={`min-w-28 px-4 py-2 text-sm transition-colors duration-200 active:translate-y-px ${
+            className={`min-w-28 rounded-xl px-4 py-2.5 text-sm font-medium transition-[background-color,color,transform] duration-200 active:translate-y-px ${
               billingPeriod === 'annual'
-                ? 'bg-neutral-950 text-white dark:bg-white dark:text-neutral-950'
+                ? 'bg-white text-neutral-950 shadow-sm dark:bg-neutral-700 dark:text-white'
                 : 'text-neutral-600 hover:text-neutral-950 dark:text-neutral-400 dark:hover:text-white'
             }`}
           >
             Yearly
           </button>
         </div>
+        <p className="mt-3 text-sm text-neutral-500 dark:text-neutral-400">
+          Yearly plans include four months free.
+        </p>
       </div>
 
-      {clerkEnabled
-        ? <ClerkRecurringPlans billingPeriod={billingPeriod} />
-        : <RecurringPlansFallback billingPeriod={billingPeriod} />}
+      <div className="mt-8 grid grid-cols-1 items-stretch gap-4 md:grid-cols-2 lg:grid-cols-3 lg:gap-5">
+        <StarterCard />
+        {clerkEnabled
+          ? <ClerkPaidPlans billingPeriod={billingPeriod} />
+          : <PaidPlansFallback billingPeriod={billingPeriod} />}
+      </div>
     </section>
   )
 }

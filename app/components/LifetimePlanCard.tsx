@@ -28,61 +28,62 @@ export default function LifetimePlanCard() {
   return (
     <section
       aria-labelledby="lifetime-plan-heading"
-      className="flex h-full flex-col border border-neutral-300 bg-neutral-100 p-6 dark:border-neutral-700 dark:bg-neutral-900"
+      className="rounded-xl border border-neutral-200 bg-neutral-50 p-6 dark:border-neutral-800 dark:bg-neutral-900/60 sm:p-8"
     >
-      <div>
-        <h2 id="lifetime-plan-heading" className="text-2xl font-light tracking-tight text-neutral-950 dark:text-white">
-          Elite Lifetime
-        </h2>
-        <p className="mt-2 text-sm leading-5 text-neutral-600 dark:text-neutral-400">
-          Pay once for Elite access for as long as Deca Pal operates.
-        </p>
-      </div>
-
-      <div className="mt-8 text-neutral-950 dark:text-white">
-        <div className="flex items-baseline gap-2">
-          <span className="text-4xl font-light tracking-tight">${price}</span>
-          <span className="text-sm text-neutral-500">one time</span>
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
+        <div>
+          <h2 id="lifetime-plan-heading" className="text-2xl font-semibold tracking-tight text-neutral-950 dark:text-neutral-50">
+            Prefer to pay once?
+          </h2>
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-neutral-600 dark:text-neutral-400">
+            Get Elite access with one payment and no subscription renewal.
+          </p>
         </div>
-        <p className="mt-2 text-xs text-neutral-500">Single payment in USD.</p>
+
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center lg:justify-end">
+          <div className="shrink-0">
+            <div className="flex items-end gap-2 text-neutral-950 dark:text-neutral-50">
+              <span className="text-4xl font-semibold tracking-[-0.04em]">${price}</span>
+              <span className="pb-1 text-sm text-neutral-500 dark:text-neutral-400">once</span>
+            </div>
+            <p className="mt-1 text-xs text-neutral-500 dark:text-neutral-400">Elite Lifetime</p>
+          </div>
+
+          <div className="w-full sm:w-48">
+            {!lifetimeEnabled ? (
+              <button
+                type="button"
+                disabled
+                className="btn-primary min-h-12 w-full cursor-not-allowed rounded-xl opacity-60"
+              >
+                Unavailable
+              </button>
+            ) : user ? (
+              <button
+                type="button"
+                onClick={startCheckout}
+                disabled={checkoutLoading || loading}
+                className="btn-primary min-h-12 w-full rounded-xl active:translate-y-px disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {checkoutLoading ? 'Opening checkout...' : 'Buy lifetime'}
+              </button>
+            ) : (
+              <Link
+                href="/signup"
+                className="btn-primary block min-h-12 w-full rounded-xl text-center active:translate-y-px"
+              >
+                Buy lifetime
+              </Link>
+            )}
+          </div>
+        </div>
       </div>
 
-      <ul className="mt-8 space-y-3 text-sm text-neutral-700 dark:text-neutral-300">
-        <li className="flex gap-3">
-          <span aria-hidden="true" className="text-neutral-400">✓</span>
-          <span>Unlimited roleplays under fair-use limits</span>
-        </li>
-        <li className="flex gap-3">
-          <span aria-hidden="true" className="text-neutral-400">✓</span>
-          <span>Scoring and detailed feedback</span>
-        </li>
-        <li className="flex gap-3">
-          <span aria-hidden="true" className="text-neutral-400">✓</span>
-          <span>No subscription renewal</span>
-        </li>
-      </ul>
-
-      <div className="mt-auto pt-8">
-        {!lifetimeEnabled ? (
-          <button type="button" disabled className="btn-primary w-full cursor-not-allowed opacity-60">
-            Temporarily unavailable
-          </button>
-        ) : user ? (
-          <button
-            type="button"
-            onClick={startCheckout}
-            disabled={checkoutLoading || loading}
-            className="btn-primary w-full disabled:cursor-not-allowed disabled:opacity-60"
-          >
-            {checkoutLoading ? 'Opening checkout...' : 'Choose lifetime'}
-          </button>
-        ) : (
-          <Link href="/signup" className="btn-primary block w-full text-center">
-            Choose lifetime
-          </Link>
-        )}
-        {error && <p role="alert" className="mt-3 text-sm text-red-700 dark:text-red-400">{error}</p>}
-      </div>
+      {error && (
+        <p role="alert" className="mt-4 text-sm text-red-700 dark:text-red-400">
+          {error}
+        </p>
+      )}
     </section>
   )
 }
